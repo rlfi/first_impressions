@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+<title>ResLife First Impressions Hub</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ResLife Hub">
+<meta name="theme-color" content="#eafaf6">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{
+    --navy:#0b1626;
+    --navy-2:#152a42;
+    --teal:#16a394;
+    --teal-dark:#0f7a6e;
+    --teal-pale:#e2f6f2;
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --text:#1c2733;
+    --muted:#7c8a99;
+    --line:#eef1f5;
+    --green:#3fb37f; --green-bg:#e6f7ee;
+    --purple:#7c5cbf; --purple-bg:#efe9fb;
+    --orange:#f0a323; --orange-bg:#fef2df;
+    --red:#e35660; --red-bg:#fdeaec;
+    --blue:#4a90d9; --blue-bg:#e8f2fc;
+    --pink:#ef6c9b; --pink-bg:#fdeaf1;
+    --shadow:0 6px 18px rgba(15,30,45,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#e7ebf0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  .shell{
+    max-width:420px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--bg);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  @media(min-width:480px){
+    body{padding:24px 0;}
+    .shell{
+      min-height:860px;
+      height:860px;
+      border-radius:40px;
+      box-shadow:0 30px 60px rgba(10,20,35,0.35);
+      border:8px solid #0b1626;
+    }
+  }
+
+  .screen{display:none; flex-direction:column; flex:1; min-height:0;}
+  .screen.active{display:flex;}
+  .scroll{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  .scroll::-webkit-scrollbar{display:none;}
+
+  /* Generic header for inner screens */
+  .top-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:calc(16px + env(safe-area-inset-top)) 16px 12px;
+    background:var(--card);
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:0;
+    z-index:5;
+  }
+  .icon-btn{
+    width:40px;height:40px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg);
+    color:var(--text);
+    border:none;
+    cursor:pointer;
+    flex:0 0 40px;
+  }
+  .top-bar h1{
+    flex:1;
+    font-size:16.5px;
+    font-weight:800;
+    margin:0;
+    text-align:center;
+    padding-right:40px;
+  }
+  .top-bar.left-align h1{text-align:left;padding-right:0;}
+
+  svg.i{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ===== HOME ===== */
+  #screen-home .scroll{background:var(--bg);}
+  .hero{
+    background:linear-gradient(160deg,#eafaf6 0%,#dcf1ec 100%);
+    color:var(--text);
+    padding:calc(22px + env(safe-area-inset-top)) 20px 20px;
+    border-bottom-left-radius:22px;
+    border-bottom-right-radius:22px;
+    border-bottom:1px solid #cfe9e2;
+  }
+  .hero-top{display:flex;justify-content:space-between;align-items:center;}
+  .wordmark{font-size:20px;font-weight:900;letter-spacing:0.01em;}
+  .wordmark span{color:var(--teal);}
+  .hub-sub{font-size:10px;letter-spacing:0.18em;color:var(--teal-dark);font-weight:700;margin-top:2px;}
+  .bell{
+    width:34px;height:34px;border-radius:50%;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--teal-dark);
+    border:1px solid #d7ece6;
+  }
+  .greeting{margin-top:18px;}
+  .greeting h2{margin:0;font-size:19px;font-weight:800;color:var(--navy);}
+  .greeting p{margin:5px 0 0;font-size:12.5px;color:var(--teal-dark);line-height:1.4;}
+
+  .tiles{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    padding:16px;
+  }
+  .tile{
+    background:var(--card);
+    border-radius:16px;
+    padding:14px 12px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    border:1px solid var(--line);
+  }
+  .badge{
+    width:38px;height:38px;
+    border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:10px;
+  }
+  .tile h3{margin:0 0 3px;font-size:13.5px;font-weight:800;line-height:1.25;}
+  .tile p{margin:0;font-size:11px;color:var(--muted);line-height:1.3;}
+
+  .contact-row{
+    margin:0 16px 14px;
+    background:var(--card);
+    border-radius:16px;
+    padding:14px;
+    box-shadow:var(--shadow);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    border:1px solid var(--line);
+  }
+  .contact-row h3{margin:0 0 2px;font-size:13.5px;font-weight:800;}
+  .contact-row p{margin:0;font-size:11.5px;color:var(--muted);}
+
+  .mission-banner{
+    margin:4px 16px 18px;
+    background:var(--teal-dark);
+    background:linear-gradient(135deg,var(--teal-dark),var(--teal));
+    color:#fff;
+    border-radius:16px;
+    padding:16px;
+    text-align:center;
+  }
+  .mission-banner .m-title{font-size:11px;font-weight:800;letter-spacing:0.12em;opacity:0.85;margin-bottom:4px;}
+  .mission-banner .m-body{font-size:13.5px;font-weight:800;line-height:1.4;}
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav{
+    display:flex;
+    background:var(--card);
+    border-top:1px solid var(--line);
+    padding:8px 4px calc(10px + env(safe-area-inset-bottom));
+    position:relative;
+    z-index:10;
+  }
+  .nav-btn{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-size:10.5px;
+    font-weight:700;
+    cursor:pointer;
+    padding:4px 0;
+  }
+  .nav-btn.active{color:var(--teal);}
+  .nav-btn svg{width:21px;height:21px;}
+
+  /* ===== TOGGLES ===== */
+  .underline-tabs{
+    display:flex;
+    background:var(--card);
+    border-bottom:1px solid var(--line);
+  }
+  .underline-tabs button{
+    flex:1;
+    background:none;border:none;
+    padding:12px 8px 10px;
+    font-size:13px;font-weight:700;
+    color:var(--muted);
+    border-bottom:3px solid transparent;
+    cursor:pointer;
+  }
+  .underline-tabs button.active{color:var(--teal);border-color:var(--teal);}
+
+  .pill-toggle{
+    display:flex;
+    background:var(--bg);
+    border-radius:12px;
+    padding:4px;
+    margin:14px 16px 6px;
+  }
+  .pill-toggle button{
+    flex:1;
+    border:none;background:none;
+    padding:9px 6px;
+    border-radius:9px;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:0.02em;
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .pill-toggle button.active{background:var(--green);color:#fff;}
+
+  /* ===== MAP ===== */
+  .map-wrap{padding:12px 16px 4px;}
+  .floorplan{width:100%;height:auto;display:block;}
+  .room{fill:#e4e8ec;stroke:#c3cbd3;stroke-width:3;stroke-linejoin:round;cursor:pointer;transition:fill .15s;}
+  .room-sub{fill:#d7dde1;stroke:#c3cbd3;stroke-width:2.5;cursor:pointer;}
+  .room.selected,.room-sub.selected{fill:var(--teal-pale);stroke:var(--teal);}
+  .corridor{fill:none;stroke:#d3d8dd;stroke-width:14;stroke-linecap:round;}
+  .pin{fill:var(--teal);stroke:#fff;stroke-width:2;pointer-events:none;}
+  .pin-num{fill:#fff;font-size:15px;font-weight:800;text-anchor:middle;font-family:inherit;pointer-events:none;}
+  .door-tab{fill:var(--navy);}
+  .door-label{fill:var(--navy);font-size:14px;font-weight:800;text-anchor:middle;font-family:inherit;}
+  .mk{r:8;stroke:#fff;stroke-width:2;}
+
+  .legend-list{padding:2px 16px 10px;display:flex;flex-direction:column;gap:7px;}
+  .legend-list .row{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);font-weight:600;}
+  .legend-dot{width:11px;height:11px;border-radius:50%;flex:0 0 11px;}
+
+  .room-detail{
+    margin:6px 16px 16px;
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:16px;
+    border:1px solid var(--line);
+  }
+  .room-detail .rd-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .rd-num{width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex:0 0 32px;}
+  .room-detail h3{margin:0;font-size:16px;font-weight:800;}
+  .room-detail .rd-desc{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 10px;}
+  .rd-entrance{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--teal-dark);margin-bottom:12px;}
+  .btn-primary{
+    width:100%;
+    background:var(--teal-dark);
+    color:#fff;
+    border:none;
+    padding:13px;
+    border-radius:12px;
+    font-size:13.5px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .directions-drop{
+    margin-top:10px;
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease, opacity .25s ease;
+    opacity:0;
+    background:var(--teal-pale);
+    border-radius:12px;
+  }
+  .directions-drop.open{max-height:160px; opacity:1;}
+  .directions-drop-inner{
+    padding:12px 14px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .directions-drop-inner svg{flex:0 0 18px; margin-top:1px; color:var(--teal-dark);}
+  .directions-drop-inner p{margin:0;font-size:12.5px;line-height:1.5;color:var(--teal-dark);font-weight:600;}
+  .btn-primary.is-open{background:var(--teal-dark);}
+  .btn-chev{transition:transform .25s ease; display:inline-block;}
+  .btn-chev.open{transform:rotate(180deg);}
+
+  /* ===== LIST ROWS (ministry / more / contacts) ===== */
+  .list-card{
+    margin:10px 16px;
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .list-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 14px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .list-row:last-child{border-bottom:none;}
+  .row-badge{
+    width:36px;height:36px;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 36px;
+  }
+  .row-text{flex:1;min-width:0;}
+  .row-text h4{margin:0 0 2px;font-size:13.5px;font-weight:800;}
+  .row-text p{margin:0;font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+  .chev{color:#c3cbd3;flex:0 0 16px;}
+
+  /* ===== DETAIL PAGE (ministry / room generic) ===== */
+  .detail-hero{padding:26px 20px 18px;text-align:center;background:var(--card);border-bottom:1px solid var(--line);}
+  .detail-circle{
+    width:64px;height:64px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 12px;
+  }
+  .detail-hero h2{margin:0 0 4px;font-size:18px;font-weight:800;}
+  .detail-hero .loc{font-size:12.5px;color:var(--muted);}
+  .detail-hero .pastor{font-size:11.5px;color:var(--teal-dark);font-weight:700;margin-top:3px;}
+  .detail-body{padding:16px;}
+  .detail-block{margin-bottom:16px;}
+  .detail-block h5{margin:0 0 6px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);font-weight:800;}
+  .detail-block p{margin:0;font-size:13px;line-height:1.55;color:var(--text);}
+
+  /* ===== GUIDE / EMERGENCY blocks ===== */
+  .info-card{
+    margin:10px 16px;
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:16px;
+    border:1px solid var(--line);
+  }
+  .info-card .ic-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .info-card h4{margin:0;font-size:13.5px;font-weight:800;}
+  .info-card ul{margin:0;padding-left:0;list-style:none;}
+  .info-card li{font-size:12.5px;line-height:1.5;padding:4px 0 4px 16px;position:relative;color:var(--text);}
+  .info-card li::before{content:"•";position:absolute;left:0;color:var(--teal);font-weight:900;}
+
+  .alert-card{
+    margin:14px 16px 10px;
+    background:var(--red);
+    color:#fff;
+    border-radius:16px;
+    padding:16px;
+  }
+  .alert-card .a-head{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;margin-bottom:8px;}
+  .alert-card .a-num{font-size:17px;font-weight:900;margin-bottom:6px;}
+  .alert-card p{margin:0;font-size:12px;line-height:1.5;opacity:0.95;}
+
+  /* ===== NURSERY ===== */
+  .animal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:6px 16px 16px;}
+  .animal-card{
+    background:var(--card);
+    border-radius:13px;
+    box-shadow:var(--shadow);
+    padding:11px 12px;
+    display:flex;align-items:center;gap:10px;
+    border:1px solid var(--line);
+  }
+  .animal-emoji{font-size:20px;}
+  .animal-card span.name{font-size:12.5px;font-weight:700;}
+
+  /* ===== SEARCH ===== */
+  .search-bar{
+    margin:14px 16px 6px;
+    background:var(--bg);
+    border-radius:12px;
+    display:flex;align-items:center;gap:8px;
+    padding:11px 12px;
+    color:var(--muted);
+  }
+  .search-bar input{
+    border:none;background:none;outline:none;
+    font-size:13.5px;flex:1;color:var(--text);font-family:inherit;
+  }
+  .sec-label{font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:14px 16px 8px;}
+  .chip-wrap{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px;}
+  .chip{
+    background:var(--teal-pale);
+    color:var(--teal-dark);
+    font-size:12px;font-weight:700;
+    padding:8px 13px;
+    border-radius:20px;
+    cursor:pointer;
+    border:none;
+  }
+  .recent-row{
+    display:flex;align-items:center;gap:10px;
+    padding:11px 16px;
+    font-size:12.5px;font-weight:600;
+    color:var(--text);
+    cursor:pointer;
+    border-bottom:1px solid var(--line);
+  }
+  .search-results{padding:0 16px;}
+  .cta-block{
+    margin:18px 16px 20px;
+    text-align:center;
+    padding:18px;
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+  }
+  .cta-block p{font-size:12.5px;color:var(--muted);margin:0 0 12px;font-weight:600;}
+  .cta-btn{
+    background:var(--teal);color:#fff;border:none;
+    padding:12px 20px;border-radius:12px;
+    font-size:13px;font-weight:800;cursor:pointer;
+  }
+
+  /* ===== CHAT ===== */
+  #screen-chat .scroll{padding:14px 14px 6px;display:flex;flex-direction:column;gap:10px;}
+  .bubble{max-width:82%;padding:11px 13px;border-radius:16px;font-size:12.8px;line-height:1.5;}
+  .bubble.user{align-self:flex-end;background:var(--teal);color:#fff;border-bottom-right-radius:4px;}
+  .bubble.bot{align-self:flex-start;background:var(--card);color:var(--text);border:1px solid var(--line);border-bottom-left-radius:4px;}
+  .bot-row{display:flex;gap:8px;align-self:flex-start;max-width:88%;}
+  .bot-avatar{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--navy);color:var(--teal);
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 26px;font-size:12px;font-weight:800;
+  }
+  .suggest-wrap{display:flex;gap:8px;overflow-x:auto;padding:8px 14px;background:var(--card);border-top:1px solid var(--line);}
+  .suggest-wrap::-webkit-scrollbar{display:none;}
+  .suggest-chip{
+    white-space:nowrap;
+    background:var(--bg);
+    color:var(--text);
+    font-size:11.5px;font-weight:700;
+    padding:8px 12px;
+    border-radius:20px;
+    border:none;
+    cursor:pointer;
+  }
+  .chat-input-row{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 14px 14px;
+    background:var(--card);
+  }
+  .chat-input-row input{
+    flex:1;border:1px solid var(--line);background:var(--bg);
+    border-radius:20px;padding:11px 15px;font-size:13px;outline:none;font-family:inherit;
+  }
+  .send-btn{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--teal);color:#fff;border:none;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 38px;
+  }
+
+  /* ===== SPLASH ===== */
+  #screen-splash{
+    background:linear-gradient(170deg,#eafaf6 0%, #dcf1ec 100%);
+    color:var(--text);
+    justify-content:space-between;
+    padding:calc(36px + env(safe-area-inset-top)) 26px calc(26px + env(safe-area-inset-bottom));
+  }
+  .splash-top{margin-top:10px;}
+  .splash-logo{font-size:34px;font-weight:900;letter-spacing:0.01em;}
+  .splash-logo span{color:var(--teal);}
+  .splash-tag{font-size:11px;letter-spacing:0.22em;color:var(--teal-dark);font-weight:700;margin-top:4px;}
+  .logo-mark-lg{
+    width:72px;height:72px;
+    border-radius:18px;
+    background:#fff;
+    padding:8px;
+    display:block;
+    border:1px solid #d7ece6;
+    box-shadow:0 6px 16px rgba(15,122,110,0.14);
+  }
+  .logo-mark-sm{
+    width:44px;height:44px;
+    border-radius:12px;
+    background:#fff;
+    padding:5px;
+    display:block;
+    flex:0 0 44px;
+    border:1px solid #d7ece6;
+  }
+  .hero-brand{display:flex;align-items:center;gap:12px;}
+  .splash-verse{
+    margin-top:26px;
+    font-size:19px;
+    font-style:italic;
+    color:var(--navy);
+    line-height:1.45;
+    font-weight:700;
+  }
+  .splash-mid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;margin:20px 0;}
+  .splash-feat{display:flex;align-items:center;gap:12px;color:var(--text);font-size:13px;font-weight:600;}
+  .splash-feat svg{color:var(--teal-dark);flex:0 0 20px;}
+  .splash-mission{
+    background:linear-gradient(135deg,var(--teal-dark),var(--teal));
+    border-radius:16px;padding:16px;text-align:center;margin-bottom:8px;
+  }
+  .splash-mission .m-title{font-size:11px;font-weight:800;letter-spacing:0.12em;opacity:0.85;margin-bottom:4px;color:#fff;}
+  .splash-mission .m-body{font-size:13.5px;font-weight:800;line-height:1.4;color:#fff;}
+  .splash-btn{
+    margin-top:14px;
+    width:100%;
+    background:var(--teal-dark);
+    color:#fff;
+    border:none;
+    padding:15px;
+    border-radius:14px;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(15,122,110,0.25);
+  }
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+
+  <!-- SPLASH -->
+  <div class="screen active" id="screen-splash">
+    <div class="splash-top">
+      <img id="logo-splash" class="logo-mark-lg" alt="ResLife">
+      <div class="splash-tag" style="margin-top:14px;">FIRST IMPRESSIONS HUB</div>
+      <div class="splash-verse">Everyone Encountered.<br>Everyone Embraced.</div>
+    </div>
+    <div class="splash-mid">
+      <div class="splash-feat"><span id="icon-sf1"></span><span>Find answers fast</span></div>
+      <div class="splash-feat"><span id="icon-sf2"></span><span>Serve with confidence</span></div>
+      <div class="splash-feat"><span id="icon-sf3"></span><span>Help people feel seen, safe & welcome</span></div>
+    </div>
+    <div>
+      <div class="splash-mission">
+        <div class="m-title">MISSION</div>
+        <div class="m-body">EVERYONE ENCOUNTERED.<br>EVERYONE EMBRACED.</div>
+      </div>
+      <button class="splash-btn" onclick="go('home')">Enter the Hub</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen" id="screen-home">
+    <div class="scroll">
+      <div class="hero">
+        <div class="hero-top">
+          <div class="hero-brand">
+            <img id="logo-home" class="logo-mark-sm" alt="ResLife">
+            <div>
+              <div class="hub-sub" style="margin-top:0;">FIRST IMPRESSIONS HUB</div>
+            </div>
+          </div>
+          <div class="bell">🔔</div>
+        </div>
+        <div class="greeting">
+          <h2>Good morning, Team!</h2>
+          <p>Thanks for helping people feel seen, safe & welcome.</p>
+        </div>
+      </div>
+
+      <div class="tiles" id="home-tiles"></div>
+
+      <div class="contact-row" onclick="go('contacts')">
+        <div class="badge" style="background:var(--teal-pale);color:var(--teal-dark);width:42px;height:42px;" id="icon-contact-phone"></div>
+        <div style="flex:1;">
+          <h3>Important Contacts</h3>
+          <p>Staff & key numbers</p>
+        </div>
+        <div class="chev" id="icon-contact-chev"></div>
+      </div>
+
+      <div class="mission-banner">
+        <div class="m-title">MISSION</div>
+        <div class="m-body">EVERYONE ENCOUNTERED.<br>EVERYONE EMBRACED.</div>
+      </div>
+    </div>
+    <div class="bottom-nav" id="nav-home"></div>
+  </div>
+
+  <!-- MAP -->
+  <div class="screen" id="screen-map">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="goHome()"><span id="icon-map-back"></span></button>
+      <h1>Campus Map</h1>
+      <button class="icon-btn" onclick="go('search')"><span id="icon-map-search"></span></button>
+    </div>
+    <div class="scroll">
+      <div class="underline-tabs">
+        <button class="floor-btn active" data-floor="upper" onclick="setFloor('upper')">Upper Floor</button>
+        <button class="floor-btn" data-floor="main" onclick="setFloor('main')">Main Floor</button>
+      </div>
+      <div class="map-wrap">
+        <div id="floor-upper-wrap"></div>
+        <div id="floor-main-wrap" style="display:none"></div>
+      </div>
+      <div class="legend-list">
+        <div class="row"><span class="legend-dot" style="background:var(--orange)"></span>Coffee Kiosk</div>
+        <div class="row"><span class="legend-dot" style="background:var(--green)"></span>Restrooms</div>
+        <div class="row"><span class="legend-dot" style="background:var(--purple)"></span>Nursing Mothers Room</div>
+      </div>
+      <div id="room-detail-slot"></div>
+    </div>
+    <div class="bottom-nav" id="nav-map"></div>
+  </div>
+
+  <!-- MINISTRY -->
+  <div class="screen" id="screen-ministry">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="goHome()"><span id="icon-ministry-back"></span></button>
+      <h1>Where Does This Ministry Meet?</h1>
+      <button class="icon-btn" onclick="go('search')"><span id="icon-ministry-search"></span></button>
+    </div>
+    <div class="scroll">
+      <div class="pill-toggle" id="ministry-toggle"></div>
+      <div id="ministry-list"></div>
+    </div>
+    <div class="bottom-nav" id="nav-ministry"></div>
+  </div>
+
+  <!-- MINISTRY DETAIL -->
+  <div class="screen" id="screen-mdetail">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-mdetail-back"></span></button>
+      <h1 id="md-title">Ministry</h1>
+      <button class="icon-btn">☆</button>
+    </div>
+    <div class="scroll" id="md-body"></div>
+  </div>
+
+  <!-- GUIDE -->
+  <div class="screen" id="screen-guide">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-guide-back"></span></button>
+      <h1>First Impressions Guide</h1>
+      <div style="width:40px"></div>
+    </div>
+    <div class="scroll" id="guide-body"></div>
+  </div>
+
+  <!-- EMERGENCY -->
+  <div class="screen" id="screen-emergency">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-emergency-back"></span></button>
+      <h1>Emergency Procedures</h1>
+      <div style="width:40px"></div>
+    </div>
+    <div class="scroll" id="emergency-body"></div>
+  </div>
+
+  <!-- NURSERY -->
+  <div class="screen" id="screen-nursery">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-nursery-back"></span></button>
+      <h1>Nursery Rooms</h1>
+      <div style="width:40px"></div>
+    </div>
+    <div class="scroll">
+      <div class="pill-toggle" id="nursery-toggle"></div>
+      <div class="animal-grid" id="nursery-grid"></div>
+    </div>
+  </div>
+
+  <!-- CONTACTS -->
+  <div class="screen" id="screen-contacts">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-contacts-back"></span></button>
+      <h1>Important Contacts</h1>
+      <div style="width:40px"></div>
+    </div>
+    <div class="scroll" id="contacts-body"></div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="screen" id="screen-search">
+    <div class="top-bar left-align">
+      <h1 style="text-align:left;padding-right:0;">Search</h1>
+    </div>
+    <div class="scroll">
+      <div class="search-bar">
+        <span id="icon-search-bar"></span>
+        <input id="search-input" placeholder="Search for a ministry, room, or question…" oninput="runSearch()">
+      </div>
+      <div id="search-default">
+        <div class="sec-label">Popular Searches</div>
+        <div class="chip-wrap" id="popular-chips"></div>
+        <div class="sec-label">Recent Searches</div>
+        <div id="recent-list"></div>
+      </div>
+      <div class="search-results" id="search-results" style="display:none"></div>
+      <div class="cta-block">
+        <p>Can't find what you need?<br>Ask our assistant.</p>
+        <button class="cta-btn" onclick="go('chat')">💬 Chat with ResLife Assistant</button>
+      </div>
+    </div>
+    <div class="bottom-nav" id="nav-search"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="screen" id="screen-chat">
+    <div class="top-bar left-align">
+      <div class="bot-avatar">R</div>
+      <h1 style="text-align:left;">ResLife Assistant</h1>
+    </div>
+    <div class="scroll" id="chat-log"></div>
+    <div class="suggest-wrap" id="chat-suggest"></div>
+    <div class="chat-input-row">
+      <input id="chat-input" placeholder="Ask a question…" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="send-btn" onclick="sendChat()"><span id="icon-chat-send"></span></button>
+    </div>
+    <div class="bottom-nav" id="nav-chat"></div>
+  </div>
+
+  <!-- MORE -->
+  <div class="screen" id="screen-more">
+    <div class="top-bar left-align">
+      <h1 style="text-align:left;">More</h1>
+    </div>
+    <div class="scroll" id="more-body"></div>
+    <div class="bottom-nav" id="nav-more"></div>
+  </div>
+
+</div>
+
+<script>
+/* ---------- ICONS ---------- */
+function ic(name){
+  const p = {
+    back:'<path d="M15 19l-7-7 7-7"/>',
+    search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+    chevron:'<path d="M9 6l6 6-6 6"/>',
+    'chevron-down':'<path d="M6 9l6 6 6-6"/>',
+    phone:'<path d="M6 3h4l2 5-2.5 1.5a11 11 0 0 0 5 5L16 12l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2z"/>',
+    map:'<path d="M9 20l-6 2V6l6-2 6 2 6-2v16l-6 2-6-2z"/><path d="M9 4v16M15 6v16"/>',
+    home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+    chat:'<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H7l-4 3V11.5A8.5 8.5 0 0 1 11.5 3h1A8.5 8.5 0 0 1 21 11.5z"/>',
+    more:'<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',
+    send:'<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>',
+    heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>',
+    people:'<circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15 20a5 5 0 0 1 7.5-4.3"/>',
+    baby:'<circle cx="12" cy="8" r="4"/><path d="M6 20c0-4 3-6 6-6s6 2 6 6"/>',
+    warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/>',
+    question:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/>',
+    smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="0.8" fill="currentColor"/><circle cx="15" cy="9" r="0.8" fill="currentColor"/>',
+    hand:'<path d="M8 12V5a1.5 1.5 0 0 1 3 0v5"/><path d="M11 10V4a1.5 1.5 0 0 1 3 0v6"/><path d="M14 10V6a1.5 1.5 0 0 1 3 0v7"/><path d="M8 12l-2 1a2 2 0 0 0-1 3l2 5a3 3 0 0 0 3 2h4a4 4 0 0 0 4-4v-4a1.5 1.5 0 0 0-3 0"/>',
+    star:'<path d="M12 2l3 6.5 7 .8-5.2 4.9 1.4 7-6.2-3.5L5.8 21l1.4-7L2 9.3l7-.8z"/>',
+    bag:'<path d="M6 8h12l1 13H5z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    coffee:'<path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M7 3c0 1-1 1-1 2M11 3c0 1-1 1-1 2"/>',
+    leaf:'<path d="M20 4S6 4 6 16c0 3 2 4 4 4C22 20 20 4 20 4z"/><path d="M8 20c0-6 4-10 10-13"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    pin:'<path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+    info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/>'
+  };
+  return `<svg class="i" viewBox="0 0 24 24">${p[name]||p.info}</svg>`;
+}
+function badgeIcon(name,color,bg,size){
+  size = size||38;
+  return `<div class="badge" style="background:${bg};color:${color};width:${size}px;height:${size}px;">${ic(name)}</div>`;
+}
+
+const LOGO_SRC = "data:image/png;base64,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";
+document.getElementById('logo-splash').src = LOGO_SRC;
+document.getElementById('logo-home').src = LOGO_SRC;
+
+/* ---------- STATIC ICON PLACEHOLDERS ---------- */
+const staticIcons = {
+  'icon-sf1':'search','icon-sf2':'people','icon-sf3':'smile',
+  'icon-contact-phone':'phone','icon-contact-chev':'chevron',
+  'icon-map-back':'back','icon-map-search':'search',
+  'icon-ministry-back':'back','icon-ministry-search':'search',
+  'icon-mdetail-back':'back',
+  'icon-guide-back':'back','icon-emergency-back':'back',
+  'icon-nursery-back':'back','icon-contacts-back':'back',
+  'icon-search-bar':'search','icon-chat-send':'send'
+};
+Object.entries(staticIcons).forEach(([id,name])=>{
+  const el = document.getElementById(id);
+  if(el) el.innerHTML = ic(name);
+});
+
+/* ---------- NAV STACK ---------- */
+let stack = ['splash'];
+const rootTabs = ['home','map','search','chat','more'];
+
+function render(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const top = stack[stack.length-1];
+  document.getElementById('screen-'+top).classList.add('active');
+  rootTabs.forEach(t=>{
+    const nav = document.getElementById('nav-'+t);
+    if(nav) nav.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===top));
+  });
+}
+function go(screen){ stack.push(screen); render(); window.scrollTo(0,0); }
+function goHome(){ stack=['home']; render(); }
+function back(){ if(stack.length>1) stack.pop(); render(); }
+function tab(screen){ stack=[screen]; render(); }
+
+/* ---------- BOTTOM NAV BUILD ---------- */
+const navItems = [
+  {id:'home', label:'Home', icon:'home'},
+  {id:'map', label:'Map', icon:'map'},
+  {id:'search', label:'Search', icon:'search'},
+  {id:'chat', label:'Chat', icon:'chat'},
+  {id:'more', label:'More', icon:'more'}
+];
+function buildNav(containerId){
+  const el = document.getElementById(containerId);
+  el.innerHTML = navItems.map(n=>`<button class="nav-btn" data-tab="${n.id}" onclick="tab('${n.id}')">${ic(n.icon)}<span>${n.label}</span></button>`).join('');
+}
+['nav-home','nav-map','nav-search','nav-chat','nav-more'].forEach(buildNav);
+
+/* ---------- HOME TILES ---------- */
+const tiles = [
+  {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
+  {icon:'people', color:'var(--purple)', bg:'var(--purple-bg)', title:'Where Does This Ministry Meet?', sub:'Find rooms & locations', go:'ministry'},
+  {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'First Impressions Guide', sub:'Best practices & steps', go:'guide'},
+  {icon:'baby', color:'var(--red)', bg:'var(--red-bg)', title:'Nursery Rooms', sub:'Find age & room', go:'nursery'},
+  {icon:'warn', color:'var(--red)', bg:'var(--red-bg)', title:'Emergency Procedures', sub:'Important info', go:'emergency'},
+  {icon:'question', color:'var(--blue)', bg:'var(--blue-bg)', title:'Quick Answers', sub:'Common questions', go:'search'}
+];
+document.getElementById('home-tiles').innerHTML = tiles.map(t=>`
+  <div class="tile" onclick="go('${t.go}')">
+    ${badgeIcon(t.icon,t.color,t.bg)}
+    <h3>${t.title}</h3>
+    <p>${t.sub}</p>
+  </div>`).join('');
+
+/* ---------- ROOM DATA ---------- */
+const rooms = [
+  {id:1, name:'Res Center', floor:'upper', desc:'Resource center with information and materials for guests and volunteers.', entrance:'Door G'},
+  {id:2, name:'Classroom 115', floor:'upper', desc:'Classroom space used for groups and studies.', entrance:'Door H'},
+  {id:3, name:'Classroom 322', floor:'upper', desc:'Classroom space used for groups and studies.', entrance:'Door E'},
+  {id:4, name:'Gym', floor:'upper', desc:'Multi-purpose gym used for activities and events.', entrance:'Door H'},
+  {id:5, name:'ResKids Area', floor:'upper', desc:'Kids ministry check-in and classrooms.', entrance:'Door H'},
+  {id:6, name:'180', floor:'upper', desc:'Young adults gathering space.', entrance:'Door C'},
+  {id:7, name:'Garage', floor:'upper', desc:'Vehicle and equipment storage.', entrance:'Door C'},
+  {id:8, name:'Ground Floor', floor:'upper', desc:'Main lobby and gathering space for Ground Floor services.', entrance:'Door C'},
+  {id:9, name:'Zone', floor:'upper', desc:'Student ministry gathering space (3rd–5th grade).', entrance:'Door C'},
+  {id:10, name:'Nursery Area (Upper)', floor:'upper', desc:'Nursery care for upper-level services.', entrance:'Door C'},
+  {id:11, name:'Olive Tree', floor:'upper', desc:'Meeting space for benevolence and deacons.', entrance:'Door J'},
+  {id:12, name:'Worship Center (Upper)', floor:'upper', desc:'Main worship center for upper-level services.', entrance:'Door J'},
+  {id:13, name:'Hospitality Suite', floor:'upper', desc:'Guest hospitality and team snack area.', entrance:'Door J'},
+  {id:14, name:'Nursery Area (Lower)', floor:'main', desc:'Nursery care for lower-level services.', entrance:'Door N'},
+  {id:15, name:'Next Steps Area', floor:'main', desc:'Next Steps coaching for new guests.', entrance:'Door N'},
+  {id:16, name:'Community Room', floor:'main', desc:'Free coffee and community gathering space.', entrance:'Door N'},
+  {id:17, name:'Resource Center', floor:'main', desc:'Resources and an information desk.', entrance:'Door N'},
+  {id:18, name:'Worship Center (Lower)', floor:'main', desc:'Main worship center for lower-level services.', entrance:'Door N'},
+  {id:19, name:'Chapel', floor:'main', desc:'Chapel space used for prayer and Growth Track.', entrance:'Door K'},
+  {id:20, name:'Choir Room', floor:'main', desc:'Choir rehearsal and robing room.', entrance:'Door K'}
+];
+function roomById(id){ return rooms.find(r=>r.id===id); }
+
+/* ---------- FLOOR PLAN SVGs ---------- */
+const upperSVG = `
+<svg viewBox="0 -30 1000 730" class="floorplan" id="svg-upper">
+  <path d="M900,240 L935,120" class="corridor"/>
+  <path d="M620,230 L650,230" class="corridor"/>
+  <polygon class="room" data-id="7" points="900,60 962,38 992,92 950,122"/>
+  <circle class="pin" cx="935" cy="82" r="15"/><text class="pin-num" x="935" y="87">7</text>
+  <polygon class="door-tab" points="300,110 340,110 320,140"/><text class="door-label" x="320" y="100">Door E</text>
+  <polygon class="room" data-id="3" points="300,140 370,140 370,205 300,205"/>
+  <circle class="pin" cx="335" cy="172" r="15"/><text class="pin-num" x="335" y="177">3</text>
+  <polygon class="room" data-id="6" points="565,130 630,130 630,320 565,320"/>
+  <circle class="pin" cx="597" cy="225" r="15"/><text class="pin-num" x="597" y="230">6</text>
+  <polygon class="door-tab" points="640,215 640,255 670,235"/><text class="door-label" x="648" y="200">Door C</text>
+  <polygon class="room" data-id="8" points="655,160 855,160 855,340 655,340"/>
+  <circle class="pin" cx="755" cy="250" r="15"/><text class="pin-num" x="755" y="255">8</text>
+  <polygon class="room" data-id="9" points="860,160 905,160 905,320 860,320"/>
+  <circle class="pin" cx="882" cy="240" r="15"/><text class="pin-num" x="882" y="245">9</text>
+  <polygon class="room" data-id="1" points="120,340 165,235 285,195 385,240 425,340 385,445 285,485 165,445"/>
+  <circle class="pin" cx="270" cy="340" r="17"/><text class="pin-num" x="270" y="346">1</text>
+  <polygon class="room-sub" data-id="1" points="120,340 55,305 55,375"/>
+  <text class="door-label" x="30" y="345" text-anchor="start">Door G</text>
+  <polygon class="room" data-id="2" points="155,445 225,445 225,505 155,505"/>
+  <circle class="pin" cx="190" cy="475" r="15"/><text class="pin-num" x="190" y="480">2</text>
+  <polygon class="door-tab" points="245,510 285,510 265,540"/><text class="door-label" x="265" y="560">Door H</text>
+  <polygon class="room" data-id="4" points="425,300 485,270 545,300 545,380 485,412 425,380"/>
+  <circle class="pin" cx="485" cy="340" r="16"/><text class="pin-num" x="485" y="345">4</text>
+  <polygon class="room" data-id="5" points="425,385 485,415 505,470 445,500 400,460"/>
+  <circle class="pin" cx="460" cy="445" r="15"/><text class="pin-num" x="460" y="450">5</text>
+  <polygon class="door-tab" points="555,375 595,375 575,405"/><text class="door-label" x="575" y="360">Door J</text>
+  <polygon class="room" data-id="10" points="600,345 855,345 900,385 878,485 700,505 600,440"/>
+  <circle class="pin" cx="760" cy="420" r="16"/><text class="pin-num" x="760" y="425">10</text>
+  <polygon class="room" data-id="11" points="700,505 780,505 800,565 740,595 680,565"/>
+  <circle class="pin" cx="740" cy="545" r="15"/><text class="pin-num" x="740" y="550">11</text>
+  <path class="room" data-id="12" d="M905,345 L955,345 Q1000,345 1000,480 Q1000,620 955,620 L905,620 Z"/>
+  <circle class="pin" cx="945" cy="480" r="17"/><text class="pin-num" x="945" y="486">12</text>
+  <polygon class="room" data-id="13" points="850,600 925,600 925,665 850,665"/>
+  <circle class="pin" cx="887" cy="632" r="15"/><text class="pin-num" x="887" y="637">13</text>
+  <circle class="mk" cx="645" cy="252" r="9" style="fill:var(--orange)"/>
+  <circle class="mk" cx="400" cy="150" r="9" style="fill:var(--green)"/>
+  <circle class="mk" cx="885" cy="150" r="9" style="fill:var(--green)"/>
+  <circle class="mk" cx="900" cy="345" r="9" style="fill:var(--green)"/>
+  <circle class="mk" cx="955" cy="600" r="9" style="fill:var(--green)"/>
+  <circle class="mk" cx="335" cy="300" r="9" style="fill:var(--purple)"/>
+  <circle class="mk" cx="862" cy="590" r="9" style="fill:var(--purple)"/>
+</svg>`;
+
+const mainSVG = `
+<svg viewBox="0 0 1000 620" class="floorplan" id="svg-main">
+  <polygon class="door-tab" points="130,45 170,45 150,75"/><text class="door-label" x="150" y="35">Door N</text>
+  <polygon class="room" data-id="14" points="80,80 225,60 265,145 225,225 100,225 60,150"/>
+  <circle class="pin" cx="160" cy="145" r="16"/><text class="pin-num" x="160" y="150">14</text>
+  <polygon class="room" data-id="15" points="100,225 225,225 225,305 145,305 100,275"/>
+  <circle class="pin" cx="165" cy="265" r="15"/><text class="pin-num" x="165" y="270">15</text>
+  <circle class="mk" cx="260" cy="295" r="9" style="fill:var(--orange)"/>
+  <polygon class="room" data-id="16" points="80,305 225,305 245,425 80,425"/>
+  <circle class="pin" cx="155" cy="365" r="15"/><text class="pin-num" x="155" y="370">16</text>
+  <polygon class="room" data-id="17" points="265,285 365,285 365,425 265,425"/>
+  <circle class="pin" cx="315" cy="355" r="15"/><text class="pin-num" x="315" y="360">17</text>
+  <polygon class="room" data-id="18" points="390,280 430,180 560,140 670,190 705,280 670,380 560,420 430,380"/>
+  <circle class="pin" cx="545" cy="280" r="18"/><text class="pin-num" x="545" y="286">18</text>
+  <polygon class="room" data-id="19" points="705,340 785,340 805,420 745,460 685,420"/>
+  <circle class="pin" cx="745" cy="400" r="15"/><text class="pin-num" x="745" y="405">19</text>
+  <polygon class="room" data-id="20" points="785,300 855,280 885,340 855,400 805,400"/>
+  <circle class="pin" cx="830" cy="340" r="15"/><text class="pin-num" x="830" y="345">20</text>
+  <polygon class="door-tab" points="740,465 780,465 760,495"/><text class="door-label" x="760" y="515">Door K</text>
+  <circle class="mk" cx="95" cy="55" r="9" style="fill:var(--green)"/>
+  <circle class="mk" cx="700" cy="330" r="9" style="fill:var(--green)"/>
+  <circle class="mk" cx="395" cy="300" r="9" style="fill:var(--purple)"/>
+  <circle class="mk" cx="625" cy="400" r="9" style="fill:var(--purple)"/>
+</svg>`;
+
+document.getElementById('floor-upper-wrap').innerHTML = upperSVG;
+document.getElementById('floor-main-wrap').innerHTML = mainSVG;
+
+let currentFloor='upper';
+let selectedRoom=1;
+
+function setFloor(f){
+  currentFloor=f;
+  document.querySelectorAll('.floor-btn').forEach(b=>b.classList.toggle('active', b.dataset.floor===f));
+  document.getElementById('floor-upper-wrap').style.display = f==='upper' ? '' : 'none';
+  document.getElementById('floor-main-wrap').style.display = f==='main' ? '' : 'none';
+  const firstRoom = rooms.find(r=>r.floor===f);
+  selectRoom(firstRoom.id);
+}
+function selectRoom(id){
+  selectedRoom=id;
+  document.querySelectorAll('.room,.room-sub').forEach(el=>{
+    el.classList.toggle('selected', parseInt(el.dataset.id)===id);
+  });
+  const r = roomById(id);
+  document.getElementById('room-detail-slot').innerHTML = `
+    <div class="room-detail">
+      <div class="rd-head"><div class="rd-num">${r.id}</div><h3>${r.name}</h3></div>
+      <p class="rd-desc">${r.desc}</p>
+      <div class="rd-entrance">${ic('pin')} Nearest Entrance: ${r.entrance}</div>
+      <button class="btn-primary" id="dir-btn" onclick="showDirections(${r.id})">Get Directions <span class="btn-chev" id="dir-chev">${ic('chevron-down')}</span></button>
+      <div class="directions-drop" id="directions-drop">
+        <div class="directions-drop-inner">${ic('pin')}<p id="directions-text"></p></div>
+      </div>
+    </div>`;
+}
+function showDirections(id){
+  const r = roomById(id);
+  const drop = document.getElementById('directions-drop');
+  const btn = document.getElementById('dir-btn');
+  const chev = document.getElementById('dir-chev');
+  const isOpen = drop.classList.contains('open');
+  if(isOpen){
+    drop.classList.remove('open');
+    btn.classList.remove('is-open');
+    chev.classList.remove('open');
+  } else {
+    document.getElementById('directions-text').textContent = `Enter through ${r.entrance}, then follow the hallway signage to ${r.name}.`;
+    drop.classList.add('open');
+    btn.classList.add('is-open');
+    chev.classList.add('open');
+  }
+}
+document.addEventListener('click', e=>{
+  const el = e.target.closest('.room,.room-sub');
+  if(el && el.dataset.id) selectRoom(parseInt(el.dataset.id));
+});
+selectRoom(1);
+
+/* ---------- MINISTRY DATA ---------- */
+const ministries = {
+  sunam:[
+    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Worship Center (Upper Level)',pastor:'Pastor Duane VanderKlok',entrance:'Door J', desc:'Our main English-language service, gathering the whole church family for worship and teaching.', how:'Enter through Door J and follow the main hallway to the Worship Center.'},
+    {icon:'people',color:'var(--teal)',bg:'var(--teal-pale)',title:'Iglesia Vida',loc:'Worship Center (Upper Level)',pastor:'Pastor Luis Quezada',entrance:'Door J', desc:'Our Spanish-language service, meeting in the same Worship Center.', how:'Enter through Door J and follow the main hallway to the Worship Center.'},
+    {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Community Room',pastor:'', entrance:'Door N', desc:'Free coffee for guests and members before and after service.', how:'Enter through Door N; the Community Room is just off the main lobby.'},
+    {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.'},
+    {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'High School',loc:'Ground Floor',pastor:'Pastors Ben & Kendra Lepsch — 9 AM only',entrance:'Door C', desc:'High School students gather for teaching, worship, and community.', how:'Enter through Door C or Door J. Take the hallway to the main lobby — High School is on the Ground Floor.'},
+    {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.'},
+    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'3rd – 5th Grade',loc:'The Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.'},
+    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 2nd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
+    {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby.'}
+  ],
+  sunpm:[
+    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Ground Floor',pastor:'Pastor Daniel VanderKlok',entrance:'Door C', desc:'Our evening service, gathering on the Ground Floor.', how:'Enter through Door C and follow the hallway to the Ground Floor.'},
+    {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Ground Floor Lobby',pastor:'', entrance:'Door C', desc:'Free coffee available in the Ground Floor Lobby.', how:'Enter through Door C; coffee is set up in the lobby.'},
+    {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'The Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.'},
+    {icon:'info',color:'var(--muted)',bg:'var(--bg)',title:'Other Classes',loc:'See Guest Service Desk',pastor:'', entrance:'', desc:'Additional classes vary by season — check the Guest Service Desk for current locations.', how:'Ask any team member at the Guest Service Desk for directions.'},
+    {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.'},
+    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'3rd – 5th Grade',loc:'Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.'},
+    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 2nd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
+    {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll — Upper level only',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby. Upper level only for this service.'}
+  ],
+  wed:[
+    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Res Center',pastor:'Pastor Daniel VanderKlok',entrance:'Door G', desc:'Our midweek service, gathering in the Res Center.', how:'Enter through Door G and follow the hallway to the Res Center.'},
+    {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Res Center Lobby',pastor:'', entrance:'Door G', desc:'Free coffee available in the Res Center Lobby.', how:'Enter through Door G; coffee is set up in the lobby.'},
+    {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.'},
+    {icon:'info',color:'var(--muted)',bg:'var(--bg)',title:'Other Classes',loc:'See Guest Service Desk',pastor:'', entrance:'', desc:'Additional classes vary by season — check the Guest Service Desk for current locations.', how:'Ask any team member at the Guest Service Desk for directions.'},
+    {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'High School',loc:'Ground Floor',pastor:'Pastors Ben & Kendra Lepsch',entrance:'Door C', desc:'High School students gather for teaching, worship, and community.', how:'Enter through Door C or Door J. Take the hallway to the main lobby — High School is on the Ground Floor.'},
+    {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.'},
+    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'3rd – 5th Grade',loc:'Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.'},
+    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 2nd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
+    {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll — Upper level only',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby. Upper level only for this service.'}
+  ]
+};
+let currentDay='sunam';
+function buildMinistryToggle(){
+  const labels=[{k:'sunam',l:'SUNDAY AM'},{k:'sunpm',l:'SUNDAY PM'},{k:'wed',l:'WEDNESDAY'}];
+  document.getElementById('ministry-toggle').innerHTML = labels.map(o=>
+    `<button class="${o.k===currentDay?'active':''}" onclick="setDay('${o.k}')">${o.l}</button>`).join('');
+}
+function setDay(d){ currentDay=d; buildMinistryToggle(); renderMinistryList(); }
+function renderMinistryList(){
+  const items = ministries[currentDay];
+  document.getElementById('ministry-list').innerHTML = `<div class="list-card">${
+    items.map((m,i)=>`
+    <div class="list-row" onclick="openMinistry('${currentDay}',${i})">
+      <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
+      <div class="row-text"><h4>${m.title}</h4><p>${pinSvgSmall()}${m.loc}${m.pastor?' · '+m.pastor:''}</p></div>
+      <div class="chev">${ic('chevron')}</div>
+    </div>`).join('')
+  }</div>`;
+}
+function pinSvgSmall(){ return `<svg class="i" style="width:11px;height:11px;" viewBox="0 0 24 24">${ '<path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>' }</svg>`; }
+
+function openMinistry(day, idx){
+  const m = ministries[day][idx];
+  document.getElementById('md-title').textContent = m.title;
+  document.getElementById('md-body').innerHTML = `
+    <div class="detail-hero">
+      <div class="detail-circle" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
+      <h2>${m.title}</h2>
+      <div class="loc">${m.loc}</div>
+      ${m.pastor?`<div class="pastor">${m.pastor}</div>`:''}
+    </div>
+    <div class="detail-body">
+      <div class="detail-block"><h5>What to Expect</h5><p>${m.desc}</p></div>
+      ${m.how?`<div class="detail-block"><h5>How to Get There</h5><p>${m.how}</p></div>`:''}
+      <button class="btn-primary" id="md-dir-btn" onclick="toggleMdDirections('${m.entrance||''}','${m.loc}')">Get Directions <span class="btn-chev" id="md-dir-chev">${ic('chevron-down')}</span></button>
+      <div class="directions-drop" id="md-directions-drop">
+        <div class="directions-drop-inner">${ic('pin')}<p id="md-directions-text"></p></div>
+      </div>
+    </div>`;
+  go('mdetail');
+}
+function toggleMdDirections(entrance, loc){
+  const drop = document.getElementById('md-directions-drop');
+  const btn = document.getElementById('md-dir-btn');
+  const chev = document.getElementById('md-dir-chev');
+  const isOpen = drop.classList.contains('open');
+  if(isOpen){
+    drop.classList.remove('open'); btn.classList.remove('is-open'); chev.classList.remove('open');
+  } else {
+    document.getElementById('md-directions-text').textContent = `Enter through ${entrance || 'the main lobby'} and follow signage to ${loc}.`;
+    drop.classList.add('open'); btn.classList.add('is-open'); chev.classList.add('open');
+  }
+}
+buildMinistryToggle();
+renderMinistryList();
+
+/* ---------- GUIDE ---------- */
+const guideSections = [
+  {icon:'smile',color:'var(--green)',bg:'var(--green-bg)',title:'Help People Feel Seen, Safe & Welcome',
+    items:['Smile','Make eye contact','Acknowledge people quickly','Be genuine in your greetings & conversations']},
+  {icon:'hand',color:'var(--blue)',bg:'var(--blue-bg)',title:'Take the Initiative With Practical Help',
+    items:['Help people know where to go, what to do, and what to expect','Refrain from pointing — walk with them if you can',"If you're walking with someone, ask about themselves or what brings them to Res"]},
+  {icon:'star',color:'var(--navy)',bg:'#e7ebf0',title:'Be Available',
+    items:['Avoid huddling with volunteers','Avoid looking distracted','Be ready to help']},
+  {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'First-Time Visitors',
+    items:['Bring first-time guests to the closest welcome desk','Introduce them to a Next Steps coach to begin the guest process']}
+];
+document.getElementById('guide-body').innerHTML = guideSections.map(s=>`
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon(s.icon,s.color,s.bg,34)}<h4>${s.title}</h4></div>
+    <ul>${s.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+  </div>`).join('') + `
+  <div class="mission-banner" style="margin:16px;">
+    <div class="m-title">MISSION</div>
+    <div class="m-body">EVERYONE ENCOUNTERED.<br>EVERYONE EMBRACED.</div>
+  </div>`;
+
+/* ---------- EMERGENCY ---------- */
+document.getElementById('emergency-body').innerHTML = `
+  <div class="alert-card">
+    <div class="a-head">${ic('phone')} EMERGENCY SITUATIONS</div>
+    <div class="a-num">CALL 616.534.4923 OPT. 2</div>
+    <p>If a pastor is needed RIGHT AWAY, call the above number to leave a message. Our on-duty pastor will get back to you shortly.</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('heart','var(--green)','var(--green-bg)',34)}<h4>Benevolence + Food Pantry</h4></div>
+    <p style="font-size:12.5px;color:var(--text);margin:0;">Meet with the deacons in the Olive Tree at 10:15 – 10:40 am, Sundays.</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Pastoral Care</h4></div>
+    <p style="font-size:12.5px;color:var(--text);margin:0;">Ministry appointments, hospital visitation & funeral information — refer to Pastors Matt Yonker, Nick Mayo, or Pat Tibbitts.<br><br>Direct: 616.524.9121 · Church: 616.534.4923</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('bag','var(--orange)','var(--orange-bg)',34)}<h4>Lost & Found</h4></div>
+    <p style="font-size:12.5px;color:var(--text);margin:0;">Sunday AM: direct to Door K, let the Safety Team know.<br>Monday – Thursday, 8:30am–4pm: Front Office (Door G) or call 616.534.4923.</p>
+  </div>`;
+
+/* ---------- NURSERY ---------- */
+const nurseryLower = [
+  ['Bunnies','🐰'],['Giraffes','🦒'],['Dolphins','🐬'],['Kangaroos','🦘'],['Doves','🕊️'],['Koalas','🐨'],
+  ['Ducks','🦆'],['Lambs','🐑'],['Elephants','🐘'],['Penguins','🐧'],['Fawns','🦌'],['Seals','🦭'],['Flamingos','🦩'],['Turtles','🐢']
+];
+const nurseryUpper = [
+  ['Bears','🐻'],['Otters','🦦'],['Beavers','🦫'],['Pandas','🐼'],['Cheetahs','🐆'],['Rhinos','🦏'],
+  ['Gators','🐊'],['Zebras','🦓'],['Hippos','🦛'],['Lions','🦁'],['The Big Room','⭐']
+];
+let nurseryLevel='lower';
+function buildNurseryToggle(){
+  document.getElementById('nursery-toggle').innerHTML = `
+    <button class="${nurseryLevel==='lower'?'active':''}" onclick="setNurseryLevel('lower')">LOWER LEVEL</button>
+    <button class="${nurseryLevel==='upper'?'active':''}" onclick="setNurseryLevel('upper')">UPPER LEVEL</button>`;
+}
+function setNurseryLevel(l){ nurseryLevel=l; buildNurseryToggle(); renderNursery(); }
+function renderNursery(){
+  const list = nurseryLevel==='lower'?nurseryLower:nurseryUpper;
+  document.getElementById('nursery-grid').innerHTML = list.map(([name,emoji])=>`
+    <div class="animal-card"><span class="animal-emoji">${emoji}</span><span class="name">${name}</span></div>`).join('');
+}
+buildNurseryToggle();
+renderNursery();
+
+/* ---------- CONTACTS ---------- */
+document.getElementById('contacts-body').innerHTML = `
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('phone','var(--red)','var(--red-bg)',34)}<h4>Emergency Line</h4></div>
+    <p style="font-size:12.5px;margin:0;">616.534.4923, option 2 — for urgent pastoral needs.</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Pastoral Care Office</h4></div>
+    <p style="font-size:12.5px;margin:0;">Direct: 616.524.9121<br>Church: 616.534.4923<br>Refer to Pastors Matt Yonker, Nick Mayo, or Pat Tibbitts.</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('bag','var(--orange)','var(--orange-bg)',34)}<h4>Lost & Found / Front Office</h4></div>
+    <p style="font-size:12.5px;margin:0;">Monday – Thursday, 8:30am – 4pm<br>Front Office (Door G) · 616.534.4923</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('heart','var(--green)','var(--green-bg)',34)}<h4>Benevolence + Food Pantry</h4></div>
+    <p style="font-size:12.5px;margin:0;">Meet the deacons in the Olive Tree, 10:15–10:40 am Sundays.</p>
+  </div>`;
+
+/* ---------- MORE ---------- */
+const moreLinks = [
+  {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'First Impressions Guide', sub:'Best practices & steps', go:'guide'},
+  {icon:'warn', color:'var(--red)', bg:'var(--red-bg)', title:'Emergency Procedures', sub:'Important info', go:'emergency'},
+  {icon:'baby', color:'var(--red)', bg:'var(--red-bg)', title:'Nursery Rooms', sub:'Find age & room', go:'nursery'},
+  {icon:'phone', color:'var(--teal)', bg:'var(--teal-pale)', title:'Important Contacts', sub:'Staff & key numbers', go:'contacts'},
+  {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
+  {icon:'people', color:'var(--purple)', bg:'var(--purple-bg)', title:'Where Does This Ministry Meet?', sub:'Find rooms & locations', go:'ministry'}
+];
+document.getElementById('more-body').innerHTML = `<div class="list-card">${
+  moreLinks.map(m=>`
+  <div class="list-row" onclick="go('${m.go}')">
+    <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
+    <div class="row-text"><h4>${m.title}</h4><p>${m.sub}</p></div>
+    <div class="chev">${ic('chevron')}</div>
+  </div>`).join('')
+}</div>`;
+
+/* ---------- SEARCH ---------- */
+const popular = ['Growth Track','3rd Grade','Nursery','High School','Coffee','Restrooms'];
+document.getElementById('popular-chips').innerHTML = popular.map(p=>`<button class="chip" onclick="searchFor('${p}')">${p}</button>`).join('');
+const recent = ['Where is the closest restroom?','3rd – 5th Grade (The Zone)','Nursery pickup','Growth Track location','Lost & Found'];
+document.getElementById('recent-list').innerHTML = recent.map(r=>`<div class="recent-row" onclick="searchFor('${r}')">${ic('clock')}${r}</div>`).join('');
+
+const searchIndex = [];
+rooms.forEach(r=>searchIndex.push({type:'Room',title:r.name,sub:'Nearest entrance: '+r.entrance,action:()=>{go('map'); setTimeout(()=>{ setFloor(r.floor); selectRoom(r.id); },50);}, icon:'pin', color:'var(--teal)', bg:'var(--teal-pale)'}));
+Object.entries(ministries).forEach(([day,list])=>list.forEach((m,i)=>searchIndex.push({type:'Ministry',title:m.title,sub:m.loc,action:()=>openMinistry(day,i), icon:m.icon,color:m.color,bg:m.bg})));
+searchIndex.push({type:'FAQ',title:'Emergency Procedures',sub:'Call 616.534.4923 opt. 2',action:()=>go('emergency'), icon:'warn',color:'var(--red)',bg:'var(--red-bg)'});
+searchIndex.push({type:'FAQ',title:'Lost & Found',sub:'Front Office, Door G',action:()=>go('emergency'), icon:'bag',color:'var(--orange)',bg:'var(--orange-bg)'});
+searchIndex.push({type:'FAQ',title:'Pastoral Care',sub:'616.524.9121',action:()=>go('emergency'), icon:'people',color:'var(--purple)',bg:'var(--purple-bg)'});
+
+function searchFor(q){
+  document.getElementById('search-input').value = q;
+  runSearch();
+}
+function runSearch(){
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const defaultEl = document.getElementById('search-default');
+  const resultsEl = document.getElementById('search-results');
+  if(!q){ defaultEl.style.display=''; resultsEl.style.display='none'; return; }
+  defaultEl.style.display='none'; resultsEl.style.display='';
+  const matches = searchIndex.filter(it=>it.title.toLowerCase().includes(q)||it.sub.toLowerCase().includes(q)).slice(0,12);
+  resultsEl.innerHTML = matches.length ? `<div class="list-card">${
+    matches.map((m,i)=>`
+    <div class="list-row" onclick="searchIndex_click(${searchIndex.indexOf(m)})">
+      <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
+      <div class="row-text"><h4>${m.title}</h4><p>${m.sub}</p></div>
+      <div class="chev">${ic('chevron')}</div>
+    </div>`).join('')
+  }</div>` : `<div class="cta-block"><p>No results for "${q}".</p></div>`;
+}
+function searchIndex_click(i){ searchIndex[i].action(); }
+
+/* ---------- CHAT ---------- */
+const chatRules = [
+  {kw:['pickup','preschool','parent','drop off','drop-off'], a:"Parents pick up preschoolers in the Nursery & Preschool area. If you're on the Lower Level, go to your child's classroom door. If you're on the Upper Level, exit through Door N. Our team will help guide you!"},
+  {kw:['growth track'], a:"Growth Track meets in the Chapel at every service — enter through Door K."},
+  {kw:['coffee'], a:"Free coffee is in the Community Room (Sunday AM), the Ground Floor Lobby (Sunday PM), or the Res Center Lobby (Wednesday)."},
+  {kw:['first time','first-time','visitor','guest'], a:"Bring first-time guests to the closest welcome desk and introduce them to a Next Steps coach to begin the guest process."},
+  {kw:['pastoral','pastor','care'], a:"For pastoral care, refer to Pastors Matt Yonker, Nick Mayo, or Pat Tibbitts. Direct: 616.524.9121 · Church: 616.534.4923."},
+  {kw:['lost'], a:"Sunday AM: direct to Door K and let the Safety Team know. Monday–Thursday 8:30am–4pm: Front Office (Door G) or call 616.534.4923."},
+  {kw:['emergency'], a:"If a pastor is needed right away, call 616.534.4923, option 2, and leave a message. Our on-duty pastor will get back to you shortly."},
+  {kw:['restroom','bathroom'], a:"Restrooms are marked with a green dot on the Campus Map — check the Map tab for the one nearest you."},
+  {kw:['zone','3rd','4th','5th'], a:"3rd–5th Grade meets in The Zone with Pastor Victoria Hernandez. Enter through Door C."},
+  {kw:['high school'], a:"High School meets on the Ground Floor with Pastors Ben & Kendra Lepsch. Enter through Door C or Door J."}
+];
+function botReply(q){
+  const lower = q.toLowerCase();
+  const rule = chatRules.find(r=>r.kw.some(k=>lower.includes(k)));
+  return rule ? rule.a : "I don't have an answer for that yet — try the Search tab, or ask a team lead for help.";
+}
+function addBubble(text,who){
+  const log = document.getElementById('chat-log');
+  if(who==='bot'){
+    log.insertAdjacentHTML('beforeend', `<div class="bot-row"><div class="bot-avatar">R</div><div class="bubble bot">${text}</div></div>`);
+  } else {
+    log.insertAdjacentHTML('beforeend', `<div class="bubble user">${text}</div>`);
+  }
+  log.scrollTop = log.scrollHeight;
+}
+addBubble("Hi! I'm the ResLife Assistant. Ask me where a ministry meets, how to help a guest, or what to do in an emergency.", 'bot');
+
+const chatSuggestions = ["Where do parents pick up their preschool child?","Where is Growth Track?","Where is the coffee?","Who do I call for pastoral care?"];
+document.getElementById('chat-suggest').innerHTML = chatSuggestions.map(s=>`<button class="suggest-chip" onclick="quickAsk('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+function quickAsk(q){
+  document.getElementById('chat-input').value = q;
+  sendChat();
+}
+function sendChat(){
+  const input = document.getElementById('chat-input');
+  const q = input.value.trim();
+  if(!q) return;
+  addBubble(q,'user');
+  input.value='';
+  setTimeout(()=>addBubble(botReply(q),'bot'), 350);
+}
+
+render();
+</script>
+</body>
+</html>
