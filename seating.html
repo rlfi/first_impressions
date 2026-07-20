@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worship Center Seating Chart — ResLife</title>
+<style>
+  :root{
+    --teal-dark:#0f7a6e;
+    --teal:#16a394;
+    --bg:#f4f6f9;
+    --text:#1c2733;
+    --muted:#7c8a99;
+    --line:#eef1f5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--text);
+  }
+  header{
+    position:sticky;
+    top:0;
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    padding:14px 16px;
+    z-index:5;
+  }
+  header h1{
+    margin:0;
+    font-size:16px;
+    font-weight:800;
+    text-align:center;
+  }
+  header p{
+    margin:4px 0 0;
+    font-size:11.5px;
+    color:var(--muted);
+    text-align:center;
+  }
+  .tabs{
+    display:flex;
+    max-width:500px;
+    margin:10px auto 0;
+    background:var(--bg);
+    border-radius:12px;
+    padding:4px;
+  }
+  .tabs button{
+    flex:1;
+    border:none;
+    background:none;
+    padding:10px;
+    border-radius:9px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:13px;
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .tabs button.active{background:var(--teal-dark);color:#fff;}
+  .viewer{
+    padding:16px;
+    text-align:center;
+  }
+  .viewer img{
+    max-width:100%;
+    height:auto;
+    display:none;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+  }
+  .viewer img.active{display:inline-block;}
+  .hint{
+    text-align:center;
+    font-size:12px;
+    color:var(--muted);
+    padding:0 16px 24px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Worship Center Seating Chart</h1>
+  <p>Pinch to zoom &middot; scroll to pan</p>
+  <div class="tabs">
+    <button id="tab-main" class="active" onclick="show('main')">Main Floor (2,586)</button>
+    <button id="tab-balcony" onclick="show('balcony')">Balcony (1,541)</button>
+  </div>
+</header>
+
+<div class="viewer">
+  <img id="img-main" class="active" src="seating-main.png" alt="Main Floor Seating Chart">
+  <img id="img-balcony" src="seating-balcony.png" alt="Balcony Seating Chart">
+</div>
+<p class="hint">Use your browser's pinch/zoom gesture to view section details up close.</p>
+
+<script>
+function show(which){
+  document.getElementById('tab-main').classList.toggle('active', which==='main');
+  document.getElementById('tab-balcony').classList.toggle('active', which==='balcony');
+  document.getElementById('img-main').classList.toggle('active', which==='main');
+  document.getElementById('img-balcony').classList.toggle('active', which==='balcony');
+}
+</script>
+
+</body>
+</html>
