@@ -1033,6 +1033,7 @@ function selectRoom(id){
     el.classList.toggle('selected', parseInt(el.dataset.id)===id);
   });
   const r = roomById(id);
+  const isWorshipCenter = r.name.includes('Worship Center');
   document.getElementById('room-detail-slot').innerHTML = `
     <div class="room-detail">
       <div class="rd-head"><div class="rd-num">${r.id}</div><h3>${r.name}</h3></div>
@@ -1042,6 +1043,7 @@ function selectRoom(id){
       <div class="directions-drop" id="directions-drop">
         <div class="directions-drop-inner">${ic('pin')}<p id="directions-text"></p></div>
       </div>
+      ${isWorshipCenter?`<button class="btn-secondary" style="margin-top:10px;" onclick="window.open('seating.html','_blank')">View Seating Chart ${ic('external')}</button>`:''}
     </div>`;
 }
 function showDirections(id){
@@ -1126,6 +1128,7 @@ function openMinistry(day, idx){
   const m = ministries[day][idx];
   document.getElementById('md-title').textContent = m.title;
   const isNursery = m.icon === 'baby';
+  const isWorshipCenter = m.loc.includes('Worship Center');
   document.getElementById('md-body').innerHTML = `
     <div class="detail-hero">
       <div class="detail-circle" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
@@ -1140,6 +1143,7 @@ function openMinistry(day, idx){
       <div class="directions-drop" id="md-directions-drop">
         <div class="directions-drop-inner">${ic('pin')}<p id="md-directions-text"></p></div>
       </div>
+      ${isWorshipCenter?`<button class="btn-secondary" style="margin-top:10px;" onclick="window.open('seating.html','_blank')">View Seating Chart ${ic('external')}</button>`:''}
       ${isNursery?`
       <button class="btn-secondary" id="md-nursery-btn" onclick="toggleMdNursery()" style="margin-top:10px;">Find Your Child's Room <span class="btn-chev" id="md-nursery-chev">${ic('chevron-down')}</span></button>
       <div class="directions-drop" id="md-nursery-drop">
