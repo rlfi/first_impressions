@@ -165,15 +165,15 @@
 
   .mission-banner{
     margin:4px 16px 18px;
-    background:var(--teal-dark);
-    background:linear-gradient(135deg,var(--teal-dark),var(--teal));
-    color:#fff;
-    border-radius:16px;
-    padding:16px;
-    text-align:center;
+    background:var(--teal-pale);
+    border-left:4px solid var(--teal);
+    color:var(--navy);
+    border-radius:10px;
+    padding:14px 16px;
+    text-align:left;
   }
-  .mission-banner .m-title{font-size:11px;font-weight:800;letter-spacing:0.12em;opacity:0.85;margin-bottom:4px;}
-  .mission-banner .m-body{font-size:13.5px;font-weight:800;line-height:1.4;}
+  .mission-banner .m-title{font-size:10px;letter-spacing:0.14em;opacity:0.7;margin-bottom:4px;color:var(--teal-dark);}
+  .mission-banner .m-body{font-size:13px;font-weight:700;line-height:1.45;font-style:italic;}
 
   /* ===== BOTTOM NAV ===== */
   .bottom-nav{
@@ -279,6 +279,18 @@
     font-weight:800;
     cursor:pointer;
   }
+  .btn-secondary{
+    width:100%;
+    background:var(--pink-bg);
+    color:#c2447a;
+    border:none;
+    padding:13px;
+    border-radius:12px;
+    font-size:13.5px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .btn-secondary.is-open{background:#f7c9dc;}
   .directions-drop{
     margin-top:10px;
     max-height:0;
@@ -358,6 +370,34 @@
   .info-card ul{margin:0;padding-left:0;list-style:none;}
   .info-card li{font-size:12.5px;line-height:1.5;padding:4px 0 4px 16px;position:relative;color:var(--text);}
   .info-card li::before{content:"•";position:absolute;left:0;color:var(--teal);font-weight:900;}
+  .check-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;cursor:pointer;}
+  .check-box{
+    width:19px;height:19px;
+    border:2px solid var(--teal);
+    border-radius:6px;
+    flex:0 0 19px;
+    margin-top:1px;
+    position:relative;
+    transition:background .15s ease;
+  }
+  .check-box.checked{background:var(--teal);}
+  .check-box.checked::after{
+    content:"";
+    position:absolute;left:5px;top:1px;
+    width:6px;height:10px;
+    border:solid white;
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+  .check-label{font-size:12.5px;line-height:1.5;color:var(--text);transition:color .15s ease;}
+  .check-row.checked .check-label{color:var(--muted);text-decoration:line-through;}
+  .reset-checks-btn{
+    background:none;border:none;
+    color:var(--teal-dark);
+    font-size:12px;font-weight:700;
+    text-decoration:underline;
+    cursor:pointer;
+  }
 
   .alert-card{
     margin:14px 16px 10px;
@@ -581,11 +621,6 @@
         </div>
         <div class="chev" id="icon-contact-chev"></div>
       </div>
-
-      <div class="mission-banner">
-        <div class="m-title">MISSION</div>
-        <div class="m-body">EVERYONE ENCOUNTERED.<br>EVERYONE EMBRACED.</div>
-      </div>
     </div>
     <div class="bottom-nav" id="nav-home"></div>
   </div>
@@ -593,7 +628,7 @@
   <!-- MAP -->
   <div class="screen" id="screen-map">
     <div class="top-bar">
-      <button class="icon-btn" onclick="goHome()"><span id="icon-map-back"></span></button>
+      <button class="icon-btn" onclick="back()"><span id="icon-map-back"></span></button>
       <h1>Campus Map</h1>
       <button class="icon-btn" onclick="go('search')"><span id="icon-map-search"></span></button>
     </div>
@@ -619,7 +654,7 @@
   <!-- MINISTRY -->
   <div class="screen" id="screen-ministry">
     <div class="top-bar">
-      <button class="icon-btn" onclick="goHome()"><span id="icon-ministry-back"></span></button>
+      <button class="icon-btn" onclick="back()"><span id="icon-ministry-back"></span></button>
       <h1>Where Does This Ministry Meet?</h1>
       <button class="icon-btn" onclick="go('search')"><span id="icon-ministry-search"></span></button>
     </div>
@@ -742,6 +777,7 @@ function ic(name){
     search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
     chevron:'<path d="M9 6l6 6-6 6"/>',
     'chevron-down':'<path d="M6 9l6 6 6-6"/>',
+    external:'<path d="M14 4h6v6"/><path d="M20 4L10 14"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>',
     phone:'<path d="M6 3h4l2 5-2.5 1.5a11 11 0 0 0 5 5L16 12l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2z"/>',
     map:'<path d="M9 20l-6 2V6l6-2 6 2 6-2v16l-6 2-6-2z"/><path d="M9 4v16M15 6v16"/>',
     home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
@@ -803,10 +839,26 @@ function render(){
     if(nav) nav.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===top));
   });
 }
-function go(screen){ stack.push(screen); render(); window.scrollTo(0,0); }
-function goHome(){ stack=['home']; render(); }
-function back(){ if(stack.length>1) stack.pop(); render(); }
-function tab(screen){ stack=[screen]; render(); }
+function pushHistory(){
+  try{ history.pushState({stack:[...stack]}, '', ''); }catch(e){}
+}
+function go(screen){ stack.push(screen); pushHistory(); render(); window.scrollTo(0,0); }
+function goHome(){ stack=['home']; pushHistory(); render(); }
+function back(){
+  if(stack.length>1){ history.back(); }
+  else { tab('home'); }
+}
+function tab(screen){ stack=[screen]; pushHistory(); render(); }
+
+window.addEventListener('popstate', (e)=>{
+  if(e.state && e.state.stack && e.state.stack.length){
+    stack = e.state.stack;
+  } else {
+    stack = ['home'];
+  }
+  render();
+});
+history.replaceState({stack:[...stack]}, '', '');
 
 /* ---------- BOTTOM NAV BUILD ---------- */
 const navItems = [
@@ -827,12 +879,13 @@ const tiles = [
   {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
   {icon:'people', color:'var(--purple)', bg:'var(--purple-bg)', title:'Where Does This Ministry Meet?', sub:'Find rooms & locations', go:'ministry'},
   {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'First Impressions Guide', sub:'Best practices & steps', go:'guide'},
-  {icon:'baby', color:'var(--red)', bg:'var(--red-bg)', title:'Nursery Rooms', sub:'Find age & room', go:'nursery'},
   {icon:'warn', color:'var(--red)', bg:'var(--red-bg)', title:'Emergency Procedures', sub:'Important info', go:'emergency'},
-  {icon:'question', color:'var(--blue)', bg:'var(--blue-bg)', title:'Quick Answers', sub:'Common questions', go:'search'}
+  {icon:'question', color:'var(--blue)', bg:'var(--blue-bg)', title:'Quick Answers', sub:'Common questions', go:'search'},
+  {icon:'external', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'ResLife Classes', sub:'Sign up for a class', external:'https://reslife.org/class/'},
+  {icon:'external', color:'var(--purple)', bg:'var(--purple-bg)', title:'ResLife Website', sub:'Ministries & more', external:'https://reslife.org/ministries/'}
 ];
 document.getElementById('home-tiles').innerHTML = tiles.map(t=>`
-  <div class="tile" onclick="go('${t.go}')">
+  <div class="tile" onclick="${t.external?`window.open('${t.external}','_blank')`:`go('${t.go}')`}">
     ${badgeIcon(t.icon,t.color,t.bg)}
     <h3>${t.title}</h3>
     <p>${t.sub}</p>
@@ -1046,6 +1099,7 @@ function pinSvgSmall(){ return `<svg class="i" style="width:11px;height:11px;" v
 function openMinistry(day, idx){
   const m = ministries[day][idx];
   document.getElementById('md-title').textContent = m.title;
+  const isNursery = m.icon === 'baby';
   document.getElementById('md-body').innerHTML = `
     <div class="detail-hero">
       <div class="detail-circle" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
@@ -1060,8 +1114,41 @@ function openMinistry(day, idx){
       <div class="directions-drop" id="md-directions-drop">
         <div class="directions-drop-inner">${ic('pin')}<p id="md-directions-text"></p></div>
       </div>
+      ${isNursery?`
+      <button class="btn-secondary" id="md-nursery-btn" onclick="toggleMdNursery()" style="margin-top:10px;">Find Your Child's Room <span class="btn-chev" id="md-nursery-chev">${ic('chevron-down')}</span></button>
+      <div class="directions-drop" id="md-nursery-drop">
+        <div style="padding:12px 4px 4px;">
+          <div class="pill-toggle" id="md-nursery-toggle" style="margin:0 0 6px;"></div>
+          <div class="animal-grid" id="md-nursery-grid" style="padding:6px 0 4px;"></div>
+        </div>
+      </div>`:''}
     </div>`;
   go('mdetail');
+}
+let mdNurseryLevel='lower';
+function toggleMdNursery(){
+  const drop = document.getElementById('md-nursery-drop');
+  const btn = document.getElementById('md-nursery-btn');
+  const chev = document.getElementById('md-nursery-chev');
+  const isOpen = drop.classList.contains('open');
+  if(isOpen){
+    drop.classList.remove('open'); btn.classList.remove('is-open'); chev.classList.remove('open');
+  } else {
+    buildMdNurseryToggle();
+    renderMdNursery();
+    drop.classList.add('open'); btn.classList.add('is-open'); chev.classList.add('open');
+  }
+}
+function buildMdNurseryToggle(){
+  document.getElementById('md-nursery-toggle').innerHTML = `
+    <button class="${mdNurseryLevel==='lower'?'active':''}" onclick="setMdNurseryLevel('lower')">LOWER LEVEL</button>
+    <button class="${mdNurseryLevel==='upper'?'active':''}" onclick="setMdNurseryLevel('upper')">UPPER LEVEL</button>`;
+}
+function setMdNurseryLevel(l){ mdNurseryLevel=l; buildMdNurseryToggle(); renderMdNursery(); }
+function renderMdNursery(){
+  const list = mdNurseryLevel==='lower'?nurseryLower:nurseryUpper;
+  document.getElementById('md-nursery-grid').innerHTML = list.map(([name,emoji])=>`
+    <div class="animal-card"><span class="animal-emoji">${emoji}</span><span class="name">${name}</span></div>`).join('');
 }
 function toggleMdDirections(entrance, loc){
   const drop = document.getElementById('md-directions-drop');
@@ -1089,15 +1176,33 @@ const guideSections = [
   {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'First-Time Visitors',
     items:['Bring first-time guests to the closest welcome desk','Introduce them to a Next Steps coach to begin the guest process']}
 ];
-document.getElementById('guide-body').innerHTML = guideSections.map(s=>`
+document.getElementById('guide-body').innerHTML = guideSections.map((s,si)=>`
   <div class="info-card">
     <div class="ic-head">${badgeIcon(s.icon,s.color,s.bg,34)}<h4>${s.title}</h4></div>
-    <ul>${s.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    ${s.items.map((i,ii)=>`
+      <div class="check-row" id="check-${si}-${ii}" onclick="toggleCheck(${si},${ii})">
+        <div class="check-box"></div>
+        <div class="check-label">${i}</div>
+      </div>`).join('')}
   </div>`).join('') + `
+  <div style="text-align:center;padding:4px 16px 6px;">
+    <button class="reset-checks-btn" onclick="resetChecks()">Reset checklist</button>
+  </div>
   <div class="mission-banner" style="margin:16px;">
     <div class="m-title">MISSION</div>
-    <div class="m-body">EVERYONE ENCOUNTERED.<br>EVERYONE EMBRACED.</div>
+    <div class="m-body">Everyone Encountered.<br>Everyone Embraced.</div>
   </div>`;
+function toggleCheck(si,ii){
+  const row = document.getElementById(`check-${si}-${ii}`);
+  row.classList.toggle('checked');
+  row.querySelector('.check-box').classList.toggle('checked');
+}
+function resetChecks(){
+  document.querySelectorAll('#guide-body .check-row').forEach(r=>{
+    r.classList.remove('checked');
+    r.querySelector('.check-box').classList.remove('checked');
+  });
+}
 
 /* ---------- EMERGENCY ---------- */
 document.getElementById('emergency-body').innerHTML = `
