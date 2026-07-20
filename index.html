@@ -28,6 +28,7 @@
     --purple:#7c5cbf; --purple-bg:#efe9fb;
     --orange:#f0a323; --orange-bg:#fef2df;
     --red:#e35660; --red-bg:#fdeaec;
+    --cyan:#3fb8c4; --cyan-bg:#e3f6f8;
     --blue:#4a90d9; --blue-bg:#e8f2fc;
     --pink:#ef6c9b; --pink-bg:#fdeaf1;
     --shadow:0 6px 18px rgba(15,30,45,0.08);
@@ -250,6 +251,21 @@
   .door-tab{fill:var(--navy);}
   .door-label{fill:var(--navy);font-size:14px;font-weight:800;text-anchor:middle;font-family:inherit;}
   .mk{r:8;stroke:#fff;stroke-width:2;}
+  .cat-breakout{fill:#f7dcb0 !important;}
+  .cat-apparel{fill:#cdeedb !important;}
+  .cat-coffee{fill:#e5d9f2 !important;}
+  .cat-coffee.selected, .cat-coffee:hover{fill:var(--teal-pale) !important;}
+  .cat-breakout.selected, .cat-breakout:hover{fill:var(--teal-pale) !important;}
+  .cat-apparel.selected, .cat-apparel:hover{fill:var(--teal-pale) !important;}
+  .cat-meals{fill:#c7ecf0 !important;}
+  .cat-meals.selected, .cat-meals:hover{fill:var(--teal-pale) !important;}
+  .legend-num{
+    width:20px;height:20px;border-radius:50%;
+    background:var(--teal-dark);color:#fff;
+    font-size:11px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 20px;
+  }
 
   .legend-list{padding:2px 16px 10px;display:flex;flex-direction:column;gap:7px;}
   .legend-list .row{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);font-weight:600;}
@@ -629,23 +645,20 @@
   <div class="screen" id="screen-map">
     <div class="top-bar">
       <button class="icon-btn" onclick="back()"><span id="icon-map-back"></span></button>
-      <h1>Campus Map</h1>
+      <h1>OneHeart Conference Map</h1>
       <button class="icon-btn" onclick="go('search')"><span id="icon-map-search"></span></button>
     </div>
     <div class="scroll">
       <div class="underline-tabs">
         <button class="floor-btn active" data-floor="upper" onclick="setFloor('upper')">Upper Floor</button>
-        <button class="floor-btn" data-floor="main" onclick="setFloor('main')">Main Floor</button>
+        <button class="floor-btn" data-floor="main" onclick="setFloor('main')">Lower Floor</button>
       </div>
       <div class="map-wrap">
         <div id="floor-upper-wrap"></div>
         <div id="floor-main-wrap" style="display:none"></div>
       </div>
-      <div class="legend-list">
-        <div class="row"><span class="legend-dot" style="background:var(--orange)"></span>Coffee Kiosk</div>
-        <div class="row"><span class="legend-dot" style="background:var(--green)"></span>Restrooms</div>
-        <div class="row"><span class="legend-dot" style="background:var(--purple)"></span>Nursing Mothers Room</div>
-      </div>
+      <div class="legend-list" id="activity-legend"></div>
+      <div class="legend-list" id="category-legend" style="padding-top:0;"></div>
       <div id="room-detail-slot"></div>
     </div>
     <div class="bottom-nav" id="nav-map"></div>
@@ -893,98 +906,111 @@ document.getElementById('home-tiles').innerHTML = tiles.map(t=>`
 
 /* ---------- ROOM DATA ---------- */
 const rooms = [
-  {id:1, name:'Res Center', floor:'upper', desc:'Resource center with information and materials for guests and volunteers.', entrance:'Door G'},
-  {id:2, name:'Classroom 115', floor:'upper', desc:'Classroom space used for groups and studies.', entrance:'Door H'},
-  {id:3, name:'Classroom 322', floor:'upper', desc:'Classroom space used for groups and studies.', entrance:'Door E'},
-  {id:4, name:'Gym', floor:'upper', desc:'Multi-purpose gym used for activities and events.', entrance:'Door H'},
+  {id:1, name:'Res Center', floor:'upper', desc:'Breakout session space — hosts Trike Races (near Door E) and Mini Golf (near Door H).', entrance:'Door G', activities:[1,2], category:'breakout'},
+  {id:2, name:'Classroom 115', floor:'upper', desc:'Structural space, not part of the conference activity zones.', entrance:'Door H'},
+  {id:3, name:'Classroom 322', floor:'upper', desc:'Structural space, not part of the conference activity zones.', entrance:'Door E'},
+  {id:4, name:'Gym', floor:'upper', desc:'Breakout session space — hosts Volleyball & Basketball.', entrance:'Door H', activities:[3], category:'breakout'},
   {id:5, name:'ResKids Area', floor:'upper', desc:'Kids ministry check-in and classrooms.', entrance:'Door H'},
-  {id:6, name:'180', floor:'upper', desc:'Young adults gathering space.', entrance:'Door C'},
+  {id:6, name:'Oneighty', floor:'upper', desc:'Breakout session space — Hangout Space.', entrance:'Door C', activities:[4], category:'breakout'},
   {id:7, name:'Garage', floor:'upper', desc:'Vehicle and equipment storage.', entrance:'Door C'},
-  {id:8, name:'Ground Floor', floor:'upper', desc:'Main lobby and gathering space for Ground Floor services.', entrance:'Door C'},
-  {id:9, name:'Zone', floor:'upper', desc:'Student ministry gathering space (3rd–5th grade).', entrance:'Door C'},
-  {id:10, name:'Nursery Area (Upper)', floor:'upper', desc:'Nursery care for upper-level services.', entrance:'Door C'},
-  {id:11, name:'Olive Tree', floor:'upper', desc:'Meeting space for benevolence and deacons.', entrance:'Door J'},
-  {id:12, name:'Worship Center (Upper)', floor:'upper', desc:'Main worship center for upper-level services.', entrance:'Door J'},
-  {id:13, name:'Hospitality Suite', floor:'upper', desc:'Guest hospitality and team snack area.', entrance:'Door J'},
-  {id:14, name:'Nursery Area (Lower)', floor:'main', desc:'Nursery care for lower-level services.', entrance:'Door N'},
-  {id:15, name:'Next Steps Area', floor:'main', desc:'Next Steps coaching for new guests.', entrance:'Door N'},
-  {id:16, name:'Community Room', floor:'main', desc:'Free coffee and community gathering space.', entrance:'Door N'},
-  {id:17, name:'Resource Center', floor:'main', desc:'Resources and an information desk.', entrance:'Door N'},
-  {id:18, name:'Worship Center (Lower)', floor:'main', desc:'Main worship center for lower-level services.', entrance:'Door N'},
-  {id:19, name:'Chapel', floor:'main', desc:'Chapel space used for prayer and Growth Track.', entrance:'Door K'},
+  {id:8, name:'Ground Floor', floor:'upper', desc:'Video Games breakout area.', entrance:'Door C', activities:[6], category:'breakout'},
+  {id:9, name:'Zone Hallway', floor:'upper', desc:'Art Project breakout area.', entrance:'Door C', activities:[9], category:'breakout'},
+  {id:21, name:'Room 467-A', floor:'upper', desc:'Art Project breakout area.', entrance:'Door C', activities:[8], category:'breakout'},
+  {id:22, name:'Room 467-B', floor:'upper', desc:'Quiet Room.', entrance:'Door C', activities:[7], category:'breakout'},
+  {id:10, name:'Nursery Area (Upper)', floor:'upper', desc:'Nursery care area.', entrance:'Door C'},
+  {id:11, name:'Olive Tree', floor:'upper', desc:'Meeting and gathering space.', entrance:'Door J'},
+  {id:12, name:'Worship Center (Upper)', floor:'upper', desc:'Main worship center — general sessions.', entrance:'Door J', activities:[5]},
+  {id:13, name:'Hospitality Suite', floor:'upper', desc:'Hospitality and team snack area.', entrance:'Door J'},
+  {id:14, name:'Nursery Area (Lower)', floor:'main', desc:'Nursery care area.', entrance:'Door N'},
+  {id:15, name:'Next Steps Area', floor:'main', desc:'Community gathering space.', entrance:'Door N'},
+  {id:16, name:'Community Room', floor:'main', desc:'Apparel — conference merchandise & gear.', entrance:'Door N', category:'apparel'},
+  {id:17, name:'Resource Center', floor:'main', desc:'Coffee & Snacks.', entrance:'Door N', category:'coffee'},
+  {id:18, name:'Worship Center (Lower)', floor:'main', desc:'Activities breakout space.', entrance:'Door N', activities:[10], category:'breakout'},
+  {id:19, name:'Chapel', floor:'main', desc:'Saturday Meals served here.', entrance:'Door K', category:'meals'},
   {id:20, name:'Choir Room', floor:'main', desc:'Choir rehearsal and robing room.', entrance:'Door K'}
 ];
 function roomById(id){ return rooms.find(r=>r.id===id); }
+
+const activities = [
+  {num:1, label:'Trike Races'},
+  {num:2, label:'Mini Golf'},
+  {num:3, label:'Volleyball & Basketball'},
+  {num:4, label:'Hangout Space'},
+  {num:5, label:'Laser Tag'},
+  {num:6, label:'Video Games'},
+  {num:7, label:'Quiet Room'},
+  {num:8, label:'Art Project'},
+  {num:9, label:'Art Project'},
+  {num:10, label:'Activities'}
+];
+const categories = [
+  {key:'restrooms', label:'Restrooms', color:'var(--red)'},
+  {key:'coffee', label:'Coffee & Snacks', color:'var(--purple)'},
+  {key:'apparel', label:'Apparel', color:'var(--green)'},
+  {key:'breakout', label:'Breakout Session', color:'var(--orange)'},
+  {key:'meals', label:'Saturday Meals', color:'var(--cyan)'}
+];
+document.getElementById('activity-legend').innerHTML = activities.map(a=>
+  `<div class="row"><span class="legend-num">${a.num}</span>${a.label}</div>`).join('');
+document.getElementById('category-legend').innerHTML = categories.map(c=>
+  `<div class="row"><span class="legend-dot" style="background:${c.color}"></span>${c.label}</div>`).join('');
 
 /* ---------- FLOOR PLAN SVGs ---------- */
 const upperSVG = `
 <svg viewBox="0 -30 1000 730" class="floorplan" id="svg-upper">
   <path d="M900,240 L935,120" class="corridor"/>
   <path d="M620,230 L650,230" class="corridor"/>
+
   <polygon class="room" data-id="7" points="900,60 962,38 992,92 950,122"/>
-  <circle class="pin" cx="935" cy="82" r="15"/><text class="pin-num" x="935" y="87">7</text>
   <polygon class="door-tab" points="300,110 340,110 320,140"/><text class="door-label" x="320" y="100">Door E</text>
   <polygon class="room" data-id="3" points="300,140 370,140 370,205 300,205"/>
-  <circle class="pin" cx="335" cy="172" r="15"/><text class="pin-num" x="335" y="177">3</text>
-  <polygon class="room" data-id="6" points="565,130 630,130 630,320 565,320"/>
-  <circle class="pin" cx="597" cy="225" r="15"/><text class="pin-num" x="597" y="230">6</text>
+  <polygon class="room cat-breakout" data-id="6" points="565,130 630,130 630,320 565,320"/>
+  <circle class="pin" cx="597" cy="225" r="15"/><text class="pin-num" x="597" y="230">4</text>
   <polygon class="door-tab" points="640,215 640,255 670,235"/><text class="door-label" x="648" y="200">Door C</text>
-  <polygon class="room" data-id="8" points="655,160 855,160 855,340 655,340"/>
-  <circle class="pin" cx="755" cy="250" r="15"/><text class="pin-num" x="755" y="255">8</text>
-  <polygon class="room" data-id="9" points="860,160 905,160 905,320 860,320"/>
-  <circle class="pin" cx="882" cy="240" r="15"/><text class="pin-num" x="882" y="245">9</text>
-  <polygon class="room" data-id="1" points="120,340 165,235 285,195 385,240 425,340 385,445 285,485 165,445"/>
-  <circle class="pin" cx="270" cy="340" r="17"/><text class="pin-num" x="270" y="346">1</text>
-  <polygon class="room-sub" data-id="1" points="120,340 55,305 55,375"/>
+  <polygon class="room cat-breakout" data-id="8" points="655,160 855,160 855,340 655,340"/>
+  <circle class="pin" cx="755" cy="250" r="15"/><text class="pin-num" x="755" y="255">6</text>
+  <polygon class="room cat-breakout" data-id="9" points="860,160 895,160 895,240 860,240"/>
+  <circle class="pin" cx="877" cy="200" r="14"/><text class="pin-num" x="877" y="205">9</text>
+  <polygon class="room cat-breakout" data-id="21" points="898,160 925,160 925,240 898,240"/>
+  <circle class="pin" cx="911" cy="200" r="14"/><text class="pin-num" x="911" y="205">8</text>
+  <polygon class="room cat-breakout" data-id="22" points="928,160 955,160 955,240 928,240"/>
+  <circle class="pin" cx="941" cy="200" r="14"/><text class="pin-num" x="941" y="205">7</text>
+  <polygon class="room cat-breakout" data-id="1" points="120,340 165,235 285,195 385,240 425,340 385,445 285,485 165,445"/>
+  <circle class="pin" cx="240" cy="270" r="15"/><text class="pin-num" x="240" y="275">1</text>
+  <circle class="pin" cx="240" cy="410" r="15"/><text class="pin-num" x="240" y="415">2</text>
+  <polygon class="room-sub cat-breakout" data-id="1" points="120,340 55,305 55,375"/>
   <text class="door-label" x="30" y="345" text-anchor="start">Door G</text>
   <polygon class="room" data-id="2" points="155,445 225,445 225,505 155,505"/>
-  <circle class="pin" cx="190" cy="475" r="15"/><text class="pin-num" x="190" y="480">2</text>
   <polygon class="door-tab" points="245,510 285,510 265,540"/><text class="door-label" x="265" y="560">Door H</text>
-  <polygon class="room" data-id="4" points="425,300 485,270 545,300 545,380 485,412 425,380"/>
-  <circle class="pin" cx="485" cy="340" r="16"/><text class="pin-num" x="485" y="345">4</text>
+  <polygon class="room cat-breakout" data-id="4" points="425,300 485,270 545,300 545,380 485,412 425,380"/>
+  <circle class="pin" cx="485" cy="340" r="16"/><text class="pin-num" x="485" y="345">3</text>
   <polygon class="room" data-id="5" points="425,385 485,415 505,470 445,500 400,460"/>
-  <circle class="pin" cx="460" cy="445" r="15"/><text class="pin-num" x="460" y="450">5</text>
   <polygon class="door-tab" points="555,375 595,375 575,405"/><text class="door-label" x="575" y="360">Door J</text>
   <polygon class="room" data-id="10" points="600,345 855,345 900,385 878,485 700,505 600,440"/>
-  <circle class="pin" cx="760" cy="420" r="16"/><text class="pin-num" x="760" y="425">10</text>
   <polygon class="room" data-id="11" points="700,505 780,505 800,565 740,595 680,565"/>
-  <circle class="pin" cx="740" cy="545" r="15"/><text class="pin-num" x="740" y="550">11</text>
   <path class="room" data-id="12" d="M905,345 L955,345 Q1000,345 1000,480 Q1000,620 955,620 L905,620 Z"/>
-  <circle class="pin" cx="945" cy="480" r="17"/><text class="pin-num" x="945" y="486">12</text>
+  <circle class="pin" cx="945" cy="480" r="17"/><text class="pin-num" x="945" y="486">5</text>
   <polygon class="room" data-id="13" points="850,600 925,600 925,665 850,665"/>
-  <circle class="pin" cx="887" cy="632" r="15"/><text class="pin-num" x="887" y="637">13</text>
-  <circle class="mk" cx="645" cy="252" r="9" style="fill:var(--orange)"/>
-  <circle class="mk" cx="400" cy="150" r="9" style="fill:var(--green)"/>
-  <circle class="mk" cx="885" cy="150" r="9" style="fill:var(--green)"/>
-  <circle class="mk" cx="900" cy="345" r="9" style="fill:var(--green)"/>
-  <circle class="mk" cx="955" cy="600" r="9" style="fill:var(--green)"/>
-  <circle class="mk" cx="335" cy="300" r="9" style="fill:var(--purple)"/>
-  <circle class="mk" cx="862" cy="590" r="9" style="fill:var(--purple)"/>
+  <circle class="mk" cx="400" cy="150" r="9" style="fill:var(--red)"/>
+  <circle class="mk" cx="885" cy="150" r="9" style="fill:var(--red)"/>
+  <circle class="mk" cx="900" cy="345" r="9" style="fill:var(--red)"/>
+  <circle class="mk" cx="955" cy="600" r="9" style="fill:var(--red)"/>
 </svg>`;
 
 const mainSVG = `
 <svg viewBox="0 0 1000 620" class="floorplan" id="svg-main">
   <polygon class="door-tab" points="130,45 170,45 150,75"/><text class="door-label" x="150" y="35">Door N</text>
   <polygon class="room" data-id="14" points="80,80 225,60 265,145 225,225 100,225 60,150"/>
-  <circle class="pin" cx="160" cy="145" r="16"/><text class="pin-num" x="160" y="150">14</text>
   <polygon class="room" data-id="15" points="100,225 225,225 225,305 145,305 100,275"/>
-  <circle class="pin" cx="165" cy="265" r="15"/><text class="pin-num" x="165" y="270">15</text>
-  <circle class="mk" cx="260" cy="295" r="9" style="fill:var(--orange)"/>
-  <polygon class="room" data-id="16" points="80,305 225,305 245,425 80,425"/>
-  <circle class="pin" cx="155" cy="365" r="15"/><text class="pin-num" x="155" y="370">16</text>
-  <polygon class="room" data-id="17" points="265,285 365,285 365,425 265,425"/>
-  <circle class="pin" cx="315" cy="355" r="15"/><text class="pin-num" x="315" y="360">17</text>
-  <polygon class="room" data-id="18" points="390,280 430,180 560,140 670,190 705,280 670,380 560,420 430,380"/>
-  <circle class="pin" cx="545" cy="280" r="18"/><text class="pin-num" x="545" y="286">18</text>
-  <polygon class="room" data-id="19" points="705,340 785,340 805,420 745,460 685,420"/>
-  <circle class="pin" cx="745" cy="400" r="15"/><text class="pin-num" x="745" y="405">19</text>
+  <polygon class="room cat-apparel" data-id="16" points="80,305 225,305 245,425 80,425"/>
+  <polygon class="room cat-coffee" data-id="17" points="265,285 365,285 365,425 265,425"/>
+  <polygon class="room cat-breakout" data-id="18" points="390,280 430,180 560,140 670,190 705,280 670,380 560,420 430,380"/>
+  <circle class="pin" cx="545" cy="280" r="18"/><text class="pin-num" x="545" y="286">10</text>
+  <polygon class="room cat-meals" data-id="19" points="705,340 785,340 805,420 745,460 685,420"/>
   <polygon class="room" data-id="20" points="785,300 855,280 885,340 855,400 805,400"/>
-  <circle class="pin" cx="830" cy="340" r="15"/><text class="pin-num" x="830" y="345">20</text>
   <polygon class="door-tab" points="740,465 780,465 760,495"/><text class="door-label" x="760" y="515">Door K</text>
-  <circle class="mk" cx="95" cy="55" r="9" style="fill:var(--green)"/>
-  <circle class="mk" cx="700" cy="330" r="9" style="fill:var(--green)"/>
-  <circle class="mk" cx="395" cy="300" r="9" style="fill:var(--purple)"/>
-  <circle class="mk" cx="625" cy="400" r="9" style="fill:var(--purple)"/>
+  <circle class="mk" cx="95" cy="55" r="9" style="fill:var(--red)"/>
+  <circle class="mk" cx="700" cy="330" r="9" style="fill:var(--red)"/>
 </svg>`;
 
 document.getElementById('floor-upper-wrap').innerHTML = upperSVG;
