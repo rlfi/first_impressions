@@ -1216,15 +1216,15 @@ document.getElementById('emergency-body').innerHTML = `
     <div class="a-head">${ic('phone')} EMERGENCY SITUATIONS</div>
     <div class="a-num">Security: 616.261.3775</div>
     <p style="margin-top:6px;font-size:15px;">Pastor Ricky Luong: (616) 334-5596</p>
-    <p style="margin-top:6px;font-size:15px;">Pastoral On Call: 616.534.4923 OPT. 2 — leave a message, our on-duty pastor will get back to you shortly.</p>
+    <p style="margin-top:6px;font-size:15px;">Pastoral Care: 616.534.4923 OPT. 2 — leave a message, our on-duty pastor will get back to you shortly.</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Deacon On Call</h4></div>
+    <p style="font-size:12.5px;color:var(--text);margin:0;">(616) 334-5596</p>
   </div>
   <div class="info-card">
     <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Pastoral Care</h4></div>
     <p style="font-size:12.5px;color:var(--text);margin:0;">Ministry appointments, hospital visitation & funeral information — refer to Pastors Matt Yonker, Nick Mayo, or Pat Binish.<br><br>Direct: 616.524.9121 · Church: 616.534.4923</p>
-  </div>
-  <div class="info-card">
-    <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Deacon On Call</h4></div>
-    <p style="font-size:12.5px;color:var(--text);margin:0;">Pastor Ricky Luong — (616) 334-5596</p>
   </div>
   <div class="info-card">
     <div class="ic-head">${badgeIcon('heart','var(--green)','var(--green-bg)',34)}<h4>Benevolence + Food Pantry</h4></div>
@@ -1271,11 +1271,11 @@ document.getElementById('contacts-body').innerHTML = `
   </div>
   <div class="info-card">
     <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Deacon On Call</h4></div>
-    <p style="font-size:12.5px;margin:0;">Pastor Ricky Luong — (616) 334-5596</p>
+    <p style="font-size:12.5px;margin:0;">(616) 334-5596</p>
   </div>
   <div class="info-card">
     <div class="ic-head">${badgeIcon('phone','var(--red)','var(--red-bg)',34)}<h4>Security</h4></div>
-    <p style="font-size:12.5px;margin:0;">Watch Command: (616) 261-3775<br>Security Head: Mark Garner</p>
+    <p style="font-size:12.5px;margin:0;">(616) 261-3775<br>Security Head: Mark Garner</p>
   </div>
   <div class="info-card">
     <div class="ic-head">${badgeIcon('bag','var(--orange)','var(--orange-bg)',34)}<h4>Lost & Found / Front Office</h4></div>
@@ -1347,7 +1347,7 @@ const chatRules = [
   {kw:['first time','first-time','visitor','guest'], a:"Bring first-time guests to the closest welcome desk and introduce them to a Next Steps coach to begin the guest process."},
   {kw:['pastoral','pastor','care'], a:"For pastoral care, refer to Pastors Matt Yonker, Nick Mayo, or Pat Binish. Direct: 616.524.9121 · Church: 616.534.4923."},
   {kw:['nurse'], a:"For a nurse, contact Watch Command at (616) 261-3775."},
-  {kw:['deacon'], a:"Contact Pastor Ricky at (616) 334-5596."},
+  {kw:['deacon'], a:"Contact the Deacon On Call at (616) 334-5596."},
   {kw:['security','watch command','safety'], a:"For security, contact Watch Command at (616) 261-3775. Security Head: Mark Garner."},
   {kw:['hispanic','spanish'], a:"The Hispanic Service is held at Iglesia Vida (ResCenter)."},
   {kw:['lost'], a:"Sunday AM: direct to Door K and let the Safety Team know. Monday–Thursday 8:30am–4pm: Front Office (Door G) or call 616.534.4923."},
