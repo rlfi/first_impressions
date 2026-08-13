@@ -1012,14 +1012,32 @@ document.getElementById('floor-main-wrap').innerHTML =
 buildFloorLegend('upper');
 
 /* ---------- MAP FULLSCREEN ZOOM/PAN ---------- */
-const mapFsState = { scale:1, minScale:1, maxScale:5, tx:0, ty:0, pointers:{}, startDist:0, startScale:1, startMid:{x:0,y:0}, panStart:null, lastTap:0 };
+const mapFsState = { scale:1, baseScale:1, minScale:1, maxScale:5, tx:0, ty:0, pointers:{}, startDist:0, startScale:1, startMid:{x:0,y:0}, panStart:null, lastTap:0 };
+function mapFsFitToScreen(){
+  const img = document.getElementById('map-fullscreen-img');
+  const content = document.getElementById('map-fullscreen-content');
+  if(!img.naturalWidth || !img.naturalHeight) return;
+  const cw = content.clientWidth, ch = content.clientHeight;
+  const fit = Math.min(cw / img.naturalWidth, ch / img.naturalHeight) * 0.96;
+  mapFsState.baseScale = fit;
+  mapFsState.minScale = fit;
+  mapFsState.maxScale = fit * 5;
+  mapFsState.scale = fit;
+  mapFsState.tx = 0; mapFsState.ty = 0;
+  applyMapFsTransform();
+}
 function openMapFullscreen(){
   const src = currentFloor==='upper' ? 'map-main-level.png' : 'map-level1.png';
   const img = document.getElementById('map-fullscreen-img');
-  img.src = src;
-  mapFsState.scale=1; mapFsState.tx=0; mapFsState.ty=0;
-  applyMapFsTransform();
   document.getElementById('map-fullscreen-overlay').classList.add('active');
+  if(img.src.indexOf(src) === -1){
+    img.src = src;
+  }
+  if(img.complete && img.naturalWidth){
+    mapFsFitToScreen();
+  } else {
+    img.onload = mapFsFitToScreen;
+  }
 }
 function closeMapFullscreen(){
   document.getElementById('map-fullscreen-overlay').classList.remove('active');
@@ -1044,7 +1062,7 @@ function mapFsMid(p1,p2){ return {x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2}; }
     } else if(pts.length===1){
       const now = Date.now();
       if(now - mapFsState.lastTap < 300){
-        mapFsState.scale = mapFsState.scale > 1 ? 1 : 2.5;
+        mapFsState.scale = mapFsState.scale > mapFsState.baseScale ? mapFsState.baseScale : mapFsState.baseScale * 2.5;
         mapFsState.tx = 0; mapFsState.ty = 0;
         applyMapFsTransform();
       }
@@ -1070,7 +1088,7 @@ function mapFsMid(p1,p2){ return {x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2}; }
   const clearPointer = e=>{
     delete mapFsState.pointers[e.pointerId];
     mapFsState.panStart = null;
-    if(mapFsState.scale < 1){ mapFsState.scale = 1; applyMapFsTransform(); }
+    if(mapFsState.scale < mapFsState.baseScale){ mapFsState.scale = mapFsState.baseScale; applyMapFsTransform(); }
   };
   content.addEventListener('pointerup', clearPointer);
   content.addEventListener('pointercancel', clearPointer);
