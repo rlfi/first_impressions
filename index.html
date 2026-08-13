@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ResLife First Impressions Hub</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -243,26 +243,7 @@
   .map-wrap{padding:12px 16px 4px;}
   .floorplan{width:100%;height:auto;display:block;}
   .map-img-wrap{position:relative;width:100%;line-height:0;}
-  .map-img{width:100%;height:auto;display:block;border-radius:10px;cursor:zoom-in;}
-  .map-fullscreen-overlay{
-    position:fixed;inset:0;background:rgba(8,14,22,0.96);z-index:9999;
-    display:none;align-items:center;justify-content:center;overflow:hidden;
-    touch-action:none;
-  }
-  .map-fullscreen-overlay.active{display:flex;}
-  .map-fullscreen-close{
-    position:absolute;top:16px;right:16px;z-index:10000;
-    width:40px;height:40px;border-radius:50%;
-    background:rgba(255,255,255,0.15);border:none;color:#fff;
-    font-size:20px;line-height:1;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .map-fullscreen-content{position:relative;width:100%;height:100%;touch-action:none;overflow:hidden;}
-  .map-fullscreen-content img{
-    position:absolute;top:50%;left:50%;
-    max-width:none;will-change:transform;
-    transform-origin:0 0;
-  }
+  .map-img{width:100%;height:auto;display:block;border-radius:10px;}
   .img-pin{
     position:absolute;
     width:26px;height:26px;
@@ -696,7 +677,6 @@
       <div class="map-wrap">
         <div id="floor-upper-wrap"></div>
         <div id="floor-main-wrap" style="display:none"></div>
-        <a id="open-full-map" href="map-mainlevel.html" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;font-size:12.5px;font-weight:700;color:var(--teal-dark);text-decoration:none;">Open this map as its own page <span id="icon-open-map"></span></a>
       </div>
       <div class="legend-list" id="activity-legend"></div>
       <div class="legend-list" id="category-legend" style="padding-top:0;"></div>
@@ -823,14 +803,6 @@
 
 </div>
 
-<!-- MAP FULLSCREEN ZOOM OVERLAY (outside .shell so iOS Safari doesn't clip position:fixed) -->
-<div class="map-fullscreen-overlay" id="map-fullscreen-overlay">
-  <button class="map-fullscreen-close" onclick="closeMapFullscreen()">✕</button>
-  <div class="map-fullscreen-content" id="map-fullscreen-content">
-    <img id="map-fullscreen-img" src="" alt="Campus map, zoomed">
-  </div>
-</div>
-
 <script>
 /* ---------- ICONS ---------- */
 function ic(name){
@@ -876,7 +848,7 @@ document.getElementById('logo-home').src = LOGO_SRC;
 const staticIcons = {
   'icon-sf1':'search','icon-sf2':'people','icon-sf3':'smile',
   'icon-contact-phone':'phone','icon-contact-chev':'chevron',
-  'icon-map-back':'back','icon-map-search':'search','icon-open-map':'external',
+  'icon-map-back':'back','icon-map-search':'search',
   'icon-ministry-back':'back','icon-ministry-search':'search',
   'icon-mdetail-back':'back',
   'icon-guide-back':'back','icon-emergency-back':'back',
@@ -1006,125 +978,10 @@ function buildMapPins(f){
 }
 
 document.getElementById('floor-upper-wrap').innerHTML =
-  `<div class="map-img-wrap"><img class="map-img" src="map-main-level.png" alt="Main Level campus map" onclick="openMapFullscreen()">${buildMapPins('upper')}</div>`;
+  `<div class="map-img-wrap"><img class="map-img" src="map-main-level.png" alt="Main Level campus map">${buildMapPins('upper')}</div>`;
 document.getElementById('floor-main-wrap').innerHTML =
-  `<div class="map-img-wrap"><img class="map-img" src="map-level1.png" alt="Level 1 campus map" onclick="openMapFullscreen()">${buildMapPins('main')}</div>`;
+  `<div class="map-img-wrap"><img class="map-img" src="map-level1.png" alt="Level 1 campus map">${buildMapPins('main')}</div>`;
 buildFloorLegend('upper');
-
-/* ---------- MAP FULLSCREEN ZOOM/PAN ---------- */
-const mapFsState = { scale:1, baseScale:1, minScale:1, maxScale:5, tx:0, ty:0, pointers:{}, startDist:0, startScale:1, startMid:{x:0,y:0}, panStart:null, lastTap:0 };
-function mapFsFitToScreen(){
-  const img = document.getElementById('map-fullscreen-img');
-  const content = document.getElementById('map-fullscreen-content');
-  if(!img.naturalWidth || !img.naturalHeight) return;
-  const cw = content.clientWidth, ch = content.clientHeight;
-  const fit = Math.min(cw / img.naturalWidth, ch / img.naturalHeight) * 0.96;
-  mapFsState.baseScale = fit;
-  mapFsState.minScale = fit;
-  mapFsState.maxScale = fit * 5;
-  mapFsState.scale = fit;
-  mapFsState.tx = 0; mapFsState.ty = 0;
-  applyMapFsTransform();
-}
-function openMapFullscreen(){
-  const src = currentFloor==='upper' ? 'map-main-level.png' : 'map-level1.png';
-  const img = document.getElementById('map-fullscreen-img');
-  document.getElementById('map-fullscreen-overlay').classList.add('active');
-  document.body.style.overflow = 'hidden';
-  if(img.src.indexOf(src) === -1){
-    img.src = src;
-  }
-  if(img.complete && img.naturalWidth){
-    mapFsFitToScreen();
-  } else {
-    img.onload = mapFsFitToScreen;
-  }
-}
-function closeMapFullscreen(){
-  document.getElementById('map-fullscreen-overlay').classList.remove('active');
-  document.body.style.overflow = '';
-}
-function applyMapFsTransform(){
-  const img = document.getElementById('map-fullscreen-img');
-  img.style.transform = `translate(-50%,-50%) translate(${mapFsState.tx}px,${mapFsState.ty}px) scale(${mapFsState.scale})`;
-}
-function mapFsDist(p1,p2){ return Math.hypot(p1.x-p2.x, p1.y-p2.y); }
-function mapFsMid(p1,p2){ return {x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2}; }
-(function(){
-  const content = document.getElementById('map-fullscreen-content');
-  if(!content) return;
-
-  function touchPoint(t){ return {x:t.clientX, y:t.clientY}; }
-
-  content.addEventListener('touchstart', e=>{
-    e.preventDefault();
-    if(e.touches.length===2){
-      const p1 = touchPoint(e.touches[0]), p2 = touchPoint(e.touches[1]);
-      mapFsState.startDist = mapFsDist(p1,p2);
-      mapFsState.startScale = mapFsState.scale;
-      mapFsState.panStart = null;
-    } else if(e.touches.length===1){
-      const now = Date.now();
-      if(now - mapFsState.lastTap < 300){
-        mapFsState.scale = mapFsState.scale > mapFsState.baseScale * 1.05 ? mapFsState.baseScale : mapFsState.baseScale * 2.5;
-        mapFsState.tx = 0; mapFsState.ty = 0;
-        applyMapFsTransform();
-      }
-      mapFsState.lastTap = now;
-      const p = touchPoint(e.touches[0]);
-      mapFsState.panStart = {x:p.x, y:p.y, tx:mapFsState.tx, ty:mapFsState.ty};
-    }
-  }, {passive:false});
-
-  content.addEventListener('touchmove', e=>{
-    e.preventDefault();
-    if(e.touches.length===2){
-      const p1 = touchPoint(e.touches[0]), p2 = touchPoint(e.touches[1]);
-      const dist = mapFsDist(p1,p2);
-      const ratio = dist / (mapFsState.startDist || dist);
-      mapFsState.scale = Math.min(mapFsState.maxScale, Math.max(mapFsState.minScale, mapFsState.startScale * ratio));
-      applyMapFsTransform();
-    } else if(e.touches.length===1 && mapFsState.panStart){
-      const p = touchPoint(e.touches[0]);
-      mapFsState.tx = mapFsState.panStart.tx + (p.x - mapFsState.panStart.x);
-      mapFsState.ty = mapFsState.panStart.ty + (p.y - mapFsState.panStart.y);
-      applyMapFsTransform();
-    }
-  }, {passive:false});
-
-  content.addEventListener('touchend', e=>{
-    mapFsState.panStart = null;
-    if(mapFsState.scale < mapFsState.baseScale){
-      mapFsState.scale = mapFsState.baseScale;
-      mapFsState.tx = 0; mapFsState.ty = 0;
-      applyMapFsTransform();
-    }
-  });
-  content.addEventListener('touchcancel', e=>{
-    mapFsState.panStart = null;
-  });
-
-  /* Desktop mouse support */
-  let mouseDown=false;
-  content.addEventListener('mousedown', e=>{
-    mouseDown=true;
-    mapFsState.panStart = {x:e.clientX, y:e.clientY, tx:mapFsState.tx, ty:mapFsState.ty};
-  });
-  content.addEventListener('mousemove', e=>{
-    if(!mouseDown || !mapFsState.panStart) return;
-    mapFsState.tx = mapFsState.panStart.tx + (e.clientX - mapFsState.panStart.x);
-    mapFsState.ty = mapFsState.panStart.ty + (e.clientY - mapFsState.panStart.y);
-    applyMapFsTransform();
-  });
-  window.addEventListener('mouseup', ()=>{ mouseDown=false; mapFsState.panStart=null; });
-
-  content.addEventListener('wheel', e=>{
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 1.1 : 0.9;
-    mapFsState.scale = Math.min(mapFsState.maxScale, Math.max(mapFsState.minScale, mapFsState.scale*delta));
-    applyMapFsTransform();
-  }, {passive:false});
-})();
 
 let currentFloor='upper';
 let selectedRoom=1;
@@ -1139,8 +996,6 @@ function setFloor(f){
   selectRoom(firstRoom.id);
   const hashFloor = f==='upper' ? 'map-mainlevel' : 'map-level1';
   try{ history.replaceState(history.state, '', '#'+hashFloor); }catch(e){}
-  const openLink = document.getElementById('open-full-map');
-  if(openLink) openLink.href = f==='upper' ? 'map-mainlevel.html' : 'map-level1.html';
 }
 function selectRoom(id){
   selectedRoom=id;
