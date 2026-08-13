@@ -953,7 +953,7 @@ const rooms = [
   {id:5, num:5, name:"Noah's Ark Nursery/Preschool", floor:'upper', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'52nd St entrance (Door K)', color:'var(--orange)', x:48.3, y:48.0},
   {id:6, num:6, name:'Atrium', floor:'upper', desc:'Atrium lobby connecting to the Ivanrest Ave entrance.', entrance:'Atrium Entrance (Door N)', color:'var(--purple)', x:51.5, y:27.5},
   {id:7, num:1, name:'RezKidz Center (Kindergarten – 4th grade)', floor:'main', desc:'Kids ministry check-in and classrooms for Kindergarten through 4th grade.', entrance:'Door C', color:'var(--green)', x:17.9, y:52.6},
-  {id:8, num:2, name:'Gym', floor:'main', desc:'Gym space — hosts Servicio Hispano at 11:30 a.m. (RezCenter / Iglesia Vida).', entrance:'Door B', color:'var(--cyan)', x:35.4, y:55.5},
+  {id:8, num:2, name:'Gym', floor:'main', desc:'', entrance:'Door B', color:'var(--cyan)', x:35.4, y:55.5},
   {id:9, num:3, name:'Oneighty (7th & 8th grade)', floor:'main', desc:'Student ministry space for 7th & 8th grade (Married Life).', entrance:'Door D', color:'var(--pink)', x:41.3, y:41.2},
   {id:10, num:4, name:'The Ground Floor (9th – 12th grade)', floor:'main', desc:'High school ministry space.', entrance:'Door E', color:'var(--muted)', x:54.1, y:41.2},
   {id:11, num:5, name:'The Zone (5th & 6th grade)', floor:'main', desc:'Kids ministry space for 5th & 6th grade.', entrance:'Door F', color:'var(--red)', x:62.8, y:31.9},
@@ -1010,7 +1010,7 @@ function selectRoom(id){
   document.getElementById('room-detail-slot').innerHTML = `
     <div class="room-detail">
       <div class="rd-head"><div class="rd-num">${r.id}</div><h3>${r.name}</h3></div>
-      <p class="rd-desc">${r.desc}</p>
+      ${r.desc?`<p class="rd-desc">${r.desc}</p>`:''}
       <div class="rd-entrance">${ic('pin')} Nearest Entrance: ${r.entrance}</div>
       <button class="btn-primary" id="dir-btn" onclick="showDirections(${r.id})">Get Directions <span class="btn-chev" id="dir-chev">${ic('chevron-down')}</span></button>
       <div class="directions-drop" id="directions-drop">
@@ -1046,7 +1046,7 @@ selectRoom(1);
 const ministries = {
   sunam:[
     {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Worship Center (Upper Level)',pastor:'Pastor Duane VanderKlok',entrance:'Door J', desc:'Our main English-language service, gathering the whole church family for worship and teaching.', how:'Enter through Door J and follow the main hallway to the Worship Center.'},
-    {icon:'people',color:'var(--teal)',bg:'var(--teal-pale)',title:'Iglesia Vida',loc:'Worship Center (Upper Level)',pastor:'Pastor Luis Quezada',entrance:'Door J', desc:'Our Spanish-language service, meeting in the same Worship Center.', how:'Enter through Door J and follow the main hallway to the Worship Center.'},
+    {icon:'people',color:'var(--teal)',bg:'var(--teal-pale)',title:'Iglesia Vida',loc:'ResCenter',pastor:'Pastor Luis Quezada',entrance:'Door G', desc:'Our Spanish-language service, meeting at ResCenter.', how:'Enter through Door G and follow the hallway to ResCenter.'},
     {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Main Lobby',pastor:'', entrance:'Door N', desc:'Free coffee for guests and members before and after service.', how:'Enter through Door N; coffee is set up just off the main lobby.'},
     {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.'},
     {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'High School',loc:'Ground Floor',pastor:'Pastors Ben & Kendra Lepsch — 9 AM only',entrance:'Door C', desc:'High School students gather for teaching, worship, and community.', how:'Enter through Door C or Door J. Take the hallway to the main lobby — High School is on the Ground Floor.'},
@@ -1066,8 +1066,8 @@ const ministries = {
     {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll — Upper level only',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby. Upper level only for this service.'}
   ],
   wed:[
-    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Res Center',pastor:'Pastor Daniel VanderKlok',entrance:'Door G', desc:'Our midweek service, gathering in the Res Center.', how:'Enter through Door G and follow the hallway to the Res Center.'},
-    {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Res Center Lobby',pastor:'', entrance:'Door G', desc:'Free coffee available in the Res Center Lobby.', how:'Enter through Door G; coffee is set up in the lobby.'},
+    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'ResCenter',pastor:'Pastor Daniel VanderKlok',entrance:'Door G', desc:'Our midweek service, gathering at ResCenter.', how:'Enter through Door G and follow the hallway to ResCenter.'},
+    {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'ResCenter Lobby',pastor:'', entrance:'Door G', desc:'Free coffee available in the ResCenter Lobby.', how:'Enter through Door G; coffee is set up in the lobby.'},
     {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.'},
     {icon:'info',color:'var(--muted)',bg:'var(--bg)',title:'Other Classes',loc:'See Guest Service Desk',pastor:'', entrance:'', desc:'Additional classes vary by season — check the Guest Service Desk for current locations.', how:'Ask any team member at the Guest Service Desk for directions.'},
     {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'High School',loc:'Ground Floor',pastor:'Pastors Ben & Kendra Lepsch',entrance:'Door C', desc:'High School students gather for teaching, worship, and community.', how:'Enter through Door C or Door J. Take the hallway to the main lobby — High School is on the Ground Floor.'},
@@ -1340,13 +1340,13 @@ function searchIndex_click(i){ searchIndex[i].action(); }
 const chatRules = [
   {kw:['pickup','preschool','parent','drop off','drop-off'], a:"Parents pick up preschoolers in the Nursery & Preschool area. If you're on the Lower Level, go to your child's classroom door. If you're on the Upper Level, exit through Door N. Our team will help guide you!"},
   {kw:['growth track'], a:"Growth Track meets in the Chapel at every service — enter through Door K."},
-  {kw:['coffee'], a:"Free coffee is in the Main Lobby (Sunday AM), the Ground Floor Lobby (Sunday PM), or the Res Center Lobby (Wednesday)."},
+  {kw:['coffee'], a:"Free coffee is in the Main Lobby (Sunday AM), the Ground Floor Lobby (Sunday PM), or the ResCenter Lobby (Wednesday)."},
   {kw:['first time','first-time','visitor','guest'], a:"Bring first-time guests to the closest welcome desk and introduce them to a Next Steps coach to begin the guest process."},
   {kw:['pastoral','pastor','care'], a:"For pastoral care, refer to Pastors Matt Yonker, Nick Mayo, or Pat Binish. Direct: 616.524.9121 · Church: 616.534.4923."},
   {kw:['nurse'], a:"For a nurse, contact Watch Command at (616) 261-3775."},
   {kw:['deacon'], a:"Contact the Deacon On Call at (616) 334-5596."},
   {kw:['security','watch command','safety'], a:"For security, contact Watch Command at (616) 261-3775. Security Head: Mark Garner."},
-  {kw:['hispanic','spanish'], a:"The Hispanic Service is held at Iglesia Vida (ResCenter)."},
+  {kw:['hispanic','spanish'], a:"Iglesia Vida, our Spanish-language service, meets at ResCenter on Sundays with Pastor Luis Quezada."},
   {kw:['lost'], a:"Sunday AM: direct to Door K and let the Safety Team know. Monday–Thursday 8:30am–4pm: Front Office (Door G) or call 616.534.4923."},
   {kw:['emergency'], a:"If a pastor is needed right away, call 616.534.4923, option 2, and leave a message. Our on-duty pastor will get back to you shortly."},
   {kw:['restroom','bathroom'], a:"Restrooms are marked with a green dot on the Campus Map — check the Map tab for the one nearest you."},
