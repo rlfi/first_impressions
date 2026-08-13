@@ -705,14 +705,6 @@
     <div class="bottom-nav" id="nav-map"></div>
   </div>
 
-  <!-- MAP FULLSCREEN ZOOM OVERLAY -->
-  <div class="map-fullscreen-overlay" id="map-fullscreen-overlay">
-    <button class="map-fullscreen-close" onclick="closeMapFullscreen()">✕</button>
-    <div class="map-fullscreen-content" id="map-fullscreen-content">
-      <img id="map-fullscreen-img" src="" alt="Campus map, zoomed">
-    </div>
-  </div>
-
   <!-- MINISTRY -->
   <div class="screen" id="screen-ministry">
     <div class="top-bar">
@@ -829,6 +821,14 @@
     <div class="bottom-nav" id="nav-more"></div>
   </div>
 
+</div>
+
+<!-- MAP FULLSCREEN ZOOM OVERLAY (outside .shell so iOS Safari doesn't clip position:fixed) -->
+<div class="map-fullscreen-overlay" id="map-fullscreen-overlay">
+  <button class="map-fullscreen-close" onclick="closeMapFullscreen()">✕</button>
+  <div class="map-fullscreen-content" id="map-fullscreen-content">
+    <img id="map-fullscreen-img" src="" alt="Campus map, zoomed">
+  </div>
 </div>
 
 <script>
