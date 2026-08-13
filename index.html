@@ -242,9 +242,27 @@
   /* ===== MAP ===== */
   .map-wrap{padding:12px 16px 4px;}
   .floorplan{width:100%;height:auto;display:block;}
+  .map-img-wrap{position:relative;width:100%;line-height:0;}
+  .map-img{width:100%;height:auto;display:block;border-radius:10px;}
+  .img-pin{
+    position:absolute;
+    width:26px;height:26px;
+    border-radius:50%;
+    border:2px solid #fff;
+    color:#fff;font-size:12px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;
+    transform:translate(-50%,-50%);
+    box-shadow:0 2px 6px rgba(0,0,0,0.35);
+    cursor:pointer;
+    padding:0;
+  }
+  .img-pin.selected{
+    width:34px;height:34px;
+    box-shadow:0 0 0 4px rgba(22,163,148,0.45), 0 2px 8px rgba(0,0,0,0.4);
+  }
   .room{fill:#e4e8ec;stroke:#c3cbd3;stroke-width:3;stroke-linejoin:round;cursor:pointer;transition:fill .15s;}
   .room-sub{fill:#d7dde1;stroke:#c3cbd3;stroke-width:2.5;cursor:pointer;}
-  .room.selected,.room-sub.selected{fill:var(--teal-pale);stroke:var(--teal);}
+  .room.selected,.room-sub.selected{fill:var(--teal-pale) !important;stroke:var(--teal) !important;stroke-width:4.5 !important;}
   .corridor{fill:none;stroke:#d3d8dd;stroke-width:14;stroke-linecap:round;}
   .pin{fill:var(--teal);stroke:#fff;stroke-width:2;pointer-events:none;}
   .pin-num{fill:#fff;font-size:15px;font-weight:800;text-anchor:middle;font-family:inherit;pointer-events:none;}
@@ -268,6 +286,9 @@
   }
 
   .legend-list{padding:2px 16px 10px;display:flex;flex-direction:column;gap:7px;}
+  .legend-list .row{padding:6px 8px;border-radius:9px;transition:background .15s,color .15s;}
+  .legend-list .row:hover{background:var(--teal-pale);color:var(--teal-dark);}
+  .legend-list .row.active{background:var(--teal-pale);color:var(--teal-dark);font-weight:800;}
   .legend-list .row{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);font-weight:600;}
   .legend-dot{width:11px;height:11px;border-radius:50%;flex:0 0 11px;}
 
@@ -645,17 +666,18 @@
   <div class="screen" id="screen-map">
     <div class="top-bar">
       <button class="icon-btn" onclick="back()"><span id="icon-map-back"></span></button>
-      <h1>OneHeart Conference Map</h1>
+      <h1>Campus Map</h1>
       <button class="icon-btn" onclick="go('search')"><span id="icon-map-search"></span></button>
     </div>
     <div class="scroll">
       <div class="underline-tabs">
-        <button class="floor-btn active" data-floor="upper" onclick="setFloor('upper')">Upper Floor</button>
-        <button class="floor-btn" data-floor="main" onclick="setFloor('main')">Lower Floor</button>
+        <button class="floor-btn active" data-floor="upper" onclick="setFloor('upper')">Main Level</button>
+        <button class="floor-btn" data-floor="main" onclick="setFloor('main')">Level 1</button>
       </div>
       <div class="map-wrap">
         <div id="floor-upper-wrap"></div>
         <div id="floor-main-wrap" style="display:none"></div>
+        <a id="open-full-map" href="map-mainlevel.html" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;font-size:12.5px;font-weight:700;color:var(--teal-dark);text-decoration:none;">Open this map as its own page <span id="icon-open-map"></span></a>
       </div>
       <div class="legend-list" id="activity-legend"></div>
       <div class="legend-list" id="category-legend" style="padding-top:0;"></div>
@@ -827,7 +849,7 @@ document.getElementById('logo-home').src = LOGO_SRC;
 const staticIcons = {
   'icon-sf1':'search','icon-sf2':'people','icon-sf3':'smile',
   'icon-contact-phone':'phone','icon-contact-chev':'chevron',
-  'icon-map-back':'back','icon-map-search':'search',
+  'icon-map-back':'back','icon-map-search':'search','icon-open-map':'external',
   'icon-ministry-back':'back','icon-ministry-search':'search',
   'icon-mdetail-back':'back',
   'icon-guide-back':'back','icon-emergency-back':'back',
@@ -840,8 +862,10 @@ Object.entries(staticIcons).forEach(([id,name])=>{
 });
 
 /* ---------- NAV STACK ---------- */
+const initialHash = (location.hash||'').replace('#','');
 let stack = ['splash'];
 const rootTabs = ['home','map','search','chat','more'];
+const validScreens = ['home','map','search','chat','more','guide','emergency','contacts'];
 
 function render(){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -851,9 +875,16 @@ function render(){
     const nav = document.getElementById('nav-'+t);
     if(nav) nav.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===top));
   });
+  if(top!=='splash'){
+    let hashScreen = top;
+    if(top==='map' && typeof currentFloor!=='undefined'){
+      hashScreen = currentFloor==='upper' ? 'map-mainlevel' : 'map-level1';
+    }
+    try{ history.replaceState(history.state, '', '#'+hashScreen); }catch(e){}
+  }
 }
 function pushHistory(){
-  try{ history.pushState({stack:[...stack]}, '', ''); }catch(e){}
+  try{ history.pushState({stack:[...stack]}, '', '#'+stack[stack.length-1]); }catch(e){}
 }
 function go(screen){ stack.push(screen); pushHistory(); render(); window.scrollTo(0,0); }
 function goHome(){ stack=['home']; pushHistory(); render(); }
@@ -871,7 +902,17 @@ window.addEventListener('popstate', (e)=>{
   }
   render();
 });
-history.replaceState({stack:[...stack]}, '', '');
+
+/* Deep link: if the page was opened with a #screen hash (e.g. index.html#map),
+   skip the splash screen and jump straight there. */
+(function(){
+  const initial = initialHash;
+  const screenFor = (initial==='map-mainlevel'||initial==='map-level1') ? 'map' : initial;
+  if(screenFor && validScreens.includes(screenFor)){
+    stack = screenFor==='home' ? ['home'] : ['home', screenFor];
+  }
+  history.replaceState({stack:[...stack]}, '', stack.length ? '#'+stack[stack.length-1] : '');
+})();
 
 /* ---------- BOTTOM NAV BUILD ---------- */
 const navItems = [
@@ -906,115 +947,42 @@ document.getElementById('home-tiles').innerHTML = tiles.map(t=>`
 
 /* ---------- ROOM DATA ---------- */
 const rooms = [
-  {id:1, name:'Res Center', floor:'upper', desc:'Breakout session space — hosts Trike Races (near Door E) and Mini Golf (near Door H).', entrance:'Door G', activities:[1,2], category:'breakout'},
-  {id:2, name:'Classroom 115', floor:'upper', desc:'Structural space, not part of the conference activity zones.', entrance:'Door H'},
-  {id:3, name:'Classroom 322', floor:'upper', desc:'Structural space, not part of the conference activity zones.', entrance:'Door E'},
-  {id:4, name:'Gym', floor:'upper', desc:'Breakout session space — hosts Volleyball & Basketball.', entrance:'Door H', activities:[3], category:'breakout'},
-  {id:5, name:'ResKids Area', floor:'upper', desc:'Kids ministry check-in and classrooms.', entrance:'Door H'},
-  {id:6, name:'Oneighty', floor:'upper', desc:'Breakout session space — Hangout Space.', entrance:'Door C', activities:[4], category:'breakout'},
-  {id:7, name:'Garage', floor:'upper', desc:'Vehicle and equipment storage.', entrance:'Door C'},
-  {id:8, name:'Ground Floor', floor:'upper', desc:'Video Games breakout area.', entrance:'Door C', activities:[6], category:'breakout'},
-  {id:9, name:'Zone Hallway', floor:'upper', desc:'Art Project breakout area.', entrance:'Door C', activities:[9], category:'breakout'},
-  {id:21, name:'Room 467-A', floor:'upper', desc:'Art Project breakout area.', entrance:'Door C', activities:[8], category:'breakout'},
-  {id:22, name:'Room 467-B', floor:'upper', desc:'Quiet Room.', entrance:'Door C', activities:[7], category:'breakout'},
-  {id:10, name:'Nursery Area (Upper)', floor:'upper', desc:'Nursery care area.', entrance:'Door C'},
-  {id:11, name:'Olive Tree', floor:'upper', desc:'Meeting and gathering space.', entrance:'Door J'},
-  {id:12, name:'Worship Center (Upper)', floor:'upper', desc:'Main worship center — general sessions.', entrance:'Door J', activities:[5]},
-  {id:13, name:'Hospitality Suite', floor:'upper', desc:'Hospitality and team snack area.', entrance:'Door J'},
-  {id:14, name:'Nursery Area (Lower)', floor:'main', desc:'Nursery care area.', entrance:'Door N'},
-  {id:15, name:'Next Steps Area', floor:'main', desc:'Community gathering space.', entrance:'Door N'},
-  {id:16, name:'Community Room', floor:'main', desc:'Apparel — conference merchandise & gear.', entrance:'Door N', category:'apparel'},
-  {id:17, name:'Resource Center', floor:'main', desc:'Coffee & Snacks.', entrance:'Door N', category:'coffee'},
-  {id:18, name:'Worship Center (Lower)', floor:'main', desc:'Activities breakout space.', entrance:'Door N', activities:[10], category:'breakout'},
-  {id:19, name:'Chapel', floor:'main', desc:'Saturday Meals served here.', entrance:'Door K', category:'meals'},
-  {id:20, name:'Choir Room', floor:'main', desc:'Choir rehearsal and robing room.', entrance:'Door K'}
+  {id:1, num:1, name:'Worship Center: Main Level', floor:'upper', desc:'Main sanctuary and general seating on the Main Level.', entrance:'Main Entrance (Door K)', color:'var(--orange)', x:78.7, y:51.9},
+  {id:2, num:2, name:'Chapel', floor:'upper', desc:'Smaller worship space used for chapel services and events.', entrance:'Door L', color:'var(--green)', x:82.7, y:73.5},
+  {id:3, num:3, name:'Welcome Area', floor:'upper', desc:'First stop for guests near the Main Entrance — welcome desk and Guest Services.', entrance:'Main Entrance (Door K)', color:'var(--red)', x:81.6, y:84.8},
+  {id:4, num:4, name:'Community Room', floor:'upper', desc:'Community gathering space.', entrance:'Door M', color:'var(--blue)', x:56.0, y:73.3},
+  {id:5, num:5, name:"Noah's Ark Nursery/Preschool", floor:'upper', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'52nd St entrance (Door K)', color:'var(--orange)', x:48.3, y:48.0},
+  {id:6, num:6, name:'Atrium', floor:'upper', desc:'Atrium lobby connecting to the Ivanrest Ave entrance.', entrance:'Atrium Entrance (Door N)', color:'var(--purple)', x:51.5, y:27.5},
+  {id:7, num:1, name:'RezKidz Center (Kindergarten – 4th grade)', floor:'main', desc:'Kids ministry check-in and classrooms for Kindergarten through 4th grade.', entrance:'Door C', color:'var(--green)', x:17.9, y:52.6},
+  {id:8, num:2, name:'Gym', floor:'main', desc:'Gym space — hosts Servicio Hispano at 11:30 a.m. (RezCenter / Iglesia Vida).', entrance:'Door B', color:'var(--cyan)', x:35.4, y:55.5},
+  {id:9, num:3, name:'Oneighty (7th & 8th grade)', floor:'main', desc:'Student ministry space for 7th & 8th grade (Married Life).', entrance:'Door D', color:'var(--pink)', x:41.3, y:41.2},
+  {id:10, num:4, name:'The Ground Floor (9th – 12th grade)', floor:'main', desc:'High school ministry space.', entrance:'Door E', color:'var(--muted)', x:54.1, y:41.2},
+  {id:11, num:5, name:'The Zone (5th & 6th grade)', floor:'main', desc:'Kids ministry space for 5th & 6th grade.', entrance:'Door F', color:'var(--red)', x:62.8, y:31.9},
+  {id:12, num:6, name:'Worship Center: Balcony Seating', floor:'main', desc:'Balcony seating overlooking the Worship Center below.', entrance:'Door H', color:'var(--orange)', x:86.1, y:69.9},
+  {id:13, num:7, name:'Olive Tree Café', floor:'main', desc:'Coffee & snacks.', entrance:'Door G', color:'var(--blue)', x:70.1, y:83.8},
+  {id:14, num:8, name:"Noah's Ark Nursery/Preschool", floor:'main', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'Door A', color:'var(--orange)', x:65.8, y:64.6},
+  {id:15, num:9, name:'Walking By Faith', floor:'main', desc:'Ministry meeting space.', entrance:'Door J', color:'var(--purple)', x:31.0, y:40.2}
 ];
 function roomById(id){ return rooms.find(r=>r.id===id); }
 
-const activities = [
-  {num:1, label:'Trike Races'},
-  {num:2, label:'Mini Golf'},
-  {num:3, label:'Volleyball & Basketball'},
-  {num:4, label:'Hangout Space'},
-  {num:5, label:'Laser Tag'},
-  {num:6, label:'Video Games'},
-  {num:7, label:'Quiet Room'},
-  {num:8, label:'Art Project'},
-  {num:9, label:'Art Project'},
-  {num:10, label:'Activities'}
-];
-const categories = [
-  {key:'restrooms', label:'Restrooms', color:'var(--red)'},
-  {key:'coffee', label:'Coffee & Snacks', color:'var(--purple)'},
-  {key:'apparel', label:'Apparel', color:'var(--green)'},
-  {key:'breakout', label:'Breakout Session', color:'var(--orange)'},
-  {key:'meals', label:'Saturday Meals', color:'var(--cyan)'}
-];
-document.getElementById('activity-legend').innerHTML = activities.map(a=>
-  `<div class="row"><span class="legend-num">${a.num}</span>${a.label}</div>`).join('');
-document.getElementById('category-legend').innerHTML = categories.map(c=>
-  `<div class="row"><span class="legend-dot" style="background:${c.color}"></span>${c.label}</div>`).join('');
+document.getElementById('activity-legend').innerHTML = '';
+document.getElementById('category-legend').innerHTML = '';
+function buildFloorLegend(f){
+  const list = rooms.filter(r=>r.floor===f);
+  document.getElementById('activity-legend').innerHTML = list.map(r=>
+    `<div class="row" data-id="${r.id}" style="cursor:pointer;" onclick="selectRoom(${r.id})"><span class="legend-num" style="background:${r.color};">${r.num}</span>${r.name}</div>`).join('');
+}
+function buildMapPins(f){
+  const list = rooms.filter(r=>r.floor===f);
+  return list.map(r=>
+    `<button class="img-pin" data-id="${r.id}" style="left:${r.x}%;top:${r.y}%;background:${r.color};" onclick="selectRoom(${r.id})">${r.num}</button>`).join('');
+}
 
-/* ---------- FLOOR PLAN SVGs ---------- */
-const upperSVG = `
-<svg viewBox="0 -30 1000 730" class="floorplan" id="svg-upper">
-  <path d="M900,240 L935,120" class="corridor"/>
-  <path d="M620,230 L650,230" class="corridor"/>
-
-  <polygon class="room" data-id="7" points="900,60 962,38 992,92 950,122"/>
-  <polygon class="door-tab" points="300,110 340,110 320,140"/><text class="door-label" x="320" y="100">Door E</text>
-  <polygon class="room" data-id="3" points="300,140 370,140 370,205 300,205"/>
-  <polygon class="room cat-breakout" data-id="6" points="565,130 630,130 630,320 565,320"/>
-  <circle class="pin" cx="597" cy="225" r="15"/><text class="pin-num" x="597" y="230">4</text>
-  <polygon class="door-tab" points="640,215 640,255 670,235"/><text class="door-label" x="648" y="200">Door C</text>
-  <polygon class="room cat-breakout" data-id="8" points="655,160 855,160 855,340 655,340"/>
-  <circle class="pin" cx="755" cy="250" r="15"/><text class="pin-num" x="755" y="255">6</text>
-  <polygon class="room cat-breakout" data-id="9" points="860,160 895,160 895,240 860,240"/>
-  <circle class="pin" cx="877" cy="200" r="14"/><text class="pin-num" x="877" y="205">9</text>
-  <polygon class="room cat-breakout" data-id="21" points="898,160 925,160 925,240 898,240"/>
-  <circle class="pin" cx="911" cy="200" r="14"/><text class="pin-num" x="911" y="205">8</text>
-  <polygon class="room cat-breakout" data-id="22" points="928,160 955,160 955,240 928,240"/>
-  <circle class="pin" cx="941" cy="200" r="14"/><text class="pin-num" x="941" y="205">7</text>
-  <polygon class="room cat-breakout" data-id="1" points="120,340 165,235 285,195 385,240 425,340 385,445 285,485 165,445"/>
-  <circle class="pin" cx="240" cy="270" r="15"/><text class="pin-num" x="240" y="275">1</text>
-  <circle class="pin" cx="240" cy="410" r="15"/><text class="pin-num" x="240" y="415">2</text>
-  <polygon class="room-sub cat-breakout" data-id="1" points="120,340 55,305 55,375"/>
-  <text class="door-label" x="30" y="345" text-anchor="start">Door G</text>
-  <polygon class="room" data-id="2" points="155,445 225,445 225,505 155,505"/>
-  <polygon class="door-tab" points="245,510 285,510 265,540"/><text class="door-label" x="265" y="560">Door H</text>
-  <polygon class="room cat-breakout" data-id="4" points="425,300 485,270 545,300 545,380 485,412 425,380"/>
-  <circle class="pin" cx="485" cy="340" r="16"/><text class="pin-num" x="485" y="345">3</text>
-  <polygon class="room" data-id="5" points="425,385 485,415 505,470 445,500 400,460"/>
-  <polygon class="door-tab" points="555,375 595,375 575,405"/><text class="door-label" x="575" y="360">Door J</text>
-  <polygon class="room" data-id="10" points="600,345 855,345 900,385 878,485 700,505 600,440"/>
-  <polygon class="room" data-id="11" points="700,505 780,505 800,565 740,595 680,565"/>
-  <path class="room" data-id="12" d="M905,345 L955,345 Q1000,345 1000,480 Q1000,620 955,620 L905,620 Z"/>
-  <circle class="pin" cx="945" cy="480" r="17"/><text class="pin-num" x="945" y="486">5</text>
-  <polygon class="room" data-id="13" points="850,600 925,600 925,665 850,665"/>
-  <circle class="mk" cx="400" cy="150" r="9" style="fill:var(--red)"/>
-  <circle class="mk" cx="885" cy="150" r="9" style="fill:var(--red)"/>
-  <circle class="mk" cx="900" cy="345" r="9" style="fill:var(--red)"/>
-  <circle class="mk" cx="955" cy="600" r="9" style="fill:var(--red)"/>
-</svg>`;
-
-const mainSVG = `
-<svg viewBox="0 0 1000 620" class="floorplan" id="svg-main">
-  <polygon class="door-tab" points="130,45 170,45 150,75"/><text class="door-label" x="150" y="35">Door N</text>
-  <polygon class="room" data-id="14" points="80,80 225,60 265,145 225,225 100,225 60,150"/>
-  <polygon class="room" data-id="15" points="100,225 225,225 225,305 145,305 100,275"/>
-  <polygon class="room cat-apparel" data-id="16" points="80,305 225,305 245,425 80,425"/>
-  <polygon class="room cat-coffee" data-id="17" points="265,285 365,285 365,425 265,425"/>
-  <polygon class="room cat-breakout" data-id="18" points="390,280 430,180 560,140 670,190 705,280 670,380 560,420 430,380"/>
-  <circle class="pin" cx="545" cy="280" r="18"/><text class="pin-num" x="545" y="286">10</text>
-  <polygon class="room cat-meals" data-id="19" points="705,340 785,340 805,420 745,460 685,420"/>
-  <polygon class="room" data-id="20" points="785,300 855,280 885,340 855,400 805,400"/>
-  <polygon class="door-tab" points="740,465 780,465 760,495"/><text class="door-label" x="760" y="515">Door K</text>
-  <circle class="mk" cx="95" cy="55" r="9" style="fill:var(--red)"/>
-  <circle class="mk" cx="700" cy="330" r="9" style="fill:var(--red)"/>
-</svg>`;
-
-document.getElementById('floor-upper-wrap').innerHTML = upperSVG;
-document.getElementById('floor-main-wrap').innerHTML = mainSVG;
+document.getElementById('floor-upper-wrap').innerHTML =
+  `<div class="map-img-wrap"><img class="map-img" src="map-main-level.png" alt="Main Level campus map">${buildMapPins('upper')}</div>`;
+document.getElementById('floor-main-wrap').innerHTML =
+  `<div class="map-img-wrap"><img class="map-img" src="map-level1.png" alt="Level 1 campus map">${buildMapPins('main')}</div>`;
+buildFloorLegend('upper');
 
 let currentFloor='upper';
 let selectedRoom=1;
@@ -1024,13 +992,21 @@ function setFloor(f){
   document.querySelectorAll('.floor-btn').forEach(b=>b.classList.toggle('active', b.dataset.floor===f));
   document.getElementById('floor-upper-wrap').style.display = f==='upper' ? '' : 'none';
   document.getElementById('floor-main-wrap').style.display = f==='main' ? '' : 'none';
+  buildFloorLegend(f);
   const firstRoom = rooms.find(r=>r.floor===f);
   selectRoom(firstRoom.id);
+  const hashFloor = f==='upper' ? 'map-mainlevel' : 'map-level1';
+  try{ history.replaceState(history.state, '', '#'+hashFloor); }catch(e){}
+  const openLink = document.getElementById('open-full-map');
+  if(openLink) openLink.href = f==='upper' ? 'map-mainlevel.html' : 'map-level1.html';
 }
 function selectRoom(id){
   selectedRoom=id;
-  document.querySelectorAll('.room,.room-sub').forEach(el=>{
+  document.querySelectorAll('.img-pin').forEach(el=>{
     el.classList.toggle('selected', parseInt(el.dataset.id)===id);
+  });
+  document.querySelectorAll('.legend-list .row').forEach(el=>{
+    el.classList.toggle('active', parseInt(el.dataset.id)===id);
   });
   const r = roomById(id);
   const isWorshipCenter = r.name.includes('Worship Center');
@@ -1074,7 +1050,7 @@ const ministries = {
   sunam:[
     {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Worship Center (Upper Level)',pastor:'Pastor Duane VanderKlok',entrance:'Door J', desc:'Our main English-language service, gathering the whole church family for worship and teaching.', how:'Enter through Door J and follow the main hallway to the Worship Center.'},
     {icon:'people',color:'var(--teal)',bg:'var(--teal-pale)',title:'Iglesia Vida',loc:'Worship Center (Upper Level)',pastor:'Pastor Luis Quezada',entrance:'Door J', desc:'Our Spanish-language service, meeting in the same Worship Center.', how:'Enter through Door J and follow the main hallway to the Worship Center.'},
-    {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Community Room',pastor:'', entrance:'Door N', desc:'Free coffee for guests and members before and after service.', how:'Enter through Door N; the Community Room is just off the main lobby.'},
+    {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Main Lobby',pastor:'', entrance:'Door N', desc:'Free coffee for guests and members before and after service.', how:'Enter through Door N; coffee is set up just off the main lobby.'},
     {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.'},
     {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'High School',loc:'Ground Floor',pastor:'Pastors Ben & Kendra Lepsch — 9 AM only',entrance:'Door C', desc:'High School students gather for teaching, worship, and community.', how:'Enter through Door C or Door J. Take the hallway to the main lobby — High School is on the Ground Floor.'},
     {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.'},
@@ -1247,7 +1223,15 @@ document.getElementById('emergency-body').innerHTML = `
   </div>
   <div class="info-card">
     <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Pastoral Care</h4></div>
-    <p style="font-size:12.5px;color:var(--text);margin:0;">Ministry appointments, hospital visitation & funeral information — refer to Pastors Matt Yonker, Nick Mayo, or Pat Tibbitts.<br><br>Direct: 616.524.9121 · Church: 616.534.4923</p>
+    <p style="font-size:12.5px;color:var(--text);margin:0;">Ministry appointments, hospital visitation & funeral information — refer to Pastors Matt Yonker, Nick Mayo, or Pat Binish.<br><br>Direct: 616.524.9121 · Church: 616.534.4923</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Deacon On Call</h4></div>
+    <p style="font-size:12.5px;color:var(--text);margin:0;">Pastor Ricky Luong — (616) 334-5596</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('phone','var(--red)','var(--red-bg)',34)}<h4>Security</h4></div>
+    <p style="font-size:12.5px;color:var(--text);margin:0;">Watch Command: (616) 261-3775<br>Security Head: Mark Garner</p>
   </div>
   <div class="info-card">
     <div class="ic-head">${badgeIcon('bag','var(--orange)','var(--orange-bg)',34)}<h4>Lost & Found</h4></div>
@@ -1286,7 +1270,15 @@ document.getElementById('contacts-body').innerHTML = `
   </div>
   <div class="info-card">
     <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Pastoral Care Office</h4></div>
-    <p style="font-size:12.5px;margin:0;">Direct: 616.524.9121<br>Church: 616.534.4923<br>Refer to Pastors Matt Yonker, Nick Mayo, or Pat Tibbitts.</p>
+    <p style="font-size:12.5px;margin:0;">Direct: 616.524.9121<br>Church: 616.534.4923<br>Refer to Pastors Matt Yonker, Nick Mayo, or Pat Binish.</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Deacon On Call</h4></div>
+    <p style="font-size:12.5px;margin:0;">Pastor Ricky Luong — (616) 334-5596</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('phone','var(--red)','var(--red-bg)',34)}<h4>Security</h4></div>
+    <p style="font-size:12.5px;margin:0;">Watch Command: (616) 261-3775<br>Security Head: Mark Garner</p>
   </div>
   <div class="info-card">
     <div class="ic-head">${badgeIcon('bag','var(--orange)','var(--orange-bg)',34)}<h4>Lost & Found / Front Office</h4></div>
@@ -1354,9 +1346,13 @@ function searchIndex_click(i){ searchIndex[i].action(); }
 const chatRules = [
   {kw:['pickup','preschool','parent','drop off','drop-off'], a:"Parents pick up preschoolers in the Nursery & Preschool area. If you're on the Lower Level, go to your child's classroom door. If you're on the Upper Level, exit through Door N. Our team will help guide you!"},
   {kw:['growth track'], a:"Growth Track meets in the Chapel at every service — enter through Door K."},
-  {kw:['coffee'], a:"Free coffee is in the Community Room (Sunday AM), the Ground Floor Lobby (Sunday PM), or the Res Center Lobby (Wednesday)."},
+  {kw:['coffee'], a:"Free coffee is in the Main Lobby (Sunday AM), the Ground Floor Lobby (Sunday PM), or the Res Center Lobby (Wednesday)."},
   {kw:['first time','first-time','visitor','guest'], a:"Bring first-time guests to the closest welcome desk and introduce them to a Next Steps coach to begin the guest process."},
-  {kw:['pastoral','pastor','care'], a:"For pastoral care, refer to Pastors Matt Yonker, Nick Mayo, or Pat Tibbitts. Direct: 616.524.9121 · Church: 616.534.4923."},
+  {kw:['pastoral','pastor','care'], a:"For pastoral care, refer to Pastors Matt Yonker, Nick Mayo, or Pat Binish. Direct: 616.524.9121 · Church: 616.534.4923."},
+  {kw:['nurse'], a:"For a nurse, contact Watch Command at (616) 261-3775."},
+  {kw:['deacon'], a:"Contact Pastor Ricky at (616) 334-5596."},
+  {kw:['security','watch command','safety'], a:"For security, contact Watch Command at (616) 261-3775. Security Head: Mark Garner."},
+  {kw:['hispanic','spanish'], a:"The Hispanic Service is held at Iglesia Vida (ResCenter)."},
   {kw:['lost'], a:"Sunday AM: direct to Door K and let the Safety Team know. Monday–Thursday 8:30am–4pm: Front Office (Door G) or call 616.534.4923."},
   {kw:['emergency'], a:"If a pastor is needed right away, call 616.534.4923, option 2, and leave a message. Our on-duty pastor will get back to you shortly."},
   {kw:['restroom','bathroom'], a:"Restrooms are marked with a green dot on the Campus Map — check the Map tab for the one nearest you."},
@@ -1395,6 +1391,12 @@ function sendChat(){
 }
 
 render();
+
+/* Deep link: #map-mainlevel or #map-level1 opens the map on that specific floor. */
+(function(){
+  if(initialHash==='map-mainlevel'){ setFloor('upper'); }
+  else if(initialHash==='map-level1'){ setFloor('main'); }
+})();
 </script>
 </body>
 </html>
