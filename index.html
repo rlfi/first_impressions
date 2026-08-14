@@ -647,6 +647,15 @@
       </div>
 
       <div class="tiles" id="home-tiles"></div>
+
+      <div class="contact-row" onclick="go('contacts')">
+        <div class="badge" style="background:var(--teal-pale);color:var(--teal-dark);width:42px;height:42px;" id="icon-contact-phone"></div>
+        <div style="flex:1;">
+          <h3>Important Contacts</h3>
+          <p>Staff & emergency info</p>
+        </div>
+        <div class="chev" id="icon-contact-chev"></div>
+      </div>
     </div>
     <div class="bottom-nav" id="nav-home"></div>
   </div>
@@ -826,6 +835,7 @@ document.getElementById('logo-home').src = LOGO_SRC;
 /* ---------- STATIC ICON PLACEHOLDERS ---------- */
 const staticIcons = {
   'icon-sf1':'search','icon-sf2':'people','icon-sf3':'smile',
+  'icon-contact-phone':'phone','icon-contact-chev':'chevron',
   'icon-map-back':'back','icon-map-search':'search',
   'icon-ministry-back':'back','icon-ministry-search':'search',
   'icon-mdetail-back':'back',
@@ -911,7 +921,6 @@ const tiles = [
   {icon:'people', color:'var(--purple)', bg:'var(--purple-bg)', title:'Where Does This Ministry Meet?', sub:'Find rooms & locations', go:'ministry'},
   {icon:'external', color:'var(--purple)', bg:'var(--purple-bg)', title:'ResLife Website', sub:'Ministries & more', external:'https://reslife.org/ministries/'},
   {icon:'external', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'ResLife Classes', sub:'Sign up for a class', external:'https://reslife.org/class/'},
-  {icon:'phone', color:'var(--teal)', bg:'var(--teal-pale)', title:'Important Contacts', sub:'Staff & emergency info', go:'contacts'},
   {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
   {icon:'question', color:'var(--blue)', bg:'var(--blue-bg)', title:'Quick Answers', sub:'Common questions', go:'search'}
 ];
