@@ -969,12 +969,12 @@ document.getElementById('category-legend').innerHTML = '';
 function buildFloorLegend(f){
   const list = rooms.filter(r=>r.floor===f);
   document.getElementById('activity-legend').innerHTML = list.map(r=>
-    `<div class="row" data-id="${r.id}" style="cursor:pointer;" onclick="selectRoom(${r.id})"><span class="legend-num" style="background:${r.color};">${r.num}</span>${r.name}</div>`).join('');
+    `<div class="row" data-id="${r.id}" style="cursor:pointer;" onclick="selectRoom(${r.id})"><span class="legend-num" style="background:${r.color};"></span>${r.name}</div>`).join('');
 }
 function buildMapPins(f){
   const list = rooms.filter(r=>r.floor===f);
   return list.map(r=>
-    `<button class="img-pin" data-id="${r.id}" style="left:${r.x}%;top:${r.y}%;background:${r.color};" onclick="selectRoom(${r.id})">${r.num}</button>`).join('');
+    `<button class="img-pin" data-id="${r.id}" style="left:${r.x}%;top:${r.y}%;background:${r.color};" onclick="selectRoom(${r.id})"></button>`).join('');
 }
 
 document.getElementById('floor-upper-wrap').innerHTML =
@@ -1009,7 +1009,7 @@ function selectRoom(id){
   const isWorshipCenter = r.name.includes('Worship Center');
   document.getElementById('room-detail-slot').innerHTML = `
     <div class="room-detail">
-      <div class="rd-head"><div class="rd-num">${r.id}</div><h3>${r.name}</h3></div>
+      <div class="rd-head"><div class="rd-num">${ic('pin')}</div><h3>${r.name}</h3></div>
       ${r.desc?`<p class="rd-desc">${r.desc}</p>`:''}
       <div class="rd-entrance">${ic('pin')} Nearest Entrance: ${r.entrance}</div>
       <button class="btn-primary" id="dir-btn" onclick="showDirections(${r.id})">Get Directions <span class="btn-chev" id="dir-chev">${ic('chevron-down')}</span></button>
