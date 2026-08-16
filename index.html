@@ -1266,17 +1266,10 @@ const captains = [
   {name:'Dave Vanderveen', num:'6169163003'}
 ];
 const captainMsg = "Hi, this is [your name] — I won't be able to serve on [date].";
-const isAndroid = /Android/i.test(navigator.userAgent);
-function textCaptains(){
-  const nums = captains.map(c=>c.num).join(',');
-  window.open(`sms:${nums}?body=${encodeURIComponent(captainMsg)}`, '_self');
-}
 function textOneCaptain(num){
   window.open(`sms:${num}?body=${encodeURIComponent(captainMsg)}`, '_self');
 }
-const captainTiles = isAndroid
-  ? captains.map(c=>({icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:`Text ${c.name}`, sub:"Let them know you can't serve", action:`textOneCaptain('${c.num}')`}))
-  : [{icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:'Notify Your Captains', sub:"Text if you can't serve", action:'textCaptains()'}];
+const captainTiles = captains.map(c=>({icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:`Text ${c.name}`, sub:"Let them know you can't serve", action:`textOneCaptain('${c.num}')`}));
 document.getElementById('captains-body').innerHTML = `<div class="list-card">${
   captainTiles.map(m=>`
   <div class="list-row" onclick="${m.action}">
