@@ -735,10 +735,13 @@
   <div class="screen" id="screen-captains">
     <div class="top-bar">
       <button class="icon-btn" onclick="back()"><span id="icon-captains-back"></span></button>
-      <h1>Contact Team Captains</h1>
+      <h1>Contact Your Captain</h1>
       <div style="width:40px"></div>
     </div>
-    <div class="scroll" id="captains-body"></div>
+    <div class="scroll">
+      <p style="padding:14px 16px 4px;font-size:13px;color:#6b7280;line-height:1.4;margin:0;">Each usher is assigned to one captain. Tap yours below to text them directly.</p>
+      <div id="captains-body"></div>
+    </div>
   </div>
 
   <!-- SEARCH -->
@@ -925,7 +928,7 @@ const tiles = [
   {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
   {icon:'question', color:'var(--blue)', bg:'var(--blue-bg)', title:'Quick Answers', sub:'Common questions', go:'search'},
   {icon:'phone', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'Important Contacts', sub:'Staff & emergency info', go:'contacts'},
-  {icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:'Contact Team Captains', sub:"Text if you can't serve", go:'captains'}
+  {icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:'Contact Your Captain', sub:"Text if you can't serve", go:'captains'}
 ];
 document.getElementById('home-tiles').innerHTML = tiles.map(t=>`
   <div class="tile" onclick="${t.external?`window.open('${t.external}','_blank')`:`go('${t.go}')`}">
