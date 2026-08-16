@@ -1249,17 +1249,30 @@ document.getElementById('contacts-body').innerHTML = `
   </div>`;
 
 /* ---------- MORE ---------- */
-const captainNumbers = ['6164469839','6163186150','3122412455','6169163003'];
+const captains = [
+  {name:'Kyle Mol', num:'6164469839'},
+  {name:'Paul Farmwald', num:'6163186150'},
+  {name:'Mike Robinson', num:'3122412455'},
+  {name:'Dave Vanderveen', num:'6169163003'}
+];
+const captainMsg = "Hi, this is [your name] — I won't be able to serve on [date].";
+const isAndroid = /Android/i.test(navigator.userAgent);
 function textCaptains(){
-  const msg = "Hi, this is [your name] — I won't be able to serve on [date].";
-  window.open(`sms:${captainNumbers.join(',')}?body=${encodeURIComponent(msg)}`, '_self');
+  const nums = captains.map(c=>c.num).join(',');
+  window.open(`sms:${nums}?body=${encodeURIComponent(captainMsg)}`, '_self');
 }
+function textOneCaptain(num){
+  window.open(`sms:${num}?body=${encodeURIComponent(captainMsg)}`, '_self');
+}
+const captainTiles = isAndroid
+  ? captains.map(c=>({icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:`Text ${c.name}`, sub:"Let them know you can't serve", action:`textOneCaptain('${c.num}')`}))
+  : [{icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:'Notify Your Captains', sub:"Text if you can't serve", action:'textCaptains()'}];
 const moreLinks = [
   {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'First Impressions Guide', sub:'Best practices & steps', go:'guide'},
   {icon:'baby', color:'var(--red)', bg:'var(--red-bg)', title:'Nursery Rooms', sub:'Find age & room', go:'nursery'},
   {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
   {icon:'people', color:'var(--purple)', bg:'var(--purple-bg)', title:'Where Does This Ministry Meet?', sub:'Find rooms & locations', go:'ministry'},
-  {icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:'Notify Your Captains', sub:"Text if you can't serve", action:'textCaptains()'},
+  ...captainTiles,
   {icon:'external', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'Team Captain Site', sub:'Directory & resources', external:'https://drive.google.com/drive/folders/1jf-SD4vZ0hSmhBbXrbgbZK6mlgHxPMwu'}
 ];
 document.getElementById('more-body').innerHTML = `<div class="list-card">${
