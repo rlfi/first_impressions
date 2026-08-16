@@ -70,6 +70,21 @@
     width:34px; height:34px;
     box-shadow:0 0 0 4px rgba(22,163,148,0.45), 0 2px 8px rgba(0,0,0,0.4);
   }
+  .door-pin{
+    position:absolute; width:18px; height:18px; border-radius:50%;
+    border:2px dashed rgba(15,122,110,0.55); background:transparent;
+    transform:translate(-50%,-50%); pointer-events:none;
+  }
+  .door-pin.selected{
+    width:32px; height:32px; border:3px solid #fff; background:var(--teal-dark);
+    box-shadow:0 0 0 5px rgba(22,163,148,0.5), 0 2px 8px rgba(0,0,0,0.4);
+    animation:doorPulse 1.5s ease-out infinite;
+  }
+  @keyframes doorPulse{
+    0%{box-shadow:0 0 0 0 rgba(22,163,148,0.55), 0 2px 8px rgba(0,0,0,0.4);}
+    70%{box-shadow:0 0 0 14px rgba(22,163,148,0), 0 2px 8px rgba(0,0,0,0.4);}
+    100%{box-shadow:0 0 0 0 rgba(22,163,148,0), 0 2px 8px rgba(0,0,0,0.4);}
+  }
   .legend-list{ display:flex; flex-direction:column; gap:7px; margin-bottom:16px; }
   .legend-row{
     display:flex; align-items:center; gap:9px; font-size:13.5px; font-weight:600;
@@ -121,6 +136,7 @@
     <div class="map-img-wrap">
       <img class="map-img" src="map-main-level.png" alt="Main Level campus map">
       <div id="pins"></div>
+      <div id="doorpins"></div>
     </div>
   </div>
 
@@ -131,6 +147,7 @@
 
 <script>
 const rooms = [{"id": 1, "num": 1, "name": "Worship Center: Main Level", "desc": "Main sanctuary and general seating on the Main Level.", "entrance": "Main Entrance (Door K)", "color": "var(--orange)", "x": 78.7, "y": 51.9}, {"id": 2, "num": 2, "name": "Chapel", "desc": "Smaller worship space used for chapel services and events.", "entrance": "Door L", "color": "var(--green)", "x": 82.7, "y": 73.5}, {"id": 3, "num": 3, "name": "Welcome Area", "desc": "First stop for guests near the Main Entrance \u2014 welcome desk and Guest Services.", "entrance": "Main Entrance (Door K)", "color": "var(--red)", "x": 81.6, "y": 84.8}, {"id": 4, "num": 4, "name": "Community Room", "desc": "Community gathering space.", "entrance": "Door M", "color": "var(--blue)", "x": 56.0, "y": 73.3}, {"id": 5, "num": 5, "name": "Noah's Ark Nursery/Preschool", "desc": "Nursery & preschool care, 6 weeks \u2013 5 years.", "entrance": "52nd St entrance (Door K)", "color": "var(--orange)", "x": 48.3, "y": 48.0}, {"id": 6, "num": 6, "name": "Atrium", "desc": "Atrium lobby connecting to the Ivanrest Ave entrance.", "entrance": "Atrium Entrance (Door N)", "color": "var(--purple)", "x": 51.5, "y": 27.5}];
+const doors = [{"letter":"K","x":66.6,"y":85.5},{"letter":"M","x":91.8,"y":36.6},{"letter":"N","x":56.4,"y":27.2}];
 
 function ic(name){
   const icons = {
@@ -143,6 +160,16 @@ function ic(name){
 document.getElementById('pins').innerHTML = rooms.map(r =>
   `<button class="img-pin" data-id="${r.id}" style="left:${r.x}%;top:${r.y}%;background:${r.color};" onclick="selectRoom(${r.id})">${r.num}</button>`
 ).join('');
+
+document.getElementById('doorpins').innerHTML = doors.map(d =>
+  `<div class="door-pin" data-letter="${d.letter}" style="left:${d.x}%;top:${d.y}%;"></div>`
+).join('');
+
+function selectDoors(letters){
+  document.querySelectorAll('.door-pin').forEach(el =>
+    el.classList.toggle('selected', letters.includes(el.dataset.letter))
+  );
+}
 
 document.getElementById('legend').innerHTML = rooms.map(r =>
   `<div class="legend-row" data-id="${r.id}" onclick="selectRoom(${r.id})"><span class="legend-num" style="background:${r.color};">${r.num}</span>${r.name}</div>`
@@ -163,10 +190,16 @@ function selectRoom(id){
 }
 
 (function(){
-  const h = (location.hash||'').replace('#room-','');
-  const id = parseInt(h);
-  const match = rooms.find(r => r.id === id);
+  const parts = (location.hash||'').replace('#','').split(',');
+  let roomId = null;
+  const doorLetters = [];
+  parts.forEach(p=>{
+    if(p.startsWith('room-')) roomId = parseInt(p.replace('room-',''));
+    if(p.startsWith('door-')) doorLetters.push(p.replace('door-','').toUpperCase());
+  });
+  const match = rooms.find(r => r.id === roomId);
   selectRoom(match ? match.id : rooms[0].id);
+  if(doorLetters.length) selectDoors(doorLetters);
 })();
 </script>
 </body>
