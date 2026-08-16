@@ -1036,10 +1036,10 @@ selectRoom(1);
 /* ---------- MINISTRY DATA ---------- */
 const ministries = {
   sunam:[
-    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Worship Center (Upper Level)',pastor:'Pastor Duane VanderKlok',entrance:'Door J', desc:'Our main English-language service, gathering the whole church family for worship and teaching.', how:'Enter through Door J and follow the main hallway to the Worship Center.'},
+    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Worship Center (Upper Level)',pastor:'Pastor Duane VanderKlok',entrance:'Door J', desc:'Our main English-language service, gathering the whole church family for worship and teaching.', how:'Enter through Door J and follow the main hallway to the Worship Center.', mapFile:'map-mainlevel.html', mapRoom:1},
     {icon:'people',color:'var(--teal)',bg:'var(--teal-pale)',title:'Iglesia Vida',loc:'ResCenter',pastor:'Pastor Luis Quezada',entrance:'Door G', desc:'Our Spanish-language service, meeting at ResCenter.', how:'Enter through Door G and follow the hallway to ResCenter.'},
     {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Main Lobby',pastor:'', entrance:'Door N', desc:'Free coffee for guests and members before and after service.', how:'Enter through Door N; coffee is set up just off the main lobby.'},
-    {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.'},
+    {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.', mapFile:'map-mainlevel.html', mapRoom:2},
     {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'High School',loc:'Ground Floor',pastor:'Pastors Ben & Kendra Lepsch — 9 AM only',entrance:'Door C', desc:'High School students gather for teaching, worship, and community.', how:'Enter through Door C or Door J. Take the hallway to the main lobby — High School is on the Ground Floor.'},
     {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.'},
     {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'3rd – 5th Grade',loc:'The Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.'},
@@ -1047,7 +1047,7 @@ const ministries = {
     {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby.'}
   ],
   sunpm:[
-    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Ground Floor',pastor:'Pastor Daniel VanderKlok',entrance:'Door C', desc:'Our evening service, gathering on the Ground Floor.', how:'Enter through Door C and follow the hallway to the Ground Floor.'},
+    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Ground Floor',pastor:'Pastor Daniel VanderKlok',entrance:'Door C', desc:'Our evening service, gathering on the Ground Floor.', how:'Enter through Door C and follow the hallway to the Ground Floor.', mapFile:'map-level1.html', mapRoom:10},
     {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Ground Floor Lobby',pastor:'', entrance:'Door C', desc:'Free coffee available in the Ground Floor Lobby.', how:'Enter through Door C; coffee is set up in the lobby.'},
     {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'The Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.'},
     {icon:'info',color:'var(--muted)',bg:'var(--bg)',title:'Other Classes',loc:'See Guest Service Desk',pastor:'', entrance:'', desc:'Additional classes vary by season — check the Guest Service Desk for current locations.', how:'Ask any team member at the Guest Service Desk for directions.'},
@@ -1107,6 +1107,7 @@ function openMinistry(day, idx){
       <div class="directions-drop" id="md-directions-drop">
         <div class="directions-drop-inner">${ic('pin')}<p id="md-directions-text"></p></div>
       </div>
+      ${m.mapFile?`<button class="btn-secondary" style="margin-top:10px;" onclick="window.open('${m.mapFile}#room-${m.mapRoom}','_blank')">View on Map ${ic('external')}</button>`:''}
       ${isWorshipCenter?`<button class="btn-secondary" style="margin-top:10px;" onclick="window.open('seating.html','_blank')">View Seating Chart ${ic('external')}</button>`:''}
       ${isNursery?`
       <button class="btn-secondary" id="md-nursery-btn" onclick="toggleMdNursery()" style="margin-top:10px;">Find Your Child's Room <span class="btn-chev" id="md-nursery-chev">${ic('chevron-down')}</span></button>
