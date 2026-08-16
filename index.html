@@ -1252,7 +1252,7 @@ document.getElementById('contacts-body').innerHTML = `
 const captainNumbers = ['6164469839','6163186150','3122412455','6169163003'];
 function textCaptains(){
   const msg = "Hi, this is [your name] — I won't be able to serve on [date].";
-  window.open(`sms:${captainNumbers.join(',')}&body=${encodeURIComponent(msg)}`, '_self');
+  window.open(`sms:${captainNumbers.join(',')}?body=${encodeURIComponent(msg)}`, '_self');
 }
 const moreLinks = [
   {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'First Impressions Guide', sub:'Best practices & steps', go:'guide'},
