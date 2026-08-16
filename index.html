@@ -647,15 +647,6 @@
       </div>
 
       <div class="tiles" id="home-tiles"></div>
-
-      <div class="contact-row" onclick="go('contacts')">
-        <div class="badge" style="background:var(--teal-pale);color:var(--teal-dark);width:42px;height:42px;" id="icon-contact-phone"></div>
-        <div style="flex:1;">
-          <h3>Important Contacts</h3>
-          <p>Staff & emergency info</p>
-        </div>
-        <div class="chev" id="icon-contact-chev"></div>
-      </div>
     </div>
     <div class="bottom-nav" id="nav-home"></div>
   </div>
@@ -738,6 +729,16 @@
       <div style="width:40px"></div>
     </div>
     <div class="scroll" id="contacts-body"></div>
+  </div>
+
+  <!-- CAPTAINS -->
+  <div class="screen" id="screen-captains">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-captains-back"></span></button>
+      <h1>Contact Team Captains</h1>
+      <div style="width:40px"></div>
+    </div>
+    <div class="scroll" id="captains-body"></div>
   </div>
 
   <!-- SEARCH -->
@@ -840,7 +841,7 @@ const staticIcons = {
   'icon-ministry-back':'back','icon-ministry-search':'search',
   'icon-mdetail-back':'back',
   'icon-guide-back':'back',
-  'icon-nursery-back':'back','icon-contacts-back':'back',
+  'icon-nursery-back':'back','icon-contacts-back':'back','icon-captains-back':'back',
   'icon-search-bar':'search','icon-chat-send':'send'
 };
 Object.entries(staticIcons).forEach(([id,name])=>{
@@ -852,7 +853,7 @@ Object.entries(staticIcons).forEach(([id,name])=>{
 const initialHash = (location.hash||'').replace('#','');
 let stack = ['splash'];
 const rootTabs = ['home','map','search','chat','more'];
-const validScreens = ['home','map','search','chat','more','guide','contacts'];
+const validScreens = ['home','map','search','chat','more','guide','contacts','captains'];
 
 function render(){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -922,7 +923,9 @@ const tiles = [
   {icon:'external', color:'var(--purple)', bg:'var(--purple-bg)', title:'ResLife Website', sub:'Ministries & more', external:'https://reslife.org/ministries/'},
   {icon:'external', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'ResLife Classes', sub:'Sign up for a class', external:'https://reslife.org/class/'},
   {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
-  {icon:'question', color:'var(--blue)', bg:'var(--blue-bg)', title:'Quick Answers', sub:'Common questions', go:'search'}
+  {icon:'question', color:'var(--blue)', bg:'var(--blue-bg)', title:'Quick Answers', sub:'Common questions', go:'search'},
+  {icon:'phone', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'Important Contacts', sub:'Staff & emergency info', go:'contacts'},
+  {icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:'Contact Team Captains', sub:"Text if you can't serve", go:'captains'}
 ];
 document.getElementById('home-tiles').innerHTML = tiles.map(t=>`
   <div class="tile" onclick="${t.external?`window.open('${t.external}','_blank')`:`go('${t.go}')`}">
@@ -1267,12 +1270,19 @@ function textOneCaptain(num){
 const captainTiles = isAndroid
   ? captains.map(c=>({icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:`Text ${c.name}`, sub:"Let them know you can't serve", action:`textOneCaptain('${c.num}')`}))
   : [{icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:'Notify Your Captains', sub:"Text if you can't serve", action:'textCaptains()'}];
+document.getElementById('captains-body').innerHTML = `<div class="list-card">${
+  captainTiles.map(m=>`
+  <div class="list-row" onclick="${m.action}">
+    <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
+    <div class="row-text"><h4>${m.title}</h4><p>${m.sub}</p></div>
+    <div class="chev">${ic('chevron')}</div>
+  </div>`).join('')
+}</div>`;
 const moreLinks = [
   {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'First Impressions Guide', sub:'Best practices & steps', go:'guide'},
   {icon:'baby', color:'var(--red)', bg:'var(--red-bg)', title:'Nursery Rooms', sub:'Find age & room', go:'nursery'},
   {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
   {icon:'people', color:'var(--purple)', bg:'var(--purple-bg)', title:'Where Does This Ministry Meet?', sub:'Find rooms & locations', go:'ministry'},
-  ...captainTiles,
   {icon:'external', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'Team Captain Site', sub:'Directory & resources', external:'https://drive.google.com/drive/folders/1jf-SD4vZ0hSmhBbXrbgbZK6mlgHxPMwu'}
 ];
 document.getElementById('more-body').innerHTML = `<div class="list-card">${
