@@ -1253,11 +1253,12 @@ const moreLinks = [
   {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'First Impressions Guide', sub:'Best practices & steps', go:'guide'},
   {icon:'baby', color:'var(--red)', bg:'var(--red-bg)', title:'Nursery Rooms', sub:'Find age & room', go:'nursery'},
   {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
-  {icon:'people', color:'var(--purple)', bg:'var(--purple-bg)', title:'Where Does This Ministry Meet?', sub:'Find rooms & locations', go:'ministry'}
+  {icon:'people', color:'var(--purple)', bg:'var(--purple-bg)', title:'Where Does This Ministry Meet?', sub:'Find rooms & locations', go:'ministry'},
+  {icon:'external', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'Team Captain Site', sub:'Directory & resources', external:'https://drive.google.com/drive/folders/1jf-SD4vZ0hSmhBbXrbgbZK6mlgHxPMwu'}
 ];
 document.getElementById('more-body').innerHTML = `<div class="list-card">${
   moreLinks.map(m=>`
-  <div class="list-row" onclick="go('${m.go}')">
+  <div class="list-row" onclick="${m.external?`window.open('${m.external}','_blank')`:`go('${m.go}')`}">
     <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
     <div class="row-text"><h4>${m.title}</h4><p>${m.sub}</p></div>
     <div class="chev">${ic('chevron')}</div>
