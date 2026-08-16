@@ -197,8 +197,12 @@ function selectRoom(id){
     if(p.startsWith('room-')) roomId = parseInt(p.replace('room-',''));
     if(p.startsWith('door-')) doorLetters.push(p.replace('door-','').toUpperCase());
   });
-  const match = rooms.find(r => r.id === roomId);
-  selectRoom(match ? match.id : rooms[0].id);
+  if(roomId !== null){
+    const match = rooms.find(r => r.id === roomId);
+    selectRoom(match ? match.id : rooms[0].id);
+  } else if(!doorLetters.length){
+    selectRoom(rooms[0].id);
+  }
   if(doorLetters.length) selectDoors(doorLetters);
 })();
 </script>
