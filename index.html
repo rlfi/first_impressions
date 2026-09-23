@@ -616,7 +616,10 @@
     z-index:0;
   }
   .cover-swipe-hint{
-    position:relative;
+    position:fixed;
+    top:74%;
+    left:50%;
+    transform:translateX(-50%);
     z-index:2;
     display:flex;
     flex-direction:column;
@@ -627,7 +630,6 @@
     font-weight:700;
     letter-spacing:0.08em;
     text-transform:uppercase;
-    padding:calc(18px + env(safe-area-inset-bottom, 0px));
     text-shadow:0 2px 8px rgba(0,0,0,0.5);
     animation:coverBounce 1.8s ease-in-out infinite;
   }
