@@ -895,7 +895,7 @@ Object.entries(staticIcons).forEach(([id,name])=>{
 
 /* ---------- NAV STACK ---------- */
 const initialHash = (location.hash||'').replace('#','');
-let stack = ['cover'];
+let stack = [localStorage.getItem('rlfiHasSeenCover') ? 'splash' : 'cover'];
 const rootTabs = ['home','map','search','chat','more'];
 const validScreens = ['home','map','search','chat','more','guide','contacts','captains'];
 
@@ -929,6 +929,7 @@ function tab(screen){ stack=[screen]; pushHistory(); render(); }
 /* ---------- COVER: swipe up or tap to advance to splash ---------- */
 function advanceFromCover(){
   if(stack[stack.length-1]!=='cover') return;
+  try{ localStorage.setItem('rlfiHasSeenCover','1'); }catch(e){}
   stack=['home']; pushHistory(); render();
 }
 (function(){
