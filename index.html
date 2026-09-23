@@ -895,7 +895,7 @@ Object.entries(staticIcons).forEach(([id,name])=>{
 
 /* ---------- NAV STACK ---------- */
 const initialHash = (location.hash||'').replace('#','');
-let stack = [localStorage.getItem('rlfiHasSeenCover') ? 'splash' : 'cover'];
+let stack = ['cover'];
 const rootTabs = ['home','map','search','chat','more'];
 const validScreens = ['home','map','search','chat','more','guide','contacts','captains'];
 
@@ -926,10 +926,9 @@ function back(){
 }
 function tab(screen){ stack=[screen]; pushHistory(); render(); }
 
-/* ---------- COVER: swipe up or tap to advance to splash ---------- */
+/* ---------- COVER: swipe up or tap to advance to home ---------- */
 function advanceFromCover(){
   if(stack[stack.length-1]!=='cover') return;
-  try{ localStorage.setItem('rlfiHasSeenCover','1'); }catch(e){}
   stack=['home']; pushHistory(); render();
 }
 (function(){
@@ -955,17 +954,9 @@ window.addEventListener('popstate', (e)=>{
   render();
 });
 
-/* Deep link: if the page was opened with a #screen hash (e.g. index.html#map),
-   skip the splash screen and jump straight there. Only applies to first-time
-   visitors — a returning visitor always sees Splash first, regardless of
-   whatever hash was left over in the URL bar from their last session. */
+/* Cover always shows on every visit, regardless of whatever hash was left
+   over in the URL bar from a previous session — no deep-link skip-ahead. */
 (function(){
-  if(localStorage.getItem('rlfiHasSeenCover')) return;
-  const initial = initialHash;
-  const screenFor = (initial==='map-mainlevel'||initial==='map-level1') ? 'map' : initial;
-  if(screenFor && validScreens.includes(screenFor)){
-    stack = screenFor==='home' ? ['home'] : ['home', screenFor];
-  }
   history.replaceState({stack:[...stack]}, '', stack.length ? '#'+stack[stack.length-1] : '');
 })();
 
