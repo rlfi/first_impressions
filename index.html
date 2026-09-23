@@ -607,6 +607,14 @@
     justify-content:flex-end;
     cursor:pointer;
   }
+  .cover-img{
+    position:fixed;
+    top:0; left:0;
+    width:100vw; height:100vh;
+    height:100dvh;
+    object-fit:cover;
+    z-index:0;
+  }
   .cover-swipe-hint{
     position:relative;
     z-index:2;
@@ -635,7 +643,7 @@
 
   <!-- COVER -->
   <div class="screen active" id="screen-cover" style="background:#0c0c0c;">
-    <img src="cover.jpg" alt="Guest Experience - Usher Team Hub" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+    <img src="cover.jpg" alt="Guest Experience - Usher Team Hub" class="cover-img">
     <div class="cover-swipe-hint">
       <span id="icon-cover-chev"></span>
       <span>Swipe up to begin</span>
@@ -921,7 +929,7 @@ function tab(screen){ stack=[screen]; pushHistory(); render(); }
 /* ---------- COVER: swipe up or tap to advance to splash ---------- */
 function advanceFromCover(){
   if(stack[stack.length-1]!=='cover') return;
-  stack=['splash']; pushHistory(); render();
+  stack=['home']; pushHistory(); render();
 }
 (function(){
   const coverEl = document.getElementById('screen-cover');
