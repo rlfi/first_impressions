@@ -956,8 +956,11 @@ window.addEventListener('popstate', (e)=>{
 });
 
 /* Deep link: if the page was opened with a #screen hash (e.g. index.html#map),
-   skip the splash screen and jump straight there. */
+   skip the splash screen and jump straight there. Only applies to first-time
+   visitors — a returning visitor always sees Splash first, regardless of
+   whatever hash was left over in the URL bar from their last session. */
 (function(){
+  if(localStorage.getItem('rlfiHasSeenCover')) return;
   const initial = initialHash;
   const screenFor = (initial==='map-mainlevel'||initial==='map-level1') ? 'map' : initial;
   if(screenFor && validScreens.includes(screenFor)){
