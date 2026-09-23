@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ResLife First Impressions Hub</title>
+<title>Guest Experience - Usher Team Hub</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -601,16 +601,52 @@
     cursor:pointer;
     box-shadow:0 6px 16px rgba(15,122,110,0.25);
   }
+  #screen-cover{
+    position:relative;
+    overflow:hidden;
+    justify-content:flex-end;
+    cursor:pointer;
+  }
+  .cover-swipe-hint{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:calc(18px + env(safe-area-inset-bottom, 0px));
+    text-shadow:0 2px 8px rgba(0,0,0,0.5);
+    animation:coverBounce 1.8s ease-in-out infinite;
+  }
+  .cover-swipe-hint svg{width:20px;height:20px;}
+  @keyframes coverBounce{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+  }
 </style>
 </head>
 <body>
 <div class="shell" id="shell">
 
+  <!-- COVER -->
+  <div class="screen active" id="screen-cover" style="background:#0c0c0c;">
+    <img src="cover.jpg" alt="Guest Experience - Usher Team Hub" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+    <div class="cover-swipe-hint">
+      <span id="icon-cover-chev"></span>
+      <span>Swipe up to begin</span>
+    </div>
+  </div>
+
   <!-- SPLASH -->
-  <div class="screen active" id="screen-splash">
+  <div class="screen" id="screen-splash">
     <div class="splash-top">
       <img id="logo-splash" class="logo-mark-lg" alt="ResLife">
-      <div class="splash-tag" style="margin-top:14px;">FIRST IMPRESSIONS HUB</div>
+      <div class="splash-tag" style="margin-top:14px;">GUEST EXPERIENCE - USHER TEAM HUB</div>
       <div class="splash-verse">Everyone Encountered. Everyone Embraced.</div>
     </div>
     <div class="splash-mid">
@@ -631,7 +667,7 @@
           <div class="hero-brand">
             <img id="logo-home" class="logo-mark-sm" alt="ResLife">
             <div>
-              <div class="hub-sub" style="margin-top:0;">FIRST IMPRESSIONS HUB</div>
+              <div class="hub-sub" style="margin-top:0;">GUEST EXPERIENCE - USHER TEAM HUB</div>
             </div>
           </div>
           <div class="bell">🔔</div>
@@ -799,6 +835,7 @@ function ic(name){
     search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
     chevron:'<path d="M9 6l6 6-6 6"/>',
     'chevron-down':'<path d="M6 9l6 6 6-6"/>',
+    'chevron-up':'<path d="M6 15l6-6 6 6"/>',
     external:'<path d="M14 4h6v6"/><path d="M20 4L10 14"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>',
     phone:'<path d="M6 3h4l2 5-2.5 1.5a11 11 0 0 0 5 5L16 12l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2z"/>',
     map:'<path d="M9 20l-6 2V6l6-2 6 2 6-2v16l-6 2-6-2z"/><path d="M9 4v16M15 6v16"/>',
@@ -841,7 +878,7 @@ const staticIcons = {
   'icon-mdetail-back':'back',
   'icon-guide-back':'back',
   'icon-nursery-back':'back','icon-contacts-back':'back','icon-captains-back':'back',
-  'icon-search-bar':'search','icon-chat-send':'send'
+  'icon-search-bar':'search','icon-chat-send':'send','icon-cover-chev':'chevron-up'
 };
 Object.entries(staticIcons).forEach(([id,name])=>{
   const el = document.getElementById(id);
@@ -850,7 +887,7 @@ Object.entries(staticIcons).forEach(([id,name])=>{
 
 /* ---------- NAV STACK ---------- */
 const initialHash = (location.hash||'').replace('#','');
-let stack = ['splash'];
+let stack = ['cover'];
 const rootTabs = ['home','map','search','chat','more'];
 const validScreens = ['home','map','search','chat','more','guide','contacts','captains'];
 
@@ -862,7 +899,7 @@ function render(){
     const nav = document.getElementById('nav-'+t);
     if(nav) nav.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===top));
   });
-  if(top!=='splash'){
+  if(top!=='splash' && top!=='cover'){
     let hashScreen = top;
     if(top==='map' && typeof currentFloor!=='undefined'){
       hashScreen = currentFloor==='upper' ? 'map-mainlevel' : 'map-level1';
@@ -880,6 +917,25 @@ function back(){
   else { tab('home'); }
 }
 function tab(screen){ stack=[screen]; pushHistory(); render(); }
+
+/* ---------- COVER: swipe up or tap to advance to splash ---------- */
+function advanceFromCover(){
+  if(stack[stack.length-1]!=='cover') return;
+  stack=['splash']; pushHistory(); render();
+}
+(function(){
+  const coverEl = document.getElementById('screen-cover');
+  if(!coverEl) return;
+  let touchStartY = null;
+  coverEl.addEventListener('touchstart', (e)=>{ touchStartY = e.touches[0].clientY; }, {passive:true});
+  coverEl.addEventListener('touchend', (e)=>{
+    if(touchStartY===null) return;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    touchStartY = null;
+    if(dy < -40) advanceFromCover();
+  }, {passive:true});
+  coverEl.addEventListener('click', advanceFromCover);
+})();
 
 window.addEventListener('popstate', (e)=>{
   if(e.state && e.state.stack && e.state.stack.length){
