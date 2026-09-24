@@ -19,7 +19,7 @@
     --teal:#16a394;
     --teal-dark:#0f7a6e;
     --teal-pale:#e2f6f2;
-    --bg:#f4f6f9;
+    --bg:#f7f4ee;
     --card:#ffffff;
     --text:#1c2733;
     --muted:#7c8a99;
@@ -104,12 +104,20 @@
   /* ===== HOME ===== */
   #screen-home .scroll{background:var(--bg);}
   .hero{
+    position:relative;
     background:linear-gradient(160deg,#fbf3dd 0%,#f3e4b8 100%);
     color:var(--text);
-    padding:calc(22px + env(safe-area-inset-top)) 20px 20px;
+    padding:calc(22px + env(safe-area-inset-top)) 20px 34px;
     border-bottom-left-radius:22px;
     border-bottom-right-radius:22px;
-    border-bottom:1px solid #e8d69a;
+  }
+  .hero::after{
+    content:'';
+    position:absolute;
+    left:0; right:0; bottom:-28px;
+    height:28px;
+    background:linear-gradient(180deg,rgba(243,228,184,0.55) 0%,rgba(243,228,184,0) 100%);
+    pointer-events:none;
   }
   .hero-top{display:flex;justify-content:space-between;align-items:center;}
   .wordmark{font-size:20px;font-weight:900;letter-spacing:0.01em;}
@@ -199,7 +207,7 @@
     cursor:pointer;
     padding:4px 0;
   }
-  .nav-btn.active{color:var(--teal);}
+  .nav-btn.active{color:#a67c1a;}
   .nav-btn svg{width:21px;height:21px;}
 
   /* ===== TOGGLES ===== */
