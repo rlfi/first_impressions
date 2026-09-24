@@ -1,6 +1,6 @@
 {
-  "name": "Guest Experience - Usher Team Hub",
-  "short_name": "Usher Team Hub",
+  "name": "Guest Experience - Guest Services Hub",
+  "short_name": "Guest Services Hub",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#eafaf6",
