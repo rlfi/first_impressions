@@ -792,7 +792,7 @@
       <div style="width:40px"></div>
     </div>
     <div class="scroll">
-      <p style="padding:14px 16px 4px;font-size:13px;color:#6b7280;line-height:1.4;margin:0;">Each usher is assigned to one captain. Tap yours below to text them directly.</p>
+      <p style="padding:14px 16px 4px;font-size:13px;color:#6b7280;line-height:1.4;margin:0;">Select your team, then tap your captain to text them directly.</p>
       <div id="captains-body"></div>
     </div>
   </div>
@@ -1331,25 +1331,51 @@ document.getElementById('contacts-body').innerHTML = `
   </div>`;
 
 /* ---------- MORE ---------- */
-const captains = [
-  {name:'Kyle Mol', num:'6164469839'},
-  {name:'Paul Farmwald', num:'6163186150'},
-  {name:'Mike Robinson', num:'3122412455'},
-  {name:'Dave Vanderveen', num:'6169163003'}
-];
+const captainGroups = {
+  ushers: { label:'Ushers', captains:[
+    {name:'Kyle Mol', num:'6164469839'},
+    {name:'Paul Farmwald', num:'6163186150'},
+    {name:'Mike Robinson', num:'3122412455'},
+    {name:'Dave Vanderveen', num:'6169163003'}
+  ]},
+  greeters: { label:'Greeters', captains:[] },
+  shuttle: { label:'Shuttle Drivers', captains:[] },
+  hosts: { label:'Hosts', captains:[] }
+};
 const captainMsg = "Hi, this is [your name] — I won't be able to serve on [date].";
 function textOneCaptain(num){
   window.open(`sms:${num}?body=${encodeURIComponent(captainMsg)}`, '_self');
 }
-const captainTiles = captains.map(c=>({icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:c.name, sub:'', action:`textOneCaptain('${c.num}')`}));
-document.getElementById('captains-body').innerHTML = `<div class="list-card">${
-  captainTiles.map(m=>`
-  <div class="list-row" onclick="${m.action}">
-    <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
-    <div class="row-text"><h4>${m.title}</h4>${m.sub?`<p>${m.sub}</p>`:''}</div>
-    <div class="chev">${ic('chevron')}</div>
-  </div>`).join('')
-}</div>`;
+function renderCaptainCategories(){
+  const rows = Object.entries(captainGroups).map(([key,g])=>({
+    title:g.label,
+    sub: g.captains.length ? '' : 'Coming soon',
+    action:`showCaptainCategory('${key}')`
+  }));
+  document.getElementById('captains-body').innerHTML = `<div class="list-card">${
+    rows.map(m=>`
+    <div class="list-row" onclick="${m.action}">
+      <div class="row-badge" style="background:var(--red-bg);color:var(--red);">${ic('people')}</div>
+      <div class="row-text"><h4>${m.title}</h4>${m.sub?`<p>${m.sub}</p>`:''}</div>
+      <div class="chev">${ic('chevron')}</div>
+    </div>`).join('')
+  }</div>`;
+}
+function showCaptainCategory(key){
+  const g = captainGroups[key];
+  const backRow = `<div class="list-row" onclick="renderCaptainCategories()">
+      <div class="row-badge" style="background:var(--teal-pale);color:var(--teal-dark);">${ic('back')}</div>
+      <div class="row-text"><h4>All Teams</h4></div>
+    </div>`;
+  const body = g.captains.length ? g.captains.map(c=>`
+    <div class="list-row" onclick="textOneCaptain('${c.num}')">
+      <div class="row-badge" style="background:var(--red-bg);color:var(--red);">${ic('chat')}</div>
+      <div class="row-text"><h4>${c.name}</h4></div>
+      <div class="chev">${ic('chevron')}</div>
+    </div>`).join('') : `<div style="padding:20px 16px;color:#6b7280;font-size:13px;">Captain list for ${g.label} coming soon.</div>`;
+  document.getElementById('captains-body').innerHTML = `<div class="list-card">${backRow}${body}</div>`;
+}
+renderCaptainCategories();
 const moreLinks = [
   {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'Guest Experience Guide', sub:'Best practices & steps', go:'guide'},
   {icon:'baby', color:'var(--red)', bg:'var(--red-bg)', title:'Nursery Rooms', sub:'Find age & room', go:'nursery'},
