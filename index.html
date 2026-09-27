@@ -1337,12 +1337,12 @@ const captainMsg = "Hi, this is [your name] — I won't be able to serve on [dat
 function textOneCaptain(num){
   window.open(`sms:${num}?body=${encodeURIComponent(captainMsg)}`, '_self');
 }
-const captainTiles = captains.map(c=>({icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:`Text ${c.name}`, sub:"Let them know you can't serve", action:`textOneCaptain('${c.num}')`}));
+const captainTiles = captains.map(c=>({icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:c.name, sub:'', action:`textOneCaptain('${c.num}')`}));
 document.getElementById('captains-body').innerHTML = `<div class="list-card">${
   captainTiles.map(m=>`
   <div class="list-row" onclick="${m.action}">
     <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
-    <div class="row-text"><h4>${m.title}</h4><p>${m.sub}</p></div>
+    <div class="row-text"><h4>${m.title}</h4>${m.sub?`<p>${m.sub}</p>`:''}</div>
     <div class="chev">${ic('chevron')}</div>
   </div>`).join('')
 }</div>`;
