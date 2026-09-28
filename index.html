@@ -1126,7 +1126,7 @@ function selectRoom(id){
     <div class="room-detail">
       <div class="rd-head"><div class="rd-num">${ic('pin')}</div><h3>${r.name}</h3></div>
       ${r.desc?`<p class="rd-desc">${r.desc}</p>`:''}
-      <div class="rd-entrance">${ic('pin')} Nearest Entrance: ${r.entrance}</div>
+      <div class="rd-entrance">${ic('pin')} Suggested entrance: ${r.entrance} — or pick any door below to see your own path</div>
       <button class="btn-primary" id="dir-btn" onclick="showDirections(${r.id})">Get Directions <span class="btn-chev" id="dir-chev">${ic('chevron-down')}</span></button>
       <div class="directions-drop" id="directions-drop">
         <div class="directions-drop-inner">${ic('pin')}<p id="directions-text"></p></div>
@@ -1449,7 +1449,7 @@ const recent = ['Where is the closest restroom?','4th & 5th Grade (The Zone)','N
 document.getElementById('recent-list').innerHTML = recent.map(r=>`<div class="recent-row" onclick="searchFor('${r}')">${ic('clock')}${r}</div>`).join('');
 
 const searchIndex = [];
-rooms.forEach(r=>searchIndex.push({type:'Room',title:r.name,sub:'Nearest entrance: '+r.entrance,action:()=>{go('map'); setTimeout(()=>{ setFloor(r.floor); selectRoom(r.id); },50);}, icon:'pin', color:'var(--teal)', bg:'var(--teal-pale)'}));
+rooms.forEach(r=>searchIndex.push({type:'Room',title:r.name,sub:'Suggested entrance: '+r.entrance,action:()=>{go('map'); setTimeout(()=>{ setFloor(r.floor); selectRoom(r.id); },50);}, icon:'pin', color:'var(--teal)', bg:'var(--teal-pale)'}));
 Object.entries(ministries).forEach(([day,list])=>list.forEach((m,i)=>searchIndex.push({type:'Ministry',title:m.title,sub:m.loc,action:()=>openMinistry(day,i), icon:m.icon,color:m.color,bg:m.bg})));
 searchIndex.push({type:'FAQ',title:'Emergency Procedures',sub:'Call 616.534.4923 opt. 2',action:()=>go('contacts'), icon:'warn',color:'var(--red)',bg:'var(--red-bg)'});
 searchIndex.push({type:'FAQ',title:'Lost & Found',sub:'Front Office, Door G',action:()=>go('contacts'), icon:'bag',color:'var(--orange)',bg:'var(--orange-bg)'});
