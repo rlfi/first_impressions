@@ -265,6 +265,40 @@
   .img-pin.selected{
     box-shadow:0 0 0 3px rgba(22,163,148,0.55);
   }
+  .door-pin{
+    position:absolute;
+    width:26px;height:26px;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    opacity:0;
+  }
+  .door-pin.selected{
+    opacity:1;
+    width:34px;height:34px;
+    border:3px solid #fff;
+    background:var(--teal-dark);
+    box-shadow:0 0 0 5px rgba(22,163,148,0.5), 0 2px 8px rgba(0,0,0,0.4);
+    animation:doorPulseApp 1.5s ease-out infinite;
+  }
+  @keyframes doorPulseApp{
+    0%{box-shadow:0 0 0 0 rgba(22,163,148,0.55), 0 2px 8px rgba(0,0,0,0.4);}
+    70%{box-shadow:0 0 0 14px rgba(22,163,148,0), 0 2px 8px rgba(0,0,0,0.4);}
+    100%{box-shadow:0 0 0 0 rgba(22,163,148,0), 0 2px 8px rgba(0,0,0,0.4);}
+  }
+  .door-picker-label{font-size:12px;font-weight:700;color:var(--muted);padding:12px 16px 6px;}
+  .door-chip-row{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 10px;}
+  .door-chip{
+    padding:7px 14px;
+    border-radius:20px;
+    border:1.5px solid var(--line);
+    background:var(--card);
+    font-weight:800;
+    font-size:13px;
+    color:var(--text);
+    cursor:pointer;
+  }
+  .door-chip.active{background:var(--teal-dark);color:#fff;border-color:var(--teal-dark);}
   .room{fill:#e4e8ec;stroke:#c3cbd3;stroke-width:3;stroke-linejoin:round;cursor:pointer;transition:fill .15s;}
   .room-sub{fill:#d7dde1;stroke:#c3cbd3;stroke-width:2.5;cursor:pointer;}
   .room.selected,.room-sub.selected{fill:var(--teal-pale) !important;stroke:var(--teal) !important;stroke-width:4.5 !important;}
@@ -716,6 +750,7 @@
         <button class="floor-btn active" data-floor="upper" onclick="setFloor('upper')">Main Level</button>
         <button class="floor-btn" data-floor="main" onclick="setFloor('main')">Level 1</button>
       </div>
+      <div id="door-picker"></div>
       <div class="map-wrap">
         <div id="floor-upper-wrap"></div>
         <div id="floor-main-wrap" style="display:none"></div>
@@ -1038,12 +1073,29 @@ function buildMapPins(f){
   return list.map(r=>
     `<button class="img-pin" data-id="${r.id}" style="left:${r.x}%;top:${r.y}%;color:${r.color};" onclick="selectRoom(${r.id})"></button>`).join('');
 }
+const doorGroups = {
+  upper: [{"letter":"K","x":66.6,"y":85.5},{"letter":"M","x":91.8,"y":36.6},{"letter":"N","x":56.4,"y":27.2}],
+  main: [{"letter":"A","x":60.1,"y":22.4},{"letter":"B","x":51.5,"y":29.8},{"letter":"C","x":46.7,"y":45.3},{"letter":"D","x":36.8,"y":43.0},{"letter":"E","x":20.4,"y":41.5},{"letter":"F","x":9.2,"y":45.3},{"letter":"G","x":7.8,"y":65.2},{"letter":"H","x":20.4,"y":68.2},{"letter":"J","x":46.8,"y":58.6}]
+};
+function buildDoorPins(f){
+  return doorGroups[f].map(d=>`<div class="door-pin" data-letter="${d.letter}" style="left:${d.x}%;top:${d.y}%;"></div>`).join('');
+}
+function buildDoorPicker(f){
+  document.getElementById('door-picker').innerHTML = `
+    <div class="door-picker-label">Which door did you enter? Tap it to see it on the map.</div>
+    <div class="door-chip-row">${doorGroups[f].map(d=>`<button class="door-chip" data-letter="${d.letter}" onclick="selectDoor('${d.letter}')">Door ${d.letter}</button>`).join('')}</div>`;
+}
+function selectDoor(letter){
+  document.querySelectorAll('.door-chip').forEach(b=>b.classList.toggle('active', b.dataset.letter===letter));
+  document.querySelectorAll('.door-pin').forEach(el=>el.classList.toggle('selected', el.dataset.letter===letter));
+}
 
 document.getElementById('floor-upper-wrap').innerHTML =
-  `<div class="map-img-wrap"><img class="map-img" src="map-main-level.png" alt="Main Level campus map">${buildMapPins('upper')}</div>`;
+  `<div class="map-img-wrap"><img class="map-img" src="map-main-level.png" alt="Main Level campus map">${buildMapPins('upper')}${buildDoorPins('upper')}</div>`;
 document.getElementById('floor-main-wrap').innerHTML =
-  `<div class="map-img-wrap"><img class="map-img" src="map-level1.png" alt="Level 1 campus map">${buildMapPins('main')}</div>`;
+  `<div class="map-img-wrap"><img class="map-img" src="map-level1.png" alt="Level 1 campus map">${buildMapPins('main')}${buildDoorPins('main')}</div>`;
 buildFloorLegend('upper');
+buildDoorPicker('upper');
 
 let currentFloor='upper';
 let selectedRoom=1;
@@ -1054,6 +1106,7 @@ function setFloor(f){
   document.getElementById('floor-upper-wrap').style.display = f==='upper' ? '' : 'none';
   document.getElementById('floor-main-wrap').style.display = f==='main' ? '' : 'none';
   buildFloorLegend(f);
+  buildDoorPicker(f);
   const firstRoom = rooms.find(r=>r.floor===f);
   selectRoom(firstRoom.id);
   const hashFloor = f==='upper' ? 'map-mainlevel' : 'map-level1';
