@@ -1057,20 +1057,20 @@ const rooms = [
   {id:1, num:1, name:'Worship Center: Main Level', floor:'upper', desc:'Main sanctuary and general seating on the Main Level.', entrance:'Main Entrance (Door K)', color:'var(--orange)', x:78.7, y:51.9},
   {id:2, num:2, name:'Chapel', floor:'upper', desc:'Smaller worship space used for chapel services and events.', entrance:'Door K', color:'var(--green)', x:82.7, y:73.5},
   {id:3, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'upper', desc:'First stop for guests near the Main Entrance — welcome desk and Guest Services.', entrance:'Main Entrance (Door K)', color:'var(--red)', icon:'info', x:71.2, y:70.6},
-  {id:4, num:4, name:'Community Room', floor:'upper', desc:'Community gathering space.', entrance:'Door M', color:'var(--blue)', x:56.0, y:73.3},
-  {id:5, num:5, name:"Noah's Ark Nursery/Preschool", floor:'upper', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'52nd St entrance (Door K)', color:'var(--orange)', x:48.3, y:48.0},
+  {id:4, num:4, name:'Community Room', floor:'upper', desc:'Community gathering space.', entrance:'Door K', color:'var(--blue)', x:56.0, y:73.3},
+  {id:5, num:5, name:"Noah's Ark Nursery/Preschool", floor:'upper', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'Atrium Entrance (Door N)', color:'var(--orange)', x:48.3, y:48.0},
   {id:6, num:6, name:'Atrium', floor:'upper', desc:'Atrium lobby connecting to the Ivanrest Ave entrance.', entrance:'Atrium Entrance (Door N)', color:'var(--purple)', x:51.5, y:27.5},
   {id:17, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'upper', desc:'Guest Services desk near the Atrium entrance.', entrance:'Atrium Entrance (Door N)', color:'var(--red)', icon:'info', x:55.5, y:36.5},
   {id:7, num:2, name:'ResCenter', floor:'main', desc:'Hosts Iglesia Vida on Sundays and the Wednesday Night Main Service.', entrance:'Door G', color:'var(--green)', x:17.9, y:52.6},
   {id:16, num:1, name:'Main Office', floor:'main', desc:'', entrance:'Door G', color:'var(--teal-dark)', x:10.0, y:62.0},
   {id:19, num:3, name:'ResKids', floor:'main', desc:'Kids ministry classrooms for Kindergarten through 3rd grade.', entrance:'Door C or Door J', color:'var(--purple)', x:30.7, y:68.2},
-  {id:8, num:4, name:'Gym', floor:'main', desc:'', entrance:'Door B', color:'var(--cyan)', x:35.4, y:55.5},
+  {id:8, num:4, name:'Gym', floor:'main', desc:'', entrance:'Door C or Door J', color:'var(--cyan)', x:35.4, y:55.5},
   {id:9, num:5, name:'Oneighty (6th – 8th grade)', floor:'main', desc:'Student ministry space for 6th – 8th grade (Married Life).', entrance:'Door C', color:'var(--pink)', x:41.3, y:41.2},
   {id:10, num:6, name:'The Ground Floor (9th – 12th grade)', floor:'main', desc:'High school ministry space.', entrance:'Door E', color:'var(--muted)', x:54.1, y:41.2},
   {id:11, num:7, name:'The Zone (4th & 5th grade)', floor:'main', desc:'Kids ministry space for 4th & 5th grade.', entrance:'Door C', color:'var(--red)', x:62.8, y:31.9},
   {id:12, num:8, name:'Worship Center: Balcony Seating', floor:'main', desc:'Balcony seating overlooking the Worship Center below.', entrance:'Door H', color:'var(--orange)', x:86.1, y:69.9},
   {id:13, num:9, name:'Olive Tree Café', floor:'main', desc:'Coffee & snacks.', entrance:'Door G', color:'var(--blue)', x:70.1, y:83.8},
-  {id:14, num:10, name:"Noah's Ark Nursery/Preschool", floor:'main', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'Door A', color:'var(--orange)', x:65.8, y:64.6},
+  {id:14, num:10, name:"Noah's Ark Nursery/Preschool", floor:'main', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'Door C or Door J', color:'var(--orange)', x:65.8, y:64.6},
   {id:15, num:11, name:'Walking By Faith', floor:'main', desc:'Ministry meeting space.', entrance:'Door J', color:'var(--purple)', x:31.0, y:40.2},
   {id:18, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'main', desc:'Guest Services desk near the Ground Floor Concourse.', entrance:'Door C or Door J', color:'var(--red)', icon:'info', x:44.4, y:52.5}
 ];
@@ -1090,7 +1090,7 @@ function buildMapPins(f){
 }
 const doorGroups = {
   upper: [{"letter":"K","x":66.6,"y":85.5},{"letter":"M","x":91.8,"y":36.6},{"letter":"N","x":56.4,"y":27.2}],
-  main: [{"letter":"A","x":60.1,"y":22.4},{"letter":"B","x":51.5,"y":29.8},{"letter":"C","x":46.7,"y":45.3},{"letter":"D","x":36.8,"y":43.0},{"letter":"E","x":20.4,"y":41.5},{"letter":"F","x":9.2,"y":45.3},{"letter":"G","x":7.8,"y":65.2},{"letter":"H","x":20.4,"y":68.2},{"letter":"J","x":46.8,"y":58.6}]
+  main: [{"letter":"C","x":46.7,"y":45.3},{"letter":"E","x":20.4,"y":41.5},{"letter":"G","x":7.8,"y":65.2},{"letter":"H","x":20.4,"y":68.2},{"letter":"J","x":46.8,"y":58.6}]
 };
 function buildDoorPins(f){
   return doorGroups[f].map(d=>`<div class="door-pin" data-letter="${d.letter}" style="left:${d.x}%;top:${d.y}%;"></div>`).join('');
