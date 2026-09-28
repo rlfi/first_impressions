@@ -171,7 +171,7 @@ function selectDoors(letters){
   );
 }
 
-document.getElementById('legend').innerHTML = rooms.map(r =>
+document.getElementById('legend').innerHTML = [...rooms].sort((a,b)=>(a.name.startsWith('Guest Services')?1:0)-(b.name.startsWith('Guest Services')?1:0)).map(r =>
   `<div class="legend-row" data-id="${r.id}" onclick="selectRoom(${r.id})"><span class="legend-num" style="background:${r.color};">${r.num}</span>${r.name}</div>`
 ).join('');
 

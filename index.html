@@ -1076,7 +1076,7 @@ function roomById(id){ return rooms.find(r=>r.id===id); }
 document.getElementById('activity-legend').innerHTML = '';
 document.getElementById('category-legend').innerHTML = '';
 function buildFloorLegend(f){
-  const list = rooms.filter(r=>r.floor===f);
+  const list = rooms.filter(r=>r.floor===f).sort((a,b)=>(a.name.startsWith('Guest Services')?1:0)-(b.name.startsWith('Guest Services')?1:0));
   document.getElementById('activity-legend').innerHTML = list.map(r=>
     `<div class="row" data-id="${r.id}" style="cursor:pointer;" onclick="selectRoom(${r.id})"><span class="legend-num" style="background:${r.color};"></span>${r.name}</div>`).join('');
 }
