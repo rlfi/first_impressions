@@ -1099,7 +1099,7 @@ function buildDoorPicker(f){
   /* Door chips now render inside the room detail card, directly under the suggested entrance */
   document.getElementById('door-picker').innerHTML = '';
 }
-const guestDoors = ['C','J','K','N']; /* the only doors guests actually use */
+const guestDoors = ['C','E','G','H','J','K','N']; /* the only doors guests actually use */
 function doorChipsHTML(f){
   return `<div class="door-chip-row rd-doors">${doorGroups[f].filter(d=>guestDoors.includes(d.letter)).map(d=>`<button class="door-chip${selectedDoor===d.letter?' active':''}" data-letter="${d.letter}" onclick="selectDoor('${d.letter}')">Door ${d.letter}</button>`).join('')}</div>`;
 }
