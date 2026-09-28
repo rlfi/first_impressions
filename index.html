@@ -299,6 +299,16 @@
     cursor:pointer;
   }
   .door-chip.active{background:var(--teal-dark);color:#fff;border-color:var(--teal-dark);}
+  .path-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+  .path-svg line{
+    stroke:var(--teal-dark);
+    stroke-width:0.8;
+    stroke-dasharray:2.2,1.6;
+    stroke-linecap:round;
+    opacity:0;
+    filter:drop-shadow(0 0 2px rgba(255,255,255,0.9)) drop-shadow(0 0 2px rgba(255,255,255,0.9));
+  }
+  .path-svg line.visible{opacity:1;}
   .room{fill:#e4e8ec;stroke:#c3cbd3;stroke-width:3;stroke-linejoin:round;cursor:pointer;transition:fill .15s;}
   .room-sub{fill:#d7dde1;stroke:#c3cbd3;stroke-width:2.5;cursor:pointer;}
   .room.selected,.room-sub.selected{fill:var(--teal-pale) !important;stroke:var(--teal) !important;stroke-width:4.5 !important;}
@@ -1086,22 +1096,40 @@ function buildDoorPicker(f){
     <div class="door-chip-row">${doorGroups[f].map(d=>`<button class="door-chip" data-letter="${d.letter}" onclick="selectDoor('${d.letter}')">Door ${d.letter}</button>`).join('')}</div>`;
 }
 function selectDoor(letter){
+  selectedDoor = letter;
   document.querySelectorAll('.door-chip').forEach(b=>b.classList.toggle('active', b.dataset.letter===letter));
   document.querySelectorAll('.door-pin').forEach(el=>el.classList.toggle('selected', el.dataset.letter===letter));
+  updatePathLine();
+}
+function updatePathLine(){
+  const svg = document.getElementById(currentFloor==='upper' ? 'path-upper' : 'path-main');
+  if(!svg) return;
+  const line = svg.querySelector('line');
+  if(!selectedDoor){ line.classList.remove('visible'); return; }
+  const door = doorGroups[currentFloor].find(d=>d.letter===selectedDoor);
+  const room = roomById(selectedRoom);
+  if(!door || !room){ line.classList.remove('visible'); return; }
+  line.setAttribute('x1', door.x);
+  line.setAttribute('y1', door.y);
+  line.setAttribute('x2', room.x);
+  line.setAttribute('y2', room.y);
+  line.classList.add('visible');
 }
 
 document.getElementById('floor-upper-wrap').innerHTML =
-  `<div class="map-img-wrap"><img class="map-img" src="map-main-level.png" alt="Main Level campus map">${buildMapPins('upper')}${buildDoorPins('upper')}</div>`;
+  `<div class="map-img-wrap"><img class="map-img" src="map-main-level.png" alt="Main Level campus map">${buildMapPins('upper')}${buildDoorPins('upper')}<svg class="path-svg" id="path-upper" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="0" y2="0"/></svg></div>`;
 document.getElementById('floor-main-wrap').innerHTML =
-  `<div class="map-img-wrap"><img class="map-img" src="map-level1.png" alt="Level 1 campus map">${buildMapPins('main')}${buildDoorPins('main')}</div>`;
+  `<div class="map-img-wrap"><img class="map-img" src="map-level1.png" alt="Level 1 campus map">${buildMapPins('main')}${buildDoorPins('main')}<svg class="path-svg" id="path-main" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="0" y2="0"/></svg></div>`;
 buildFloorLegend('upper');
 buildDoorPicker('upper');
 
 let currentFloor='upper';
 let selectedRoom=1;
+let selectedDoor=null;
 
 function setFloor(f){
   currentFloor=f;
+  selectedDoor=null;
   document.querySelectorAll('.floor-btn').forEach(b=>b.classList.toggle('active', b.dataset.floor===f));
   document.getElementById('floor-upper-wrap').style.display = f==='upper' ? '' : 'none';
   document.getElementById('floor-main-wrap').style.display = f==='main' ? '' : 'none';
@@ -1133,6 +1161,7 @@ function selectRoom(id){
       </div>
       ${isWorshipCenter?`<button class="btn-secondary" style="margin-top:10px;" onclick="window.open('seating.html','_blank')">View Seating Chart ${ic('external')}</button>`:''}
     </div>`;
+  updatePathLine();
 }
 function showDirections(id){
   const r = roomById(id);
