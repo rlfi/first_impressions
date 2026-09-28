@@ -1054,11 +1054,11 @@ document.getElementById('home-tiles').innerHTML = tiles.map(t=>`
 const rooms = [
   {id:1, num:1, name:'Worship Center: Main Level', floor:'upper', desc:'Main sanctuary and general seating on the Main Level.', entrance:'Main Entrance (Door K)', color:'var(--orange)', x:78.7, y:51.9},
   {id:2, num:2, name:'Chapel', floor:'upper', desc:'Smaller worship space used for chapel services and events.', entrance:'Door K', color:'var(--green)', x:82.7, y:73.5},
-  {id:3, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'upper', desc:'First stop for guests near the Main Entrance — welcome desk and Guest Services.', entrance:'Main Entrance (Door K)', color:'var(--red)', x:71.2, y:70.6},
+  {id:3, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'upper', desc:'First stop for guests near the Main Entrance — welcome desk and Guest Services.', entrance:'Main Entrance (Door K)', color:'var(--red)', icon:'info', x:71.2, y:70.6},
   {id:4, num:4, name:'Community Room', floor:'upper', desc:'Community gathering space.', entrance:'Door M', color:'var(--blue)', x:56.0, y:73.3},
   {id:5, num:5, name:"Noah's Ark Nursery/Preschool", floor:'upper', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'52nd St entrance (Door K)', color:'var(--orange)', x:48.3, y:48.0},
   {id:6, num:6, name:'Atrium', floor:'upper', desc:'Atrium lobby connecting to the Ivanrest Ave entrance.', entrance:'Atrium Entrance (Door N)', color:'var(--purple)', x:51.5, y:27.5},
-  {id:17, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'upper', desc:'Guest Services desk near the Atrium entrance.', entrance:'Atrium Entrance (Door N)', color:'var(--red)', x:55.5, y:36.5},
+  {id:17, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'upper', desc:'Guest Services desk near the Atrium entrance.', entrance:'Atrium Entrance (Door N)', color:'var(--red)', icon:'info', x:55.5, y:36.5},
   {id:7, num:2, name:'ResCenter', floor:'main', desc:'Hosts Iglesia Vida on Sundays and the Wednesday Night Main Service.', entrance:'Door G', color:'var(--green)', x:17.9, y:52.6},
   {id:16, num:1, name:'Main Office', floor:'main', desc:'', entrance:'Door G', color:'var(--teal-dark)', x:10.0, y:62.0},
   {id:8, num:4, name:'Gym', floor:'main', desc:'', entrance:'Door B', color:'var(--cyan)', x:35.4, y:55.5},
@@ -1069,7 +1069,7 @@ const rooms = [
   {id:13, num:9, name:'Olive Tree Café', floor:'main', desc:'Coffee & snacks.', entrance:'Door G', color:'var(--blue)', x:70.1, y:83.8},
   {id:14, num:10, name:"Noah's Ark Nursery/Preschool", floor:'main', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'Door A', color:'var(--orange)', x:65.8, y:64.6},
   {id:15, num:11, name:'Walking By Faith', floor:'main', desc:'Ministry meeting space.', entrance:'Door J', color:'var(--purple)', x:31.0, y:40.2},
-  {id:18, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'main', desc:'Guest Services desk near the Ground Floor Concourse.', entrance:'Door C or Door J', color:'var(--red)', x:44.4, y:52.5}
+  {id:18, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'main', desc:'Guest Services desk near the Ground Floor Concourse.', entrance:'Door C or Door J', color:'var(--red)', icon:'info', x:44.4, y:52.5}
 ];
 function roomById(id){ return rooms.find(r=>r.id===id); }
 
@@ -1154,7 +1154,7 @@ function selectRoom(id){
   const isWorshipCenter = r.name.includes('Worship Center');
   document.getElementById('room-detail-slot').innerHTML = `
     <div class="room-detail">
-      <div class="rd-head"><div class="rd-num">${ic('pin')}</div><h3>${r.name}</h3></div>
+      <div class="rd-head"><div class="rd-num">${ic(r.icon||'pin')}</div><h3>${r.name}</h3></div>
       ${r.desc?`<p class="rd-desc">${r.desc}</p>`:''}
       <div class="rd-entrance">${ic('pin')} Suggested entrance: ${r.entrance} — or pick any door below to see your own path</div>
       <button class="btn-primary" id="dir-btn" onclick="showDirections(${r.id})">Get Directions <span class="btn-chev" id="dir-chev">${ic('chevron-down')}</span></button>
@@ -1480,7 +1480,7 @@ const recent = ['Where is the closest restroom?','4th & 5th Grade (The Zone)','N
 document.getElementById('recent-list').innerHTML = recent.map(r=>`<div class="recent-row" onclick="searchFor('${r}')">${ic('clock')}${r}</div>`).join('');
 
 const searchIndex = [];
-rooms.forEach(r=>searchIndex.push({type:'Room',title:r.name,sub:'Suggested entrance: '+r.entrance,action:()=>{go('map'); setTimeout(()=>{ setFloor(r.floor); selectRoom(r.id); },50);}, icon:'pin', color:'var(--teal)', bg:'var(--teal-pale)'}));
+rooms.forEach(r=>searchIndex.push({type:'Room',title:r.name,sub:'Suggested entrance: '+r.entrance,action:()=>{go('map'); setTimeout(()=>{ setFloor(r.floor); selectRoom(r.id); },50);}, icon:r.icon||'pin', color:'var(--teal)', bg:'var(--teal-pale)'}));
 Object.entries(ministries).forEach(([day,list])=>list.forEach((m,i)=>searchIndex.push({type:'Ministry',title:m.title,sub:m.loc,action:()=>openMinistry(day,i), icon:m.icon,color:m.color,bg:m.bg})));
 searchIndex.push({type:'FAQ',title:'Emergency Procedures',sub:'Call 616.534.4923 opt. 2',action:()=>go('contacts'), icon:'warn',color:'var(--red)',bg:'var(--red-bg)'});
 searchIndex.push({type:'FAQ',title:'Lost & Found',sub:'Front Office, Door G',action:()=>go('contacts'), icon:'bag',color:'var(--orange)',bg:'var(--orange-bg)'});
