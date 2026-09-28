@@ -152,13 +152,14 @@ const doors = [{"letter":"A","x":60.1,"y":22.4},{"letter":"B","x":51.5,"y":29.8}
 function ic(name){
   const icons = {
     pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M12 21s-7-7.5-7-12a7 7 0 0 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>',
-    external:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>'
+    external:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>',
+    info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>'
   };
   return icons[name]||'';
 }
 
 document.getElementById('pins').innerHTML = rooms.map(r =>
-  `<button class="img-pin" data-id="${r.id}" style="left:${r.x}%;top:${r.y}%;background:${r.color};" onclick="selectRoom(${r.id})">${r.num}</button>`
+  `<button class="img-pin" data-id="${r.id}" style="left:${r.x}%;top:${r.y}%;background:${r.color};" onclick="selectRoom(${r.id})">${r.name.startsWith('Guest Services') ? ic('info') : r.num}</button>`
 ).join('');
 
 document.getElementById('doorpins').innerHTML = doors.map(d =>
@@ -181,7 +182,7 @@ function selectRoom(id){
   document.querySelectorAll('.legend-row').forEach(el => el.classList.toggle('active', parseInt(el.dataset.id) === id));
   const isWorshipCenter = r.name.includes('Worship Center');
   document.getElementById('detail').innerHTML = `
-    <div class="rd-head"><div class="rd-num">${r.num}</div><h3>${r.name}</h3></div>
+    <div class="rd-head"><div class="rd-num">${r.name.startsWith('Guest Services') ? ic('info') : r.num}</div><h3>${r.name}</h3></div>
     <p class="rd-desc">${r.desc}</p>
     <div class="rd-entrance">${ic('pin')} Nearest Entrance: ${r.entrance}</div>
     ${isWorshipCenter ? `<a class="btn-secondary" href="seating.html" target="_blank">View Seating Chart ${ic('external')}</a>` : ''}
