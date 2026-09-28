@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Captain Text Alerts Sign-Up | ResLife Guest Experience</title><style>
+:root{--teal:#16a394;--teal-dark:#0f7a6e;--ink:#1c2430;--muted:#5b6573;--line:#e3e7ec;--bg:#f6f7f9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.55}
+main{max-width:680px;margin:0 auto;padding:28px 20px 48px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;margin-top:14px}
+h1{font-size:26px;margin:6px 0 2px;letter-spacing:-.2px}
+h2{font-size:17px;margin:22px 0 6px}
+.kicker{color:var(--teal-dark);font-weight:700;font-size:13px}
+.muted{color:var(--muted);font-size:14px}
+p,li{font-size:15px}
+a{color:var(--teal-dark)}
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
+input[type=text],input[type=tel]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:16px}
+.consent{display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:14px}
+.consent input{margin-top:3px;width:18px;height:18px;flex:none}
+button{margin-top:18px;width:100%;padding:13px;border:0;border-radius:12px;background:var(--teal-dark);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+.links{margin-top:14px;font-size:13px;color:var(--muted)}
+.ok{display:none;background:#e8f6f3;border:1px solid #bfe6de;border-radius:12px;padding:14px;margin-top:16px;font-size:14px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.brand svg{width:22px;height:22px}
+footer{margin-top:22px;font-size:12px;color:var(--muted);text-align:center}
+</style></head><body><main>
+<div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="#0f7a6e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H7l-4 3V11.5A8.5 8.5 0 0 1 11.5 3h1A8.5 8.5 0 0 1 21 11.5z"/></svg>ResLife Guest Experience</div>
+<div class="kicker">TEAM CAPTAINS ONLY</div>
+<h1>Captain Text Alerts</h1>
+<p class="muted">Get a text from ResLife Guest Experience when a volunteer on your team reports they can't serve.</p>
+<div class="card">
+<form id="f" onsubmit="return send(event)">
+<label for="name">Full name</label><input id="name" type="text" required autocomplete="name">
+<label for="team">Team you captain</label><input id="team" type="text" placeholder="e.g. Ushers, Greeters, Hosts, Shuttle Drivers" required>
+<label for="phone">Mobile number</label><input id="phone" type="tel" required autocomplete="tel" placeholder="(616) 555-0123">
+<div class="consent"><input id="agree" type="checkbox"><label for="agree" style="margin:0;font-weight:400">I agree to receive text messages from ResLife Guest Experience when a volunteer on my team reports they can't serve. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of volunteering. See our <a href="privacy.html">Privacy Policy</a> and <a href="terms.html">Terms &amp; Conditions</a>.</label></div>
+<button id="go" type="submit" disabled>Sign up for text alerts</button>
+</form>
+<div class="ok" id="ok">Your email app will open with your sign-up details addressed to reslifecaptains@gmail.com. Send that email to finish signing up. You'll get a confirmation text once you're added.</div>
+</div>
+<footer>ResLife Guest Experience · ResLife Church Guest Experience volunteer team · Grandville, MI<br><a href="sms-signup.html">SMS Sign-Up</a> · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms &amp; Conditions</a></footer>
+</main><script>
+const agree=document.getElementById('agree'),go=document.getElementById('go');
+agree.addEventListener('change',()=>go.disabled=!agree.checked);
+function send(e){e.preventDefault(); if(!agree.checked) return false;
+ const n=document.getElementById('name').value.trim(),t=document.getElementById('team').value.trim(),p=document.getElementById('phone').value.trim();
+ const body='SMS opt-in for ResLife Guest Experience captain text alerts%0D%0A%0D%0AName: '+encodeURIComponent(n)+'%0D%0ATeam: '+encodeURIComponent(t)+'%0D%0AMobile: '+encodeURIComponent(p)+'%0D%0A%0D%0AI agreed to receive text messages from ResLife Guest Experience when a volunteer on my team reports they can%27t serve. Message frequency varies. Msg %26 data rates may apply. Reply STOP to opt out, HELP for help.%0D%0ADate: '+encodeURIComponent(new Date().toString());
+ window.location.href='mailto:reslifecaptains@gmail.com?subject='+encodeURIComponent('Captain SMS opt-in: '+n)+'&body='+body;
+ document.getElementById('ok').style.display='block'; return false;}
+</script></body></html>
