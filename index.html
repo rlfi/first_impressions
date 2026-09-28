@@ -1136,6 +1136,20 @@ function hallRoute(f, doorLetter, room){
   const chain=[]; for(let k=best; k!==undefined; k=prev[k]) chain.unshift(N[k]);
   return [[door.x,door.y], ...chain, [room.x,room.y]];
 }
+/* "View on Map" from a ministry: open the same in-app map, with the room, door and hallway path */
+function openMapAt(floor, roomId, door){
+  go('map');
+  setFloor(floor);
+  if(roomId && roomById(roomId)){ selectRoom(roomId); }
+  else {
+    selectedRoom = null;
+    document.querySelectorAll('.img-pin').forEach(el=>el.classList.remove('selected'));
+    document.querySelectorAll('.legend-list .row').forEach(el=>el.classList.remove('active'));
+    document.getElementById('room-detail-slot').innerHTML = '';
+  }
+  if(door) selectDoor(door);
+  render();
+}
 function updatePathLine(){
   ['path-upper','path-main'].forEach(id=>{ const l=document.querySelector('#'+id+' polyline'); if(l) l.classList.remove('visible'); });
   const svg = document.getElementById(currentFloor==='upper' ? 'path-upper' : 'path-main');
@@ -1295,11 +1309,8 @@ function openMinistry(day, idx){
         <div class="directions-drop-inner">${ic('pin')}<p id="md-directions-text"></p></div>
       </div>
       ${m.mapFile?(()=>{
-        const tokens=[];
-        if(m.mapRoom) tokens.push('room-'+m.mapRoom);
-        (m.mapDoors||[]).forEach(d=>tokens.push('door-'+d));
-        const url = m.mapFile+(tokens.length?('#'+tokens.join(',')):'');
-        return `<button class="btn-secondary" style="margin-top:10px;" onclick="window.open('${url}','_blank')">View on Map ${ic('external')}</button>`;
+        const fl = m.mapFile.includes('level1') ? 'main' : 'upper';
+        return `<button class="btn-secondary" style="margin-top:10px;" onclick="openMapAt('${fl}',${m.mapRoom||0},'${(m.mapDoors||[])[0]||''}')">View on Map ${ic('pin')}</button>`;
       })():''}
       ${isWorshipCenter?`<button class="btn-secondary" style="margin-top:10px;" onclick="window.open('seating.html','_blank')">View Seating Chart ${ic('external')}</button>`:''}
       ${isNursery?`
