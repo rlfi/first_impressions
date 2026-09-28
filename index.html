@@ -298,6 +298,8 @@
     color:var(--text);
     cursor:pointer;
   }
+  .rd-doors-label{font-size:12px;font-weight:700;color:var(--muted);margin:12px 0 6px;}
+  .rd-doors{padding:0 0 12px;}
   .door-chip.active{background:var(--teal-dark);color:#fff;border-color:var(--teal-dark);}
   .path-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
   .path-svg line{
@@ -1094,9 +1096,11 @@ function buildDoorPins(f){
   return doorGroups[f].map(d=>`<div class="door-pin" data-letter="${d.letter}" style="left:${d.x}%;top:${d.y}%;"></div>`).join('');
 }
 function buildDoorPicker(f){
-  document.getElementById('door-picker').innerHTML = `
-    <div class="door-picker-label">Which door did you enter? Tap it to see it on the map.</div>
-    <div class="door-chip-row">${doorGroups[f].map(d=>`<button class="door-chip" data-letter="${d.letter}" onclick="selectDoor('${d.letter}')">Door ${d.letter}</button>`).join('')}</div>`;
+  /* Door chips now render inside the room detail card, directly under the suggested entrance */
+  document.getElementById('door-picker').innerHTML = '';
+}
+function doorChipsHTML(f){
+  return `<div class="door-chip-row rd-doors">${doorGroups[f].map(d=>`<button class="door-chip${selectedDoor===d.letter?' active':''}" data-letter="${d.letter}" onclick="selectDoor('${d.letter}')">Door ${d.letter}</button>`).join('')}</div>`;
 }
 function selectDoor(letter){
   selectedDoor = letter;
@@ -1157,7 +1161,9 @@ function selectRoom(id){
     <div class="room-detail">
       <div class="rd-head"><div class="rd-num">${ic(r.icon||'pin')}</div><h3>${r.name}</h3></div>
       ${r.desc?`<p class="rd-desc">${r.desc}</p>`:''}
-      <div class="rd-entrance">${ic('pin')} Suggested entrance: ${r.entrance} — or pick any door below to see your own path</div>
+      <div class="rd-entrance">${ic('pin')} Suggested entrance: ${r.entrance}</div>
+      <div class="rd-doors-label">Came in another door? Tap it to see your path.</div>
+      ${doorChipsHTML(currentFloor)}
       <button class="btn-primary" id="dir-btn" onclick="showDirections(${r.id})">Get Directions <span class="btn-chev" id="dir-chev">${ic('chevron-down')}</span></button>
       <div class="directions-drop" id="directions-drop">
         <div class="directions-drop-inner">${ic('pin')}<p id="directions-text"></p></div>
