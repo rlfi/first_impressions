@@ -1018,7 +1018,7 @@ const rooms = [
   {id:8, num:2, name:'Gym', floor:'main', desc:'', entrance:'Door B', color:'var(--cyan)', x:35.4, y:55.5},
   {id:9, num:3, name:'Oneighty (6th – 8th grade)', floor:'main', desc:'Student ministry space for 6th – 8th grade (Married Life).', entrance:'Door C', color:'var(--pink)', x:41.3, y:41.2},
   {id:10, num:4, name:'The Ground Floor (9th – 12th grade)', floor:'main', desc:'High school ministry space.', entrance:'Door E', color:'var(--muted)', x:54.1, y:41.2},
-  {id:11, num:5, name:'The Zone (3rd – 5th grade)', floor:'main', desc:'Kids ministry space for 3rd – 5th grade.', entrance:'Door C', color:'var(--red)', x:62.8, y:31.9},
+  {id:11, num:5, name:'The Zone (4th & 5th grade)', floor:'main', desc:'Kids ministry space for 4th & 5th grade.', entrance:'Door C', color:'var(--red)', x:62.8, y:31.9},
   {id:12, num:6, name:'Worship Center: Balcony Seating', floor:'main', desc:'Balcony seating overlooking the Worship Center below.', entrance:'Door H', color:'var(--orange)', x:86.1, y:69.9},
   {id:13, num:7, name:'Olive Tree Café', floor:'main', desc:'Coffee & snacks.', entrance:'Door G', color:'var(--blue)', x:70.1, y:83.8},
   {id:14, num:8, name:"Noah's Ark Nursery/Preschool", floor:'main', desc:'Nursery & preschool care, 6 weeks – 5 years.', entrance:'Door A', color:'var(--orange)', x:65.8, y:64.6},
@@ -1113,8 +1113,8 @@ const ministries = {
     {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.', mapFile:'map-mainlevel.html', mapRoom:2, mapDoors:['K']},
     {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'High School',loc:'Ground Floor',pastor:'Pastors Ben & Kendra Lepsch — 9 AM only',entrance:'Door C', desc:'High School students gather for teaching, worship, and community.', how:'Enter through Door C or Door J. Take the hallway to the main lobby — High School is on the Ground Floor.', mapFile:'map-level1.html', mapRoom:10, mapDoors:['C','J']},
     {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · Pastor James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.', mapFile:'map-level1.html', mapRoom:9, mapDoors:['C']},
-    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'3rd – 5th Grade',loc:'The Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.', mapFile:'map-level1.html', mapRoom:11, mapDoors:['C']},
-    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 2nd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
+    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'4th & 5th Grade',loc:'The Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.', mapFile:'map-level1.html', mapRoom:11, mapDoors:['C']},
+    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 3rd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
     {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby.'}
   ],
   sunpm:[
@@ -1123,8 +1123,8 @@ const ministries = {
     {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'The Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.', mapFile:'map-mainlevel.html', mapRoom:2, mapDoors:['K']},
     {icon:'info',color:'var(--muted)',bg:'var(--bg)',title:'Other Classes',loc:'See Guest Service Desk',pastor:'', entrance:'', desc:'Additional classes vary by season — check the Guest Service Desk for current locations.', how:'Ask any team member at the Guest Service Desk for directions.'},
     {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · Pastor James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.', mapFile:'map-level1.html', mapRoom:9, mapDoors:['C']},
-    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'3rd – 5th Grade',loc:'Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.', mapFile:'map-level1.html', mapRoom:11, mapDoors:['C']},
-    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 2nd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
+    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'4th & 5th Grade',loc:'Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.', mapFile:'map-level1.html', mapRoom:11, mapDoors:['C']},
+    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 3rd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
     {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll — Upper level only',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby. Upper level only for this service.'}
   ],
   wed:[
@@ -1392,7 +1392,7 @@ document.getElementById('more-body').innerHTML = `<div class="list-card">${
 /* ---------- SEARCH ---------- */
 const popular = ['Growth Track','3rd Grade','Nursery','High School','Coffee','Restrooms'];
 document.getElementById('popular-chips').innerHTML = popular.map(p=>`<button class="chip" onclick="searchFor('${p}')">${p}</button>`).join('');
-const recent = ['Where is the closest restroom?','3rd – 5th Grade (The Zone)','Nursery pickup','Growth Track location','Lost & Found'];
+const recent = ['Where is the closest restroom?','4th & 5th Grade (The Zone)','Nursery pickup','Growth Track location','Lost & Found'];
 document.getElementById('recent-list').innerHTML = recent.map(r=>`<div class="recent-row" onclick="searchFor('${r}')">${ic('clock')}${r}</div>`).join('');
 
 const searchIndex = [];
@@ -1438,7 +1438,7 @@ const chatRules = [
   {kw:['lost'], a:"Sunday AM: direct to Door K and let the Safety Team know. Monday–Thursday 8:30am–4pm: Front Office (Door G) or call 616.534.4923."},
   {kw:['emergency'], a:"If a pastor is needed right away, call 616.534.4923, option 2, and leave a message. Our on-duty pastor will get back to you shortly."},
   {kw:['restroom','bathroom'], a:"Restrooms are marked with a green dot on the Campus Map — check the Map tab for the one nearest you."},
-  {kw:['zone','3rd','4th','5th'], a:"3rd–5th Grade meets in The Zone with Pastor Victoria Hernandez. Enter through Door C."},
+  {kw:['zone','3rd','4th','5th'], a:"4th & 5th Grade meets in The Zone with Pastor Victoria Hernandez. Enter through Door C."},
   {kw:['high school'], a:"High School meets on the Ground Floor with Pastors Ben & Kendra Lepsch. Enter through Door C or Door J."}
 ];
 function botReply(q){
