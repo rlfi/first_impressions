@@ -1484,9 +1484,67 @@ const captainGroups = {
     {name:'Gregg Velthuis', num:'6164051724'}
   ]}
 };
+const CAPTAIN_API = 'https://reslife-captain-list.mgrobinson07.workers.dev/report';
 const captainMsg = "Hi, this is [your name] — I won't be able to serve on [date].";
-function textOneCaptain(num){
-  window.open(`sms:${num}?body=${encodeURIComponent(captainMsg)}`, '_self');
+function textOneCaptain(num, body){
+  window.open(`sms:${num}?body=${encodeURIComponent(body||captainMsg)}`, '_self');
+}
+function cmEsc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function cmSaved(){try{return JSON.parse(localStorage.getItem('cmVolunteer')||'{}')}catch(e){return {}}}
+function showCaptainForm(key, idx){
+  const g = captainGroups[key], c = g.captains[idx], sv = cmSaved();
+  const first = c.name.split(' ')[0];
+  const inp = 'width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #e3e7ec;border-radius:10px;font-size:16px;margin-top:4px;background:#fff;color:inherit;';
+  const lab = 'display:block;font-size:13px;font-weight:600;margin-top:12px;';
+  document.getElementById('captains-body').innerHTML = `<div class="list-card">
+    <div class="list-row" onclick="showCaptainCategory('${key}')">
+      <div class="row-badge" style="background:var(--teal-pale);color:var(--teal-dark);">${ic('back')}</div>
+      <div class="row-text"><h4>${cmEsc(g.label)}</h4></div>
+    </div>
+    <div style="padding:14px 16px 18px;">
+      <h4 style="margin:0 0 2px;">Let ${cmEsc(first)} know you can't serve</h4>
+      <p style="margin:0;font-size:12.5px;color:#6b7280;">${cmEsc(first)} will reach out to you directly.</p>
+      <label style="${lab}" for="cm-name">Your name</label>
+      <input id="cm-name" style="${inp}" autocomplete="name" value="${cmEsc(sv.name)}">
+      <label style="${lab}" for="cm-phone">Your mobile number</label>
+      <input id="cm-phone" type="tel" style="${inp}" autocomplete="tel" placeholder="(616) 555-0123" value="${cmEsc(sv.phone)}">
+      <label style="${lab}" for="cm-date">Date you can't serve</label>
+      <input id="cm-date" type="date" style="${inp}">
+      <label style="${lab}" for="cm-reason">Reason <span style="font-weight:400;color:#6b7280;">(optional)</span></label>
+      <input id="cm-reason" style="${inp}" maxlength="120" placeholder="e.g. sick, traveling">
+      <div id="cm-err" style="display:none;color:var(--red);font-size:13px;margin-top:10px;"></div>
+      <button id="cm-send" onclick="sendCaptainReport('${key}',${idx})" style="margin-top:16px;width:100%;padding:13px;border:0;border-radius:12px;background:var(--teal-dark);color:#fff;font-size:16px;font-weight:700;">Send to ${cmEsc(first)}</button>
+    </div></div>`;
+}
+async function sendCaptainReport(key, idx){
+  const g = captainGroups[key], c = g.captains[idx], first = c.name.split(' ')[0];
+  const $ = id => document.getElementById(id);
+  const name = $('cm-name').value.trim(), phone = $('cm-phone').value.trim(), dv = $('cm-date').value, reason = $('cm-reason').value.trim();
+  const err = m => { $('cm-err').textContent = m; $('cm-err').style.display = 'block'; };
+  if (!name || phone.replace(/\D/g,'').length < 10 || !dv) return err('Please fill in your name, a 10-digit mobile number, and the date.');
+  const date = new Date(dv + 'T12:00').toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'});
+  try{ localStorage.setItem('cmVolunteer', JSON.stringify({name, phone})); }catch(e){}
+  const fallbackBody = `Hi ${first}, this is ${name}. I won't be able to serve ${date}${reason?` (${reason})`:''}.`;
+  const btn = $('cm-send'); btn.disabled = true; btn.textContent = 'Sending…';
+  let res = null;
+  try{
+    const r = await fetch(CAPTAIN_API, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({team:key, captainPhone:c.num, volunteerName:name, volunteerPhone:phone, date, reason})});
+    res = await r.json().catch(()=>null);
+    if (res && res.error && (r.status===400 || r.status===429)) { btn.disabled=false; btn.textContent=`Send to ${first}`; return err(res.error); }
+  }catch(e){ res = null; }
+  if (res && res.sent) {
+    document.getElementById('captains-body').innerHTML = `<div class="list-card"><div style="padding:22px 16px;text-align:center;">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--teal-pale);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+      <h4 style="margin:0 0 4px;">Sent to ${cmEsc(first)}</h4>
+      <p style="margin:0 0 14px;font-size:13px;color:#6b7280;">${cmEsc(first)} will reach out to you at ${cmEsc(phone)}.</p>
+      <button onclick="renderCaptainCategories()" style="padding:10px 18px;border:1px solid #e3e7ec;border-radius:10px;background:#fff;font-size:14px;font-weight:600;color:inherit;">Done</button>
+    </div></div>`;
+  } else {
+    textOneCaptain(c.num, fallbackBody);
+    showCaptainCategory(key);
+  }
 }
 function renderCaptainCategories(){
   const rows = Object.entries(captainGroups).map(([key,g])=>({
@@ -1509,8 +1567,8 @@ function showCaptainCategory(key){
       <div class="row-badge" style="background:var(--teal-pale);color:var(--teal-dark);">${ic('back')}</div>
       <div class="row-text"><h4>All Teams</h4></div>
     </div>`;
-  const body = g.captains.length ? g.captains.map(c=>`
-    <div class="list-row" onclick="textOneCaptain('${c.num}')">
+  const body = g.captains.length ? g.captains.map((c,i)=>`
+    <div class="list-row" onclick="showCaptainForm('${key}',${i})">
       <div class="row-badge" style="background:var(--red-bg);color:var(--red);">${ic('chat')}</div>
       <div class="row-text"><h4>${c.name}</h4></div>
       <div class="chev">${ic('chevron')}</div>
