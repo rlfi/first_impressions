@@ -12,7 +12,7 @@ h2{font-size:17px;margin:22px 0 6px}
 p,li{font-size:15px}
 a{color:var(--teal-dark)}
 label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
-input[type=text],input[type=tel]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:16px}
+input[type=text],input[type=tel],select{box-sizing:border-box;background:#fff;color:inherit;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:16px}
 .consent{display:flex;gap:10px;align-items:flex-start;margin-top:18px;font-size:14px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fafbfc}
 .opt{font-weight:700;color:var(--teal-dark)}
 .hint{font-size:13px;color:var(--muted);margin:8px 2px 0}
@@ -32,21 +32,42 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);text-align:center}
 <div class="card">
 <form id="f" onsubmit="return send(event)">
 <label for="name">Full name</label><input id="name" type="text" required autocomplete="name">
-<label for="team">Team you captain</label><input id="team" type="text" placeholder="e.g. Ushers, Greeters, Shuttle Drivers" required>
+<label for="team">Team you captain</label><select id="team" required><option value="" disabled selected>Choose your team</option><option>Ushers</option><option>Greeters</option><option>Shuttle Drivers</option></select>
 <label for="phone">Mobile number</label><input id="phone" type="tel" required autocomplete="tel" placeholder="(616) 555-0123">
 <div class="consent"><input id="agree" type="checkbox"><label for="agree" style="margin:0;font-weight:400"><span class="opt">Optional:</span> Yes, send me text messages from ResLife Guest Experience when a volunteer on my team reports they can't serve. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help.</label></div>
 <p class="hint">Leave this box unchecked to skip text alerts. You can still submit this form and serve as a captain without them.</p>
 <button id="go" type="submit">Submit</button>
 <p class="links">Read our <a href="privacy.html">Privacy Policy</a> and <a href="terms.html">Terms &amp; Conditions</a>.</p>
 </form>
-<div class="ok" id="ok">Your email app will open with your sign-up details addressed to reslifecaptains@gmail.com. Send that email to finish signing up.<span id="okText"> You'll get a confirmation text once you're added.</span></div>
+<div class="err" id="err" style="display:none;color:#b42318;font-size:14px;margin-top:12px"></div>
+<div class="ok" id="ok"></div>
 </div>
 <footer>ResLife Guest Experience · ResLife Church Guest Experience volunteer team · Grandville, MI<br><a href="sms-signup.html">SMS Sign-Up</a> · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms &amp; Conditions</a></footer>
 </main><script>
-const agree=document.getElementById('agree'),go=document.getElementById('go');
-function send(e){e.preventDefault(); const sms=agree.checked;
- const n=document.getElementById('name').value.trim(),t=document.getElementById('team').value.trim(),p=document.getElementById('phone').value.trim();
+const API='https://reslife-captain-list.mgrobinson07.workers.dev/signup';
+const $=id=>document.getElementById(id);
+function mailFallback(n,t,p,sms){
  const body='SMS opt-in for ResLife Guest Experience captain text alerts%0D%0A%0D%0AName: '+encodeURIComponent(n)+'%0D%0ATeam: '+encodeURIComponent(t)+'%0D%0AMobile: '+encodeURIComponent(p)+'%0D%0A%0D%0A'+(sms?'Text alerts: YES. I agreed to receive text messages from ResLife Guest Experience when a volunteer on my team reports they can%27t serve. Message frequency varies. Msg %26 data rates may apply. Reply STOP to opt out, HELP for help.':'Text alerts: NO. I did not opt in to text messages.')+'%0D%0ADate: '+encodeURIComponent(new Date().toString());
  window.location.href='mailto:reslifecaptains@gmail.com?subject='+encodeURIComponent('Captain sign-up: '+n+(sms?' (text alerts: yes)':' (text alerts: no)'))+'&body='+body;
- document.getElementById('okText').style.display=sms?'inline':'none'; document.getElementById('ok').style.display='block'; return false;}
+}
+function done(html){ $('f').style.display='none'; $('ok').innerHTML=html; $('ok').style.display='block'; }
+async function send(e){
+ e.preventDefault();
+ const sms=$('agree').checked, n=$('name').value.trim(), t=$('team').value, p=$('phone').value.trim();
+ $('err').style.display='none';
+ if(!n||!t||p.replace(/\D/g,'').length<10){ $('err').textContent='Please fill in your name, team and a 10-digit mobile number.'; $('err').style.display='block'; return false; }
+ const go=$('go'); go.disabled=true; go.textContent='Submitting…';
+ try{
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,team:t,phone:p,sms})});
+  const d=await r.json();
+  if(d.ok){
+   done(sms ? '<b>You\'re signed up.</b> You\'ll get a confirmation text from (435) 317-5904 shortly. Reply STOP anytime to opt out.'
+            : '<b>Thanks, you\'re on the captain list.</b> You chose not to receive text alerts. You can come back to this page anytime to turn them on.');
+  } else { $('err').textContent=d.error||'Something went wrong. Please try again.'; $('err').style.display='block'; go.disabled=false; go.textContent='Submit'; }
+ }catch(err){
+  mailFallback(n,t,p,sms);
+  done('Your email app should open with your sign-up details addressed to reslifecaptains@gmail.com. Send that email to finish signing up.');
+ }
+ return false;
+}
 </script></body></html>
