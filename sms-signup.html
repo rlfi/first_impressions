@@ -1,31 +1,40 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="theme-color" content="#f7f4ee"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Captain Sign-Up | ResLife Guest Experience</title><style>
-:root{--teal:#16a394;--teal-dark:#0f7a6e;--ink:#1c2430;--muted:#5b6573;--line:#e3e7ec;--bg:#f6f7f9}
+:root{--gold:#d4af37;--gold-hi:#f3d67a;--gold-dark:#9a7a12;--ink:#0b1626;--muted:#5b6573;--line:#e6e1d6;--bg:#f7f4ee;--card:#ffffff;--field:#ffffff}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.55}
 main{max-width:680px;margin:0 auto;padding:28px 20px 48px}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;margin-top:14px}
-h1{font-size:26px;margin:6px 0 2px;letter-spacing:-.2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;margin-top:14px}
+h1{font-size:26px;margin:6px 0 2px;letter-spacing:-.2px;color:var(--ink)}
 h2{font-size:17px;margin:22px 0 6px}
-.kicker{color:var(--teal-dark);font-weight:700;font-size:13px}
+.kicker{color:var(--gold-dark);font-weight:700;font-size:12px;letter-spacing:.16em;margin-top:18px}
 .muted{color:var(--muted);font-size:14px}
 p,li{font-size:15px}
-a{color:var(--teal-dark)}
-label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
-input[type=text],input[type=tel],select{box-sizing:border-box;background:#fff;color:inherit;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:16px}
-.consent{display:flex;gap:10px;align-items:flex-start;margin-top:18px;font-size:14px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fafbfc}
-.opt{font-weight:700;color:var(--teal-dark)}
+a{color:var(--gold-dark)}
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px;color:var(--ink)}
+input[type=text],input[type=tel],select{box-sizing:border-box;background:var(--field);color:var(--ink);width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:16px}
+input[type=text]:focus,input[type=tel]:focus,select:focus{outline:none;border-color:var(--gold)}
+input::placeholder{color:#9aa3ad}
+.consent{display:flex;gap:10px;align-items:flex-start;margin-top:18px;font-size:14px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fbf9f4}
+.opt{font-weight:700;color:var(--gold-dark)}
 .hint{font-size:13px;color:var(--muted);margin:8px 2px 0}
-.consent input{margin-top:3px;width:18px;height:18px;flex:none}
-button{margin-top:18px;width:100%;padding:13px;border:0;border-radius:12px;background:var(--teal-dark);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+.consent input{margin-top:3px;width:18px;height:18px;flex:none;accent-color:var(--gold)}
+button{margin-top:18px;width:100%;padding:13px;border:0;border-radius:12px;background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#141414;font-size:16px;font-weight:800;letter-spacing:.02em;cursor:pointer}
 button:disabled{opacity:.45;cursor:not-allowed}
 .links{margin-top:14px;font-size:13px;color:var(--muted)}
-.ok{display:none;background:#e8f6f3;border:1px solid #bfe6de;border-radius:12px;padding:14px;margin-top:16px;font-size:14px}
-.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
-.brand svg{width:22px;height:22px}
+.ok{display:none;background:#fbf6e6;border:1px solid var(--gold);border-radius:12px;padding:14px;margin-top:16px;font-size:14px;color:var(--ink)}
+.ok b{color:var(--ink)}
+.brand{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.brand .mark{display:flex;align-items:center;gap:10px}
+.brand img{height:44px;width:auto;display:block;filter:brightness(0)}
+.brand .mark span{font-size:30px;font-weight:900;letter-spacing:.01em;color:var(--ink);line-height:1}
+.brand .tag{font-size:11px;letter-spacing:.18em;color:var(--ink);opacity:.85}
+.brand .tag span{color:var(--gold)}
+.rule{height:2px;width:72px;background:linear-gradient(90deg,var(--gold),var(--gold-hi));border-radius:2px;margin-top:14px}
 footer{margin-top:22px;font-size:12px;color:var(--muted);text-align:center}
 </style></head><body><main>
-<div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="#0f7a6e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H7l-4 3V11.5A8.5 8.5 0 0 1 11.5 3h1A8.5 8.5 0 0 1 21 11.5z"/></svg>ResLife Guest Experience</div>
+<div class="brand"><div class="mark"><img src="logo-white.png" alt=""><span>RESLIFE</span></div><div class="tag">SEE A NEED. FILL A NEED.</div></div>
+<div class="rule"></div>
 <div class="kicker">TEAM CAPTAINS ONLY</div>
 <h1>Captain Sign-Up</h1>
 <p class="muted">Add yourself to the Guest Experience captain list so volunteers on your team can reach you. Text alerts are optional.</p>
@@ -61,7 +70,8 @@ async function send(e){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,team:t,phone:p,sms})});
   const d=await r.json();
   if(d.ok){
-   done(sms ? '<b>You\'re signed up.</b> You\'ll get a confirmation text from (435) 317-5904 shortly. Reply STOP anytime to opt out.'
+   if(sms){ try{ localStorage.setItem('capSignedUp','1'); }catch(e){} }
+   done(sms ? '<b>You\'re signed up.</b> You\'ll get a confirmation text from (435) 317-5904 shortly. Reply STOP anytime to opt out.<br><br><a href="index.html">Back to the Guest Experience Hub</a>'
             : '<b>Thanks, you\'re on the captain list.</b> You chose not to receive text alerts. You can come back to this page anytime to turn them on.');
   } else { $('err').textContent=d.error||'Something went wrong. Please try again.'; $('err').style.display='block'; go.disabled=false; go.textContent='Submit'; }
  }catch(err){

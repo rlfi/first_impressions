@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Guest Experience - Guest Services Hub</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ResLife Hub">
+<meta name="theme-color" content="#eafaf6">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{
+    --navy:#0b1626;
+    --navy-2:#152a42;
+    --teal:#16a394;
+    --teal-dark:#0f7a6e;
+    --teal-pale:#e2f6f2;
+    --bg:#f7f4ee;
+    --card:#ffffff;
+    --text:#1c2733;
+    --muted:#7c8a99;
+    --line:#eef1f5;
+    --green:#3fb37f; --green-bg:#e6f7ee;
+    --purple:#7c5cbf; --purple-bg:#efe9fb;
+    --orange:#f0a323; --orange-bg:#fef2df;
+    --red:#e35660; --red-bg:#fdeaec;
+    --cyan:#3fb8c4; --cyan-bg:#e3f6f8;
+    --blue:#4a90d9; --blue-bg:#e8f2fc;
+    --pink:#ef6c9b; --pink-bg:#fdeaf1;
+    --shadow:0 6px 18px rgba(15,30,45,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#e7ebf0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  .shell{
+    max-width:420px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--bg);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  @media(min-width:480px){
+    body{padding:24px 0;}
+    .shell{
+      min-height:860px;
+      height:860px;
+      border-radius:40px;
+      box-shadow:0 30px 60px rgba(10,20,35,0.35);
+      border:8px solid #0b1626;
+    }
+  }
+
+  .screen{display:none; flex-direction:column; flex:1; min-height:0;}
+  .screen.active{display:flex;}
+  .scroll{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  .scroll::-webkit-scrollbar{display:none;}
+
+  /* Generic header for inner screens */
+  .top-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:calc(16px + env(safe-area-inset-top)) 16px 12px;
+    background:var(--card);
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:0;
+    z-index:5;
+  }
+  .icon-btn{
+    width:40px;height:40px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg);
+    color:var(--text);
+    border:none;
+    cursor:pointer;
+    flex:0 0 40px;
+  }
+  .top-bar h1{
+    flex:1;
+    font-size:16.5px;
+    font-weight:800;
+    margin:0;
+    text-align:center;
+    padding-right:40px;
+  }
+  .top-bar.left-align h1{text-align:left;padding-right:0;}
+
+  svg.i{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ===== HOME ===== */
+  #screen-home .scroll{background:var(--bg);}
+  .hero{
+    position:relative;
+    background:linear-gradient(165deg,#153f6b 0%,#2c6099 100%);
+    color:#fff;
+    padding:calc(22px + env(safe-area-inset-top)) 20px 34px;
+    border-bottom-left-radius:22px;
+    border-bottom-right-radius:22px;
+  }
+  .hero::after{
+    content:'';
+    position:absolute;
+    left:0; right:0; bottom:-28px;
+    height:28px;
+    background:linear-gradient(180deg,rgba(111,159,216,0.35) 0%,rgba(111,159,216,0) 100%);
+    pointer-events:none;
+  }
+  .hero-top{display:flex;justify-content:space-between;align-items:center;}
+  .wordmark{font-size:20px;font-weight:900;letter-spacing:0.01em;color:#fff;}
+  .wordmark span{color:#ffd666;}
+  .hub-sub{font-size:10px;letter-spacing:0.18em;color:#ffd666;font-weight:700;margin-top:2px;}
+  .bell{
+    width:34px;height:34px;border-radius:50%;
+    background:rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#ffd666;
+    border:1px solid rgba(255,214,102,0.4);
+  }
+  .greeting{margin-top:18px;}
+  .greeting h2{margin:0;font-size:19px;font-weight:800;color:#fff;}
+  .greeting p{margin:5px 0 0;font-size:12.5px;color:#ffe6a3;line-height:1.4;}
+
+  .tiles{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    padding:16px;
+  }
+  .tile{
+    background:var(--card);
+    border-radius:16px;
+    padding:14px 12px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    border:1px solid var(--line);
+    border-top:2.5px solid #d4af37;
+  }
+  .badge{
+    width:38px;height:38px;
+    border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:10px;
+  }
+  .tile h3{margin:0 0 3px;font-size:13.5px;font-weight:800;line-height:1.25;}
+  .tile p{margin:0;font-size:11px;color:var(--muted);line-height:1.3;}
+  .cap-banner{display:flex;align-items:center;gap:12px;margin:16px 16px 0;padding:13px 14px;
+    background:var(--card);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:14px;
+    box-shadow:var(--shadow);text-decoration:none;color:inherit;}
+  .cap-banner[hidden]{display:none;}
+  .cap-banner .cb-text{flex:1;min-width:0;}
+  .cap-banner h3{margin:0 0 2px;font-size:13.5px;font-weight:800;}
+  .cap-banner p{margin:0;font-size:11.5px;color:var(--muted);line-height:1.3;}
+  .cap-banner .cb-chev{color:var(--muted);display:flex;}
+  .cap-banner .badge{margin:0;flex-shrink:0;}
+
+  .contact-row{
+    margin:0 16px 14px;
+    background:var(--card);
+    border-radius:16px;
+    padding:14px;
+    box-shadow:var(--shadow);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    border:1px solid var(--line);
+  }
+  .contact-row h3{margin:0 0 2px;font-size:13.5px;font-weight:800;}
+  .contact-row p{margin:0;font-size:11.5px;color:var(--muted);}
+
+  .mission-banner{
+    margin:4px 0 18px;
+    background:linear-gradient(135deg,#e4c25f,#c9a034);
+    color:#141414;
+    padding:14px 16px;
+    text-align:center;
+  }
+  .mission-banner .m-title{font-size:10px;letter-spacing:0.14em;opacity:0.7;margin-bottom:4px;color:#141414;text-transform:uppercase;}
+  .mission-banner .m-body{font-size:14px;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;line-height:1.5;}
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav{
+    display:flex;
+    background:var(--card);
+    border-top:1px solid var(--line);
+    padding:8px 4px calc(10px + env(safe-area-inset-bottom));
+    position:relative;
+    z-index:10;
+  }
+  .nav-btn{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-size:10.5px;
+    font-weight:700;
+    cursor:pointer;
+    padding:4px 0;
+  }
+  .nav-btn.active{color:#a67c1a;}
+  .nav-btn svg{width:21px;height:21px;}
+
+  /* ===== TOGGLES ===== */
+  .underline-tabs{
+    display:flex;
+    background:var(--card);
+    border-bottom:1px solid var(--line);
+  }
+  .underline-tabs button{
+    flex:1;
+    background:none;border:none;
+    padding:12px 8px 10px;
+    font-size:13px;font-weight:700;
+    color:var(--muted);
+    border-bottom:3px solid transparent;
+    cursor:pointer;
+  }
+  .underline-tabs button.active{color:var(--teal);border-color:var(--teal);}
+
+  .pill-toggle{
+    display:flex;
+    background:var(--bg);
+    border-radius:12px;
+    padding:4px;
+    margin:14px 16px 6px;
+  }
+  .pill-toggle button{
+    flex:1;
+    border:none;background:none;
+    padding:9px 6px;
+    border-radius:9px;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:0.02em;
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .pill-toggle button.active{background:var(--green);color:#fff;}
+
+  /* ===== MAP ===== */
+  .map-wrap{padding:12px 16px 4px;}
+  .floorplan{width:100%;height:auto;display:block;}
+  .map-img-wrap{position:relative;width:100%;line-height:0;}
+  .map-img{width:100%;height:auto;display:block;border-radius:10px;}
+  .img-pin{
+    position:absolute;
+    width:38px;height:38px;
+    border-radius:50%;
+    border:none;
+    background:transparent;
+    display:flex;align-items:center;justify-content:center;
+    transform:translate(-50%,-50%);
+    cursor:pointer;
+    padding:0;
+  }
+  .img-pin.selected{
+    box-shadow:0 0 0 3px rgba(22,163,148,0.55);
+  }
+  .door-pin{
+    position:absolute;
+    width:26px;height:26px;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    opacity:0;
+  }
+  .door-pin.selected{
+    opacity:1;
+    width:34px;height:34px;
+    border:3px solid #fff;
+    background:var(--teal-dark);
+    box-shadow:0 0 0 5px rgba(22,163,148,0.5), 0 2px 8px rgba(0,0,0,0.4);
+    animation:doorPulseApp 1.5s ease-out infinite;
+  }
+  @keyframes doorPulseApp{
+    0%{box-shadow:0 0 0 0 rgba(22,163,148,0.55), 0 2px 8px rgba(0,0,0,0.4);}
+    70%{box-shadow:0 0 0 14px rgba(22,163,148,0), 0 2px 8px rgba(0,0,0,0.4);}
+    100%{box-shadow:0 0 0 0 rgba(22,163,148,0), 0 2px 8px rgba(0,0,0,0.4);}
+  }
+  .door-picker-label{font-size:12px;font-weight:700;color:var(--muted);padding:12px 16px 6px;}
+  .door-chip-row{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 10px;}
+  .door-chip{
+    padding:7px 14px;
+    border-radius:20px;
+    border:1.5px solid var(--line);
+    background:var(--card);
+    font-weight:800;
+    font-size:13px;
+    color:var(--text);
+    cursor:pointer;
+  }
+  .rd-doors-label{font-size:12px;font-weight:700;color:var(--muted);margin:12px 0 6px;}
+  .rd-doors{padding:0 0 12px;}
+  .door-chip.active{background:var(--teal-dark);color:#fff;border-color:var(--teal-dark);}
+  .path-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+  .path-svg polyline{
+    fill:none;
+    stroke-linejoin:round;
+    stroke:var(--teal-dark);
+    stroke-width:0.8;
+    stroke-dasharray:2.2,1.6;
+    stroke-linecap:round;
+    opacity:0;
+    filter:drop-shadow(0 0 2px rgba(255,255,255,0.9)) drop-shadow(0 0 2px rgba(255,255,255,0.9));
+  }
+  .path-svg polyline.visible{opacity:1;}
+  .room{fill:#e4e8ec;stroke:#c3cbd3;stroke-width:3;stroke-linejoin:round;cursor:pointer;transition:fill .15s;}
+  .room-sub{fill:#d7dde1;stroke:#c3cbd3;stroke-width:2.5;cursor:pointer;}
+  .room.selected,.room-sub.selected{fill:var(--teal-pale) !important;stroke:var(--teal) !important;stroke-width:4.5 !important;}
+  .corridor{fill:none;stroke:#d3d8dd;stroke-width:14;stroke-linecap:round;}
+  .pin{fill:var(--teal);stroke:#fff;stroke-width:2;pointer-events:none;}
+  .pin-num{fill:#fff;font-size:15px;font-weight:800;text-anchor:middle;font-family:inherit;pointer-events:none;}
+  .door-tab{fill:var(--navy);}
+  .door-label{fill:var(--navy);font-size:14px;font-weight:800;text-anchor:middle;font-family:inherit;}
+  .mk{r:8;stroke:#fff;stroke-width:2;}
+  .cat-breakout{fill:#f7dcb0 !important;}
+  .cat-apparel{fill:#cdeedb !important;}
+  .cat-coffee{fill:#e5d9f2 !important;}
+  .cat-coffee.selected, .cat-coffee:hover{fill:var(--teal-pale) !important;}
+  .cat-breakout.selected, .cat-breakout:hover{fill:var(--teal-pale) !important;}
+  .cat-apparel.selected, .cat-apparel:hover{fill:var(--teal-pale) !important;}
+  .cat-meals{fill:#c7ecf0 !important;}
+  .cat-meals.selected, .cat-meals:hover{fill:var(--teal-pale) !important;}
+  .legend-num{
+    width:20px;height:20px;border-radius:50%;
+    background:var(--teal-dark);color:#fff;
+    font-size:11px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 20px;
+  }
+
+  .legend-list{padding:2px 16px 10px;display:flex;flex-direction:column;gap:7px;}
+  .legend-list .row{padding:6px 8px;border-radius:9px;transition:background .15s,color .15s;}
+  .legend-list .row:hover{background:var(--teal-pale);color:var(--teal-dark);}
+  .legend-list .row.active{background:var(--teal-pale);color:var(--teal-dark);font-weight:800;}
+  .legend-list .row{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);font-weight:600;}
+  .legend-dot{width:11px;height:11px;border-radius:50%;flex:0 0 11px;}
+
+  .room-detail{
+    margin:6px 16px 16px;
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:16px;
+    border:1px solid var(--line);
+  }
+  .room-detail .rd-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .rd-num{width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex:0 0 32px;}
+  .room-detail h3{margin:0;font-size:16px;font-weight:800;}
+  .room-detail .rd-desc{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 10px;}
+  .rd-entrance{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--teal-dark);margin-bottom:12px;}
+  .btn-primary{
+    width:100%;
+    background:var(--teal-dark);
+    color:#fff;
+    border:none;
+    padding:13px;
+    border-radius:12px;
+    font-size:13.5px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .btn-secondary{
+    width:100%;
+    background:var(--pink-bg);
+    color:#c2447a;
+    border:none;
+    padding:13px;
+    border-radius:12px;
+    font-size:13.5px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .btn-secondary.is-open{background:#f7c9dc;}
+  .directions-drop{
+    margin-top:10px;
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease, opacity .25s ease;
+    opacity:0;
+    background:var(--teal-pale);
+    border-radius:12px;
+  }
+  .directions-drop.open{max-height:160px; opacity:1;}
+  .directions-drop-inner{
+    padding:12px 14px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .directions-drop-inner svg{flex:0 0 18px; margin-top:1px; color:var(--teal-dark);}
+  .directions-drop-inner p{margin:0;font-size:12.5px;line-height:1.5;color:var(--teal-dark);font-weight:600;}
+  .btn-primary.is-open{background:var(--teal-dark);}
+  .btn-chev{transition:transform .25s ease; display:inline-block;}
+  .btn-chev.open{transform:rotate(180deg);}
+
+  /* ===== LIST ROWS (ministry / more / contacts) ===== */
+  .list-card{
+    margin:10px 16px;
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .list-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 14px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .list-row:last-child{border-bottom:none;}
+  .row-badge{
+    width:36px;height:36px;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 36px;
+  }
+  .row-text{flex:1;min-width:0;}
+  .row-text h4{margin:0 0 2px;font-size:13.5px;font-weight:800;}
+  .row-text p{margin:0;font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+  .chev{color:#c3cbd3;flex:0 0 16px;}
+
+  /* ===== DETAIL PAGE (ministry / room generic) ===== */
+  .detail-hero{padding:26px 20px 18px;text-align:center;background:var(--card);border-bottom:1px solid var(--line);}
+  .detail-circle{
+    width:64px;height:64px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 12px;
+  }
+  .detail-hero h2{margin:0 0 4px;font-size:18px;font-weight:800;}
+  .detail-hero .loc{font-size:12.5px;color:var(--muted);}
+  .detail-hero .pastor{font-size:11.5px;color:var(--teal-dark);font-weight:700;margin-top:3px;}
+  .detail-body{padding:16px;}
+  .detail-block{margin-bottom:16px;}
+  .detail-block h5{margin:0 0 6px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);font-weight:800;}
+  .detail-block p{margin:0;font-size:13px;line-height:1.55;color:var(--text);}
+
+  /* ===== GUIDE / EMERGENCY blocks ===== */
+  .info-card{
+    margin:10px 16px;
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:16px;
+    border:1px solid var(--line);
+  }
+  .info-card .ic-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .info-card h4{margin:0;font-size:13.5px;font-weight:800;}
+  .info-card ul{margin:0;padding-left:0;list-style:none;}
+  .info-card li{font-size:12.5px;line-height:1.5;padding:4px 0 4px 16px;position:relative;color:var(--text);}
+  .info-card li::before{content:"•";position:absolute;left:0;color:var(--teal);font-weight:900;}
+  .check-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;cursor:pointer;}
+  .check-box{
+    width:19px;height:19px;
+    border:2px solid var(--teal);
+    border-radius:6px;
+    flex:0 0 19px;
+    margin-top:1px;
+    position:relative;
+    transition:background .15s ease;
+  }
+  .check-box.checked{background:var(--teal);}
+  .check-box.checked::after{
+    content:"";
+    position:absolute;left:5px;top:1px;
+    width:6px;height:10px;
+    border:solid white;
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+  .check-label{font-size:12.5px;line-height:1.5;color:var(--text);transition:color .15s ease;}
+  .check-row.checked .check-label{color:var(--muted);text-decoration:line-through;}
+  .reset-checks-btn{
+    background:none;border:none;
+    color:var(--teal-dark);
+    font-size:12px;font-weight:700;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+
+  .alert-card{
+    margin:14px 16px 10px;
+    background:var(--red);
+    color:#fff;
+    border-radius:16px;
+    padding:16px;
+  }
+  .alert-card .a-head{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;margin-bottom:8px;}
+  .alert-card .a-num{font-size:17px;font-weight:900;margin-bottom:6px;}
+  .alert-card p{margin:0;font-size:12px;line-height:1.5;opacity:0.95;}
+
+  /* ===== NURSERY ===== */
+  .animal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:6px 16px 16px;}
+  .animal-card{
+    background:var(--card);
+    border-radius:13px;
+    box-shadow:var(--shadow);
+    padding:11px 12px;
+    display:flex;align-items:center;gap:10px;
+    border:1px solid var(--line);
+  }
+  .animal-emoji{font-size:20px;}
+  .animal-card span.name{font-size:12.5px;font-weight:700;}
+
+  /* ===== SEARCH ===== */
+  .search-bar{
+    margin:14px 16px 6px;
+    background:var(--bg);
+    border-radius:12px;
+    display:flex;align-items:center;gap:8px;
+    padding:11px 12px;
+    color:var(--muted);
+  }
+  .search-bar input{
+    border:none;background:none;outline:none;
+    font-size:13.5px;flex:1;color:var(--text);font-family:inherit;
+  }
+  .sec-label{font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#a67c1a;padding:14px 16px 8px;}
+  .chip-wrap{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px;}
+  .chip{
+    background:var(--teal-pale);
+    color:var(--teal-dark);
+    font-size:12px;font-weight:700;
+    padding:8px 13px;
+    border-radius:20px;
+    cursor:pointer;
+    border:none;
+  }
+  .recent-row{
+    display:flex;align-items:center;gap:10px;
+    padding:11px 16px;
+    font-size:12.5px;font-weight:600;
+    color:var(--text);
+    cursor:pointer;
+    border-bottom:1px solid var(--line);
+  }
+  .search-results{padding:0 16px;}
+  .cta-block{
+    margin:18px 16px 20px;
+    text-align:center;
+    padding:18px;
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+  }
+  .cta-block p{font-size:12.5px;color:var(--muted);margin:0 0 12px;font-weight:600;}
+  .cta-ic{display:inline-flex;width:16px;height:16px;margin-right:7px;vertical-align:-3px}.cta-ic svg{width:16px;height:16px}
+  .cta-btn{
+    background:var(--teal);color:#fff;border:none;
+    padding:12px 20px;border-radius:12px;
+    font-size:13px;font-weight:800;cursor:pointer;
+  }
+
+  /* ===== CHAT ===== */
+  #screen-chat .scroll{padding:14px 14px 6px;display:flex;flex-direction:column;gap:10px;}
+  .bubble{max-width:82%;padding:11px 13px;border-radius:16px;font-size:12.8px;line-height:1.5;}
+  .bubble.user{align-self:flex-end;background:var(--teal);color:#fff;border-bottom-right-radius:4px;}
+  .bubble.bot{align-self:flex-start;background:var(--card);color:var(--text);border:1px solid var(--line);border-bottom-left-radius:4px;}
+  .bot-row{display:flex;gap:8px;align-self:flex-start;max-width:88%;}
+  .bot-avatar{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--navy);color:var(--teal);
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 26px;font-size:12px;font-weight:800;
+  }
+  .suggest-wrap{display:flex;gap:8px;overflow-x:auto;padding:8px 14px;background:var(--card);border-top:1px solid var(--line);}
+  .suggest-wrap::-webkit-scrollbar{display:none;}
+  .suggest-chip{
+    white-space:nowrap;
+    background:var(--bg);
+    color:var(--text);
+    font-size:11.5px;font-weight:700;
+    padding:8px 12px;
+    border-radius:20px;
+    border:none;
+    cursor:pointer;
+  }
+  .chat-input-row{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 14px 14px;
+    background:var(--card);
+  }
+  .chat-input-row input{
+    flex:1;border:1px solid var(--line);background:var(--bg);
+    border-radius:20px;padding:11px 15px;font-size:13px;outline:none;font-family:inherit;
+  }
+  .send-btn{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--teal);color:#fff;border:none;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 38px;
+  }
+
+  /* ===== SPLASH ===== */
+  #screen-splash{
+    background:linear-gradient(170deg,#1a1d24 0%, #0d0f13 100%);
+    color:#fff;
+    justify-content:space-between;
+    padding:calc(36px + env(safe-area-inset-top)) 26px calc(46px + env(safe-area-inset-bottom));
+  }
+  .splash-top{margin-top:10px;text-align:center;}
+  .splash-logo{font-size:34px;font-weight:900;letter-spacing:0.01em;}
+  .splash-logo span{color:var(--teal);}
+  .splash-tag{font-size:14px;letter-spacing:0.2em;color:#d4af37;font-weight:700;margin-top:4px;}
+  .logo-mark-lg{
+    width:160px;height:160px;
+    display:block;
+    margin:0 auto;
+  }
+  .logo-mark-sm{
+    width:40px;height:40px;
+    display:block;
+    flex:0 0 40px;
+  }
+  .hero-brand{display:flex;align-items:center;gap:12px;}
+  .splash-verse{
+    margin-top:26px;
+    margin-left:-26px;
+    margin-right:-26px;
+    padding:14px 10px;
+    background:linear-gradient(135deg,#e4c25f,#c9a034);
+    color:#141414;
+    font-size:14px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    line-height:1.5;
+    font-weight:900;
+    text-align:center;
+  }
+  .splash-mid{flex:1;display:flex;flex-direction:column;justify-content:flex-start;gap:16px;margin:70px 0 0;}
+  .splash-feat{display:flex;align-items:center;gap:12px;color:#e8e8e4;font-size:13px;font-weight:600;}
+  .splash-feat svg{color:#d4af37;flex:0 0 20px;}
+  .splash-mission{
+    background:linear-gradient(135deg,var(--teal-dark),var(--teal));
+    border-radius:16px;padding:16px;text-align:center;margin-bottom:8px;
+  }
+  .splash-mission .m-title{font-size:11px;font-weight:800;letter-spacing:0.12em;opacity:0.85;margin-bottom:4px;color:#fff;}
+  .splash-mission .m-body{font-size:13.5px;font-weight:800;line-height:1.4;color:#fff;}
+  .splash-btn{
+    margin-top:14px;
+    width:100%;
+    background:linear-gradient(135deg,#e4c25f,#c9a034);
+    color:#141414;
+    border:none;
+    padding:15px;
+    border-radius:14px;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(0,0,0,0.35);
+  }
+  #screen-cover{
+    position:relative;
+    overflow:hidden;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .cover-img{
+    position:fixed;
+    top:0; left:0;
+    width:100vw; height:100vh;
+    height:100dvh;
+    object-fit:cover;
+    object-position:38.5% center;
+    z-index:0;
+  }
+  .cover-swipe-hint{
+    position:fixed;
+    top:74%;
+    left:0;
+    right:0;
+    width:100%;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    text-shadow:0 2px 8px rgba(0,0,0,0.5);
+    animation:coverBounce 1.8s ease-in-out infinite;
+  }
+  .cover-swipe-hint svg{width:20px;height:20px;}
+  @keyframes coverBounce{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+  }
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+
+  <!-- COVER -->
+  <div class="screen active" id="screen-cover" style="background:#0c0c0c;">
+    <img src="cover.jpg?v=wsmd" alt="Guest Experience - Guest Services Hub" class="cover-img">
+    <div class="cover-swipe-hint">
+      <span id="icon-cover-chev"></span>
+      <span>Swipe up to begin</span>
+    </div>
+  </div>
+
+  <!-- SPLASH -->
+  <div class="screen" id="screen-splash">
+    <div class="splash-top">
+      <img id="logo-splash" class="logo-mark-lg" alt="ResLife">
+      <div class="splash-tag" style="margin-top:14px;">GUEST EXPERIENCE - GUEST SERVICES HUB</div>
+      <div class="splash-verse">See A Need Fill A Need - Phil 2:4</div>
+    </div>
+    <div class="splash-mid">
+      <div class="splash-feat"><span id="icon-sf3"></span><span>Help people feel seen, safe & welcome</span></div>
+      <div class="splash-feat"><span id="icon-sf2"></span><span>Serve with confidence</span></div>
+      <div class="splash-feat"><span id="icon-sf1"></span><span>Find answers fast</span></div>
+    </div>
+    <div>
+      <button class="splash-btn" onclick="go('home')">Enter the Hub</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen" id="screen-home">
+    <div class="scroll">
+      <div class="hero">
+        <div class="hero-top">
+          <div class="hero-brand">
+            <img id="logo-home" class="logo-mark-sm" alt="ResLife">
+            <div>
+              <div class="hub-sub" style="margin-top:0;">GUEST EXPERIENCE - GUEST SERVICES HUB</div>
+            </div>
+          </div>
+          <div class="bell">🔔</div>
+        </div>
+        <div class="greeting">
+          <h2>Good morning, Team!</h2>
+          <p>Thanks for helping people feel seen, safe & welcome.</p>
+        </div>
+      </div>
+
+      <a class="cap-banner" id="cap-banner" href="sms-signup.html" hidden>
+        <span id="icon-cap-banner"></span>
+        <div class="cb-text">
+          <h3>Captains: sign up for text alerts</h3>
+          <p>Get a text when a volunteer on your team can't serve.</p>
+        </div>
+        <span class="cb-chev" id="icon-cap-chev"></span>
+      </a>
+      <div class="tiles" id="home-tiles"></div>
+    </div>
+    <div class="bottom-nav" id="nav-home"></div>
+  </div>
+
+  <!-- MAP -->
+  <div class="screen" id="screen-map">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-map-back"></span></button>
+      <h1>Campus Map</h1>
+      <button class="icon-btn" onclick="go('search')"><span id="icon-map-search"></span></button>
+    </div>
+    <div class="scroll">
+      <div class="underline-tabs">
+        <button class="floor-btn active" data-floor="upper" onclick="setFloor('upper')">Main Level</button>
+        <button class="floor-btn" data-floor="main" onclick="setFloor('main')">Level 1</button>
+      </div>
+      <div id="door-picker"></div>
+      <div class="map-wrap">
+        <div id="floor-upper-wrap"></div>
+        <div id="floor-main-wrap" style="display:none"></div>
+      </div>
+      <div class="legend-list" id="activity-legend"></div>
+      <div class="legend-list" id="category-legend" style="padding-top:0;"></div>
+      <div id="room-detail-slot"></div>
+    </div>
+    <div class="bottom-nav" id="nav-map"></div>
+  </div>
+
+  <!-- MINISTRY -->
+  <div class="screen" id="screen-ministry">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-ministry-back"></span></button>
+      <h1>Where Does This Ministry Meet?</h1>
+      <button class="icon-btn" onclick="go('search')"><span id="icon-ministry-search"></span></button>
+    </div>
+    <div class="scroll">
+      <div class="pill-toggle" id="ministry-toggle"></div>
+      <div id="ministry-list"></div>
+    </div>
+    <div class="bottom-nav" id="nav-ministry"></div>
+  </div>
+
+  <!-- MINISTRY DETAIL -->
+  <div class="screen" id="screen-mdetail">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-mdetail-back"></span></button>
+      <h1 id="md-title">Ministry</h1>
+      <button class="icon-btn">☆</button>
+    </div>
+    <div class="scroll" id="md-body"></div>
+  </div>
+
+  <!-- GUIDE -->
+  <div class="screen" id="screen-guide">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-guide-back"></span></button>
+      <h1>Guest Experience Guide</h1>
+      <div style="width:40px"></div>
+    </div>
+    <div class="scroll" id="guide-body"></div>
+  </div>
+
+  <!-- NURSERY -->
+  <div class="screen" id="screen-nursery">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-nursery-back"></span></button>
+      <h1>Nursery Rooms</h1>
+      <div style="width:40px"></div>
+    </div>
+    <div class="scroll">
+      <div class="pill-toggle" id="nursery-toggle"></div>
+      <div class="animal-grid" id="nursery-grid"></div>
+    </div>
+  </div>
+
+  <!-- CONTACTS -->
+  <div class="screen" id="screen-contacts">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-contacts-back"></span></button>
+      <h1>Important Contacts</h1>
+      <div style="width:40px"></div>
+    </div>
+    <div class="scroll" id="contacts-body"></div>
+  </div>
+
+  <!-- CAPTAINS -->
+  <div class="screen" id="screen-captains">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="back()"><span id="icon-captains-back"></span></button>
+      <h1>Contact Your Captain</h1>
+      <div style="width:40px"></div>
+    </div>
+    <div class="scroll">
+      <p style="padding:14px 16px 4px;font-size:13px;color:#6b7280;line-height:1.4;margin:0;">Select your team, then tap your captain to text them directly.</p>
+      <div id="captains-body"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="screen" id="screen-search">
+    <div class="top-bar left-align">
+      <h1 style="text-align:left;padding-right:0;">Search</h1>
+    </div>
+    <div class="scroll">
+      <div class="search-bar">
+        <span id="icon-search-bar"></span>
+        <input id="search-input" placeholder="Search for a ministry, room, or question…" oninput="runSearch()">
+      </div>
+      <div id="search-default">
+        <div class="sec-label">Popular Searches</div>
+        <div class="chip-wrap" id="popular-chips"></div>
+        <div class="sec-label">Recent Searches</div>
+        <div id="recent-list"></div>
+      </div>
+      <div class="search-results" id="search-results" style="display:none"></div>
+      <div class="cta-block">
+        <p>Can't find what you need?<br>Ask our assistant.</p>
+        <button class="cta-btn" onclick="go('chat')"><span class="cta-ic"></span>Chat with ResLife Assistant</button>
+      </div>
+    </div>
+    <div class="bottom-nav" id="nav-search"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="screen" id="screen-chat">
+    <div class="top-bar left-align">
+      <div class="bot-avatar">R</div>
+      <h1 style="text-align:left;">ResLife Assistant</h1>
+    </div>
+    <div class="scroll" id="chat-log"></div>
+    <div class="suggest-wrap" id="chat-suggest"></div>
+    <div class="chat-input-row">
+      <input id="chat-input" placeholder="Ask a question…" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="send-btn" onclick="sendChat()"><span id="icon-chat-send"></span></button>
+    </div>
+    <div class="bottom-nav" id="nav-chat"></div>
+  </div>
+
+  <!-- MORE -->
+  <div class="screen" id="screen-more">
+    <div class="top-bar left-align">
+      <h1 style="text-align:left;">More</h1>
+    </div>
+    <div class="scroll" id="more-body"></div>
+    <div class="bottom-nav" id="nav-more"></div>
+  </div>
+
+</div>
+
+<script>
+/* ---------- ICONS ---------- */
+function ic(name){
+  const p = {
+    back:'<path d="M15 19l-7-7 7-7"/>',
+    search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+    chevron:'<path d="M9 6l6 6-6 6"/>',
+    'chevron-down':'<path d="M6 9l6 6 6-6"/>',
+    'chevron-up':'<path d="M6 15l6-6 6 6"/>',
+    external:'<path d="M14 4h6v6"/><path d="M20 4L10 14"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>',
+    phone:'<path d="M6 3h4l2 5-2.5 1.5a11 11 0 0 0 5 5L16 12l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2z"/>',
+    map:'<path d="M9 20l-6 2V6l6-2 6 2 6-2v16l-6 2-6-2z"/><path d="M9 4v16M15 6v16"/>',
+    home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+    chat:'<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H7l-4 3V11.5A8.5 8.5 0 0 1 11.5 3h1A8.5 8.5 0 0 1 21 11.5z"/>',
+    more:'<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',
+    send:'<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>',
+    heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>',
+    people:'<circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15 20a5 5 0 0 1 7.5-4.3"/>',
+    baby:'<circle cx="12" cy="8" r="4"/><path d="M6 20c0-4 3-6 6-6s6 2 6 6"/>',
+    warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/>',
+    question:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/>',
+    smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="0.8" fill="currentColor"/><circle cx="15" cy="9" r="0.8" fill="currentColor"/>',
+    hand:'<path d="M8 12V5a1.5 1.5 0 0 1 3 0v5"/><path d="M11 10V4a1.5 1.5 0 0 1 3 0v6"/><path d="M14 10V6a1.5 1.5 0 0 1 3 0v7"/><path d="M8 12l-2 1a2 2 0 0 0-1 3l2 5a3 3 0 0 0 3 2h4a4 4 0 0 0 4-4v-4a1.5 1.5 0 0 0-3 0"/>',
+    star:'<path d="M12 2l3 6.5 7 .8-5.2 4.9 1.4 7-6.2-3.5L5.8 21l1.4-7L2 9.3l7-.8z"/>',
+    bag:'<path d="M6 8h12l1 13H5z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    coffee:'<path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M7 3c0 1-1 1-1 2M11 3c0 1-1 1-1 2"/>',
+    leaf:'<path d="M20 4S6 4 6 16c0 3 2 4 4 4C22 20 20 4 20 4z"/><path d="M8 20c0-6 4-10 10-13"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    pin:'<path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+    info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/>'
+  };
+  return `<svg class="i" viewBox="0 0 24 24">${p[name]||p.info}</svg>`;
+}
+function badgeIcon(name,color,bg,size){
+  size = size||38;
+  return `<div class="badge" style="background:${bg};color:${color};width:${size}px;height:${size}px;">${ic(name)}</div>`;
+}
+
+const LOGO_SRC = "data:image/png;base64,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V+l5fEKc2s5QW1O7oq6+rmqcL/+T7pPRXGOMJ2aejObaPT4g2Ylwz9h+s497+DDxBzdMBQUFXXV1dVV2j8NJ+s2+nIuLL/lw3rx521UJvFTvvPPOlUIIwc8Wqus3+3JmX/mVv9g9DqdyJRLM3mPkqfY8PiHUHBNwPrxvh4c5PwBwKIJv+Kj8AADaofIDAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBoh/ADAGiH8AMAaIfwAwBo5/8DsUYu5uqLHvcAAAAASUVORK5CYII=";
+document.getElementById('logo-splash').src = 'logo-white.png';
+document.getElementById('logo-home').src = 'logo-white.png';
+
+/* ---------- STATIC ICON PLACEHOLDERS ---------- */
+const staticIcons = {
+  'icon-sf1':'search','icon-sf2':'people','icon-sf3':'smile',
+  'icon-contact-phone':'phone','icon-contact-chev':'chevron',
+  'icon-map-back':'back','icon-map-search':'search',
+  'icon-ministry-back':'back','icon-ministry-search':'search',
+  'icon-mdetail-back':'back',
+  'icon-guide-back':'back',
+  'icon-nursery-back':'back','icon-contacts-back':'back','icon-captains-back':'back',
+  'icon-search-bar':'search','icon-chat-send':'send','icon-cover-chev':'chevron-up'
+};
+Object.entries(staticIcons).forEach(([id,name])=>{
+  const el = document.getElementById(id);
+  if(el) el.innerHTML = ic(name);
+});
+
+/* ---------- CAPTAIN SIGN-UP BANNER ----------
+   Shown only to people who opened the Hub with ?captain=1 (remembered on the
+   device so it survives opening from the home-screen icon). Hidden for good
+   once the sign-up page records a successful text-alert opt-in. */
+(function(){
+  const b = document.getElementById('cap-banner');
+  if(!b) return;
+  try{
+    if(new URLSearchParams(location.search).get('captain')==='1') localStorage.setItem('capInvite','1');
+    if(localStorage.getItem('capInvite')==='1' && localStorage.getItem('capSignedUp')!=='1'){
+      document.getElementById('icon-cap-banner').innerHTML = badgeIcon('chat','#0f7a6e','#e2f6f2',38);
+      document.getElementById('icon-cap-chev').innerHTML = ic('chevron');
+      b.hidden = false;
+    }
+  }catch(e){}
+})();
+
+/* ---------- NAV STACK ---------- */
+const initialHash = (location.hash||'').replace('#','');
+let stack = ['cover'];
+const rootTabs = ['home','map','search','chat','more'];
+const validScreens = ['home','map','search','chat','more','guide','contacts','captains'];
+
+function render(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const top = stack[stack.length-1];
+  document.getElementById('screen-'+top).classList.add('active');
+  rootTabs.forEach(t=>{
+    const nav = document.getElementById('nav-'+t);
+    if(nav) nav.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===top));
+  });
+  if(top!=='splash' && top!=='cover'){
+    let hashScreen = top;
+    if(top==='map' && typeof currentFloor!=='undefined'){
+      hashScreen = currentFloor==='upper' ? 'map-mainlevel' : 'map-level1';
+    }
+    try{ history.replaceState(history.state, '', '#'+hashScreen); }catch(e){}
+  }
+}
+function pushHistory(){
+  try{ history.pushState({stack:[...stack]}, '', '#'+stack[stack.length-1]); }catch(e){}
+}
+function go(screen){ stack.push(screen); pushHistory(); render(); window.scrollTo(0,0); }
+function goHome(){ stack=['home']; pushHistory(); render(); }
+function back(){
+  if(stack.length>1){ history.back(); }
+  else { tab('home'); }
+}
+function tab(screen){ stack=[screen]; pushHistory(); render(); }
+
+/* ---------- COVER: swipe up or tap to advance to home ---------- */
+function advanceFromCover(){
+  if(stack[stack.length-1]!=='cover') return;
+  stack=['home']; pushHistory(); render();
+}
+(function(){
+  const coverEl = document.getElementById('screen-cover');
+  if(!coverEl) return;
+  let touchStartY = null;
+  coverEl.addEventListener('touchstart', (e)=>{ touchStartY = e.touches[0].clientY; }, {passive:true});
+  coverEl.addEventListener('touchend', (e)=>{
+    if(touchStartY===null) return;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    touchStartY = null;
+    if(dy < -40) advanceFromCover();
+  }, {passive:true});
+  coverEl.addEventListener('click', advanceFromCover);
+})();
+
+window.addEventListener('popstate', (e)=>{
+  if(e.state && e.state.stack && e.state.stack.length){
+    stack = e.state.stack;
+  } else {
+    stack = ['home'];
+  }
+  render();
+});
+
+/* Cover always shows on every visit, regardless of whatever hash was left
+   over in the URL bar from a previous session — no deep-link skip-ahead. */
+(function(){
+  history.replaceState({stack:[...stack]}, '', stack.length ? '#'+stack[stack.length-1] : '');
+})();
+
+/* ---------- BOTTOM NAV BUILD ---------- */
+const navItems = [
+  {id:'home', label:'Home', icon:'home'},
+  {id:'map', label:'Map', icon:'map'},
+  {id:'search', label:'Search', icon:'search'},
+  {id:'chat', label:'Chat', icon:'chat'},
+  {id:'more', label:'More', icon:'more'}
+];
+function buildNav(containerId){
+  const el = document.getElementById(containerId);
+  el.innerHTML = navItems.map(n=>`<button class="nav-btn" data-tab="${n.id}" onclick="tab('${n.id}')">${ic(n.icon)}<span>${n.label}</span></button>`).join('');
+}
+['nav-home','nav-map','nav-search','nav-chat','nav-more'].forEach(buildNav);
+
+/* ---------- HOME TILES ---------- */
+const tiles = [
+  {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'Guest Experience Guide', sub:'Best practices & steps', go:'guide'},
+  {icon:'people', color:'var(--purple)', bg:'var(--purple-bg)', title:'Where Does This Ministry Meet?', sub:'Find rooms & locations', go:'ministry'},
+  {icon:'external', color:'var(--purple)', bg:'var(--purple-bg)', title:'ResLife Website', sub:'Ministries & more', external:'https://reslife.org/ministries/'},
+  {icon:'external', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'Register for Classes & Events', sub:"See what's coming up", external:'https://reslife.churchcenter.com/registrations/events'},
+  {icon:'map', color:'var(--green)', bg:'var(--green-bg)', title:'Campus Map', sub:'Explore the campus', go:'map'},
+  {icon:'question', color:'var(--blue)', bg:'var(--blue-bg)', title:'Quick Answers', sub:'Common questions', go:'search'},
+  {icon:'phone', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'Important Contacts', sub:'Staff & emergency info', go:'contacts'},
+  {icon:'chat', color:'var(--red)', bg:'var(--red-bg)', title:'Contact Your Captain', sub:"Text if you can't serve", go:'captains'}
+];
+document.getElementById('home-tiles').innerHTML = tiles.map(t=>`
+  <div class="tile" onclick="${t.external?`window.open('${t.external}','_blank')`:`go('${t.go}')`}">
+    ${badgeIcon(t.icon,t.color,t.bg)}
+    <h3>${t.title}</h3>
+    ${t.sub?`<p>${t.sub}</p>`:''}
+  </div>`).join('');
+
+/* ---------- ROOM DATA ---------- */
+const rooms = [
+  {id:1, num:1, name:'Worship Center: Main Level', floor:'upper', desc:'Main sanctuary and general seating on the Main Level.', entrance:'Main Entrance (Door K)', color:'var(--orange)', x:78.7, y:51.9},
+  {id:2, num:2, name:'Chapel', floor:'upper', desc:'Smaller worship space used for chapel services and events.', entrance:'Door K', color:'var(--green)', x:82.7, y:73.5},
+  {id:3, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'upper', desc:'First stop for guests near the Main Entrance — welcome desk and Guest Services.', entrance:'Main Entrance (Door K)', color:'var(--red)', icon:'info', x:71.2, y:70.6},
+  {id:4, num:4, name:'Community Room', floor:'upper', desc:'Community gathering space.', entrance:'Door K', color:'var(--blue)', x:56.0, y:73.3},
+  {id:5, num:5, name:"Noah's Ark Nursery/Preschool", floor:'upper', desc:'Nursery & preschool care, 6 weeks – 5/6 years.', entrance:'Atrium Entrance (Door N)', color:'var(--orange)', x:48.3, y:48.0},
+  {id:6, num:6, name:'Atrium', floor:'upper', desc:'Atrium lobby connecting to the Ivanrest Ave entrance.', entrance:'Atrium Entrance (Door N)', color:'var(--purple)', x:51.5, y:27.5},
+  {id:17, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'upper', desc:'Guest Services desk near the Atrium entrance.', entrance:'Atrium Entrance (Door N)', color:'var(--red)', icon:'info', x:55.5, y:36.5},
+  {id:7, num:2, name:'ResCenter', floor:'main', desc:'Hosts Iglesia Vida on Sundays and the Wednesday Night Main Service.', entrance:'Door G', color:'var(--green)', x:17.9, y:52.6},
+  {id:16, num:1, name:'Main Office', floor:'main', desc:'', entrance:'Door G', color:'var(--teal-dark)', x:10.0, y:62.0},
+  {id:19, num:3, name:'ResKids', floor:'main', desc:'Kids ministry classrooms for Kindergarten through 2nd grade.', entrance:'Door C or Door J', color:'var(--purple)', x:30.7, y:68.2},
+  {id:8, num:4, name:'Gym', floor:'main', desc:'', entrance:'Door C or Door J', color:'var(--cyan)', x:35.4, y:55.5},
+  {id:9, num:5, name:'Oneighty (6th – 8th grade)', floor:'main', desc:'Student ministry space for 6th – 8th grade (Married Life).', entrance:'Door C', color:'var(--pink)', x:41.3, y:41.2},
+  {id:10, num:6, name:'The Ground Floor (9th – 12th grade)', floor:'main', desc:'High school ministry space.', entrance:'Door E', color:'var(--muted)', x:54.1, y:41.2},
+  {id:11, num:7, name:'The Zone (3rd – 5th grade)', floor:'main', desc:'Kids ministry space for 3rd – 5th grade.', entrance:'Door C', color:'var(--red)', x:62.8, y:31.9},
+  {id:12, num:8, name:'Worship Center: Balcony Seating', floor:'main', desc:'Balcony seating overlooking the Worship Center below.', entrance:'Door H', color:'var(--orange)', x:86.1, y:69.9},
+  {id:13, num:9, name:'Olive Tree Café', floor:'main', desc:'Coffee & snacks.', entrance:'Door G', color:'var(--blue)', x:70.1, y:83.8},
+  {id:14, num:10, name:"Noah's Ark Nursery/Preschool", floor:'main', desc:'Nursery & preschool care, 6 weeks – 5/6 years.', entrance:'Door C or Door J', color:'var(--orange)', x:65.8, y:64.6},
+  {id:15, num:11, name:'Walking By Faith', floor:'main', desc:'Ministry meeting space.', entrance:'Door J', color:'var(--purple)', x:31.0, y:40.2},
+  {id:18, num:3, name:'Guest Services (Doors K, N, C & J)', floor:'main', desc:'Guest Services desk near the Ground Floor Concourse.', entrance:'Door C or Door J', color:'var(--red)', icon:'info', x:44.4, y:52.5}
+];
+function roomById(id){ return rooms.find(r=>r.id===id); }
+
+document.getElementById('activity-legend').innerHTML = '';
+document.getElementById('category-legend').innerHTML = '';
+function buildFloorLegend(f){
+  const list = rooms.filter(r=>r.floor===f).sort((a,b)=>(a.name.startsWith('Guest Services')?1:0)-(b.name.startsWith('Guest Services')?1:0));
+  document.getElementById('activity-legend').innerHTML = list.map(r=>
+    `<div class="row" data-id="${r.id}" style="cursor:pointer;" onclick="selectRoom(${r.id})"><span class="legend-num" style="background:${r.color};"></span>${r.name}</div>`).join('');
+}
+function buildMapPins(f){
+  const list = rooms.filter(r=>r.floor===f);
+  return list.map(r=>
+    `<button class="img-pin" data-id="${r.id}" style="left:${r.x}%;top:${r.y}%;color:${r.color};" onclick="selectRoom(${r.id})"></button>`).join('');
+}
+const doorGroups = {
+  upper: [{"letter":"K","x":66.6,"y":85.5},{"letter":"N","x":56.4,"y":27.2}],
+  main: [{"letter":"C","x":46.7,"y":45.3},{"letter":"E","x":20.4,"y":41.5},{"letter":"G","x":7.8,"y":65.2},{"letter":"H","x":20.4,"y":68.2},{"letter":"J","x":46.8,"y":58.6}]
+};
+function buildDoorPins(f){
+  return doorGroups[f].map(d=>`<div class="door-pin" data-letter="${d.letter}" style="left:${d.x}%;top:${d.y}%;"></div>`).join('');
+}
+function buildDoorPicker(f){
+  /* Door chips now render inside the room detail card, directly under the suggested entrance */
+  document.getElementById('door-picker').innerHTML = '';
+}
+const guestDoors = ['C','E','G','H','J','K','N']; /* the only doors guests actually use */
+function doorChipsHTML(f){
+  return `<div class="door-chip-row rd-doors">${doorGroups[f].filter(d=>guestDoors.includes(d.letter)).map(d=>`<button class="door-chip${selectedDoor===d.letter?' active':''}" data-letter="${d.letter}" onclick="selectDoor('${d.letter}')">Door ${d.letter}</button>`).join('')}</div>`;
+}
+function selectDoor(letter){
+  selectedDoor = letter;
+  document.querySelectorAll('.door-chip').forEach(b=>b.classList.toggle('active', b.dataset.letter===letter));
+  document.querySelectorAll('.door-pin').forEach(el=>el.classList.toggle('selected', el.dataset.letter===letter));
+  updatePathLine();
+}
+const hallGraph = {"main":{"nodes":{"cC":[46.7,49.5],"s1":[44.3,53.8],"s2":[46.7,54.2],"s3":[54.1,54.5],"s4":[60.3,54.8],"s5":[64.2,55.3],"lob":[70.0,62.3],"l1n":[72.7,67.5],"l1s":[73.0,76.9],"otE":[72.7,81.2],"bal":[74.8,67.8],"w1":[43.3,50.4],"w2":[41.3,50.4],"w3":[35.4,50.4],"w4":[31.0,50.4],"w5":[26.2,50.4],"rTop":[20.5,45.6],"rNE":[26.2,47.5],"rE":[26.2,55.0],"rSE":[26.0,60.5],"rS":[20.4,65.3],"rSW":[13.8,64.6],"sh1":[43.5,60.0],"sh2":[30.7,60.0],"sh3":[27.3,60.3]},"edges":[["cC","s2"],["s1","s2"],["s2","s3"],["s3","s4"],["s4","s5"],["s5","lob"],["lob","l1n"],["l1n","l1s"],["l1s","otE"],["l1n","bal"],["s1","w1"],["w1","w2"],["w2","w3"],["w3","w4"],["w4","w5"],["w5","rNE"],["w5","rE"],["rNE","rTop"],["rE","rSE"],["rSE","rS"],["rS","rSW"],["s1","sh1"],["sh1","sh2"],["sh2","sh3"],["sh3","rSE"]],"doors":{"C":["cC"],"J":["s2"],"E":["rTop"],"G":["rSW"],"H":["rS"]},"rooms":{"16":["rSW"],"7":["rTop","rE","rS"],"19":["sh2"],"8":["w3"],"9":["w2"],"10":["s3"],"11":["s4"],"12":["bal"],"13":["otE"],"14":["s4","lob"],"15":["w4"],"18":["s1"]}},"upper":{"nodes":{"at":[56.0,31.5],"m1":[61.0,36.0],"m2":[61.2,48.0],"m2b":[61.5,53.0],"m3":[62.3,60.0],"m4":[68.0,68.0],"m5":[72.5,75.5],"lob":[72.8,81.0],"ch":[75.0,77.5],"cm":[62.3,67.0],"nk":[59.0,48.0],"kIn":[68.8,84.0]},"edges":[["at","m1"],["m1","m2"],["m2","m2b"],["m2b","m3"],["m3","m4"],["m4","m5"],["m5","lob"],["m5","ch"],["lob","ch"],["m3","cm"],["cm","m4"],["m2","nk"],["kIn","lob"]],"doors":{"K":["kIn"],"N":["at"]},"rooms":{"1":["m2b"],"2":["ch"],"3":["m4","m5"],"4":["cm"],"5":["nk"],"6":["at"],"17":["at"]}}};
+/* Shortest walking route door -> hallway nodes -> room (Dijkstra; aspect-corrected distances) */
+function hallRoute(f, doorLetter, room){
+  const g = hallGraph[f]; if(!g) return null;
+  const N = g.nodes, ASP = 1275/1650; // map images are 1650x1275
+  const dist = (a,b)=>Math.hypot(a[0]-b[0], (a[1]-b[1])*ASP);
+  const adj = {}; Object.keys(N).forEach(k=>adj[k]=[]);
+  g.edges.forEach(([a,b])=>{ const w=dist(N[a],N[b]); adj[a].push([b,w]); adj[b].push([a,w]); });
+  const door = doorGroups[f].find(d=>d.letter===doorLetter);
+  const starts = (g.doors[doorLetter]||[]), ends = (g.rooms[room.id]||[]);
+  if(!door || !starts.length || !ends.length) return null;
+  const D={}, prev={}, seen=new Set();
+  Object.keys(N).forEach(k=>D[k]=Infinity);
+  starts.forEach(k=>D[k]=dist([door.x,door.y],N[k]));
+  while(true){
+    let u=null; for(const k in D){ if(!seen.has(k) && D[k]<Infinity && (u===null||D[k]<D[u])) u=k; }
+    if(u===null) break; seen.add(u);
+    adj[u].forEach(([v,w])=>{ if(D[u]+w<D[v]){ D[v]=D[u]+w; prev[v]=u; } });
+  }
+  let best=null, bestD=Infinity;
+  ends.forEach(k=>{ const t=D[k]+dist(N[k],[room.x,room.y]); if(t<bestD){bestD=t;best=k;} });
+  if(best===null || bestD===Infinity) return null;
+  const chain=[]; for(let k=best; k!==undefined; k=prev[k]) chain.unshift(N[k]);
+  return [[door.x,door.y], ...chain, [room.x,room.y]];
+}
+/* "View on Map" from a ministry: open the same in-app map, with the room, door and hallway path */
+function openMapAt(floor, roomId, door){
+  go('map');
+  setFloor(floor);
+  if(roomId && roomById(roomId)){ selectRoom(roomId); }
+  else {
+    selectedRoom = null;
+    document.querySelectorAll('.img-pin').forEach(el=>el.classList.remove('selected'));
+    document.querySelectorAll('.legend-list .row').forEach(el=>el.classList.remove('active'));
+    document.getElementById('room-detail-slot').innerHTML = '';
+  }
+  if(door) selectDoor(door);
+  render();
+}
+function updatePathLine(){
+  ['path-upper','path-main'].forEach(id=>{ const l=document.querySelector('#'+id+' polyline'); if(l) l.classList.remove('visible'); });
+  const svg = document.getElementById(currentFloor==='upper' ? 'path-upper' : 'path-main');
+  if(!svg || !selectedDoor) return;
+  const line = svg.querySelector('polyline');
+  const door = doorGroups[currentFloor].find(d=>d.letter===selectedDoor);
+  const room = roomById(selectedRoom);
+  if(!door || !room || room.floor!==currentFloor) return;
+  const pts = hallRoute(currentFloor, selectedDoor, room) || [[door.x,door.y],[room.x,room.y]];
+  line.setAttribute('points', pts.map(p=>p.join(',')).join(' '));
+  line.classList.add('visible');
+}
+
+document.getElementById('floor-upper-wrap').innerHTML =
+  `<div class="map-img-wrap"><img class="map-img" src="map-main-level.png" alt="Main Level campus map">${buildMapPins('upper')}${buildDoorPins('upper')}<svg class="path-svg" id="path-upper" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="0,0"/></svg></div>`;
+document.getElementById('floor-main-wrap').innerHTML =
+  `<div class="map-img-wrap"><img class="map-img" src="map-level1.png" alt="Level 1 campus map">${buildMapPins('main')}${buildDoorPins('main')}<svg class="path-svg" id="path-main" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="0,0"/></svg></div>`;
+buildFloorLegend('upper');
+buildDoorPicker('upper');
+
+let currentFloor='upper';
+let selectedRoom=1;
+let selectedDoor=null;
+
+function setFloor(f){
+  currentFloor=f;
+  selectedDoor=null;
+  document.querySelectorAll('.floor-btn').forEach(b=>b.classList.toggle('active', b.dataset.floor===f));
+  document.getElementById('floor-upper-wrap').style.display = f==='upper' ? '' : 'none';
+  document.getElementById('floor-main-wrap').style.display = f==='main' ? '' : 'none';
+  buildFloorLegend(f);
+  buildDoorPicker(f);
+  const firstRoom = rooms.find(r=>r.floor===f);
+  selectRoom(firstRoom.id);
+  const hashFloor = f==='upper' ? 'map-mainlevel' : 'map-level1';
+  try{ history.replaceState(history.state, '', '#'+hashFloor); }catch(e){}
+}
+function selectRoom(id){
+  selectedRoom=id;
+  document.querySelectorAll('.img-pin').forEach(el=>{
+    el.classList.toggle('selected', parseInt(el.dataset.id)===id);
+  });
+  document.querySelectorAll('.legend-list .row').forEach(el=>{
+    el.classList.toggle('active', parseInt(el.dataset.id)===id);
+  });
+  const r = roomById(id);
+  const isWorshipCenter = r.name.includes('Worship Center');
+  document.getElementById('room-detail-slot').innerHTML = `
+    <div class="room-detail">
+      <div class="rd-head"><div class="rd-num">${ic(r.icon||'pin')}</div><h3>${r.name}</h3></div>
+      ${r.desc?`<p class="rd-desc">${r.desc}</p>`:''}
+      <div class="rd-entrance">${ic('pin')} Suggested entrance: ${r.entrance}</div>
+      <div class="rd-doors-label">Came in another door? Tap it to see your path.</div>
+      ${doorChipsHTML(currentFloor)}
+      <button class="btn-primary" id="dir-btn" onclick="showDirections(${r.id})">Get Directions <span class="btn-chev" id="dir-chev">${ic('chevron-down')}</span></button>
+      <div class="directions-drop" id="directions-drop">
+        <div class="directions-drop-inner">${ic('pin')}<p id="directions-text"></p></div>
+      </div>
+      ${isWorshipCenter?`<button class="btn-secondary" style="margin-top:10px;" onclick="window.open('seating.html','_blank')">View Seating Chart ${ic('external')}</button>`:''}
+    </div>`;
+  updatePathLine();
+}
+function showDirections(id){
+  const r = roomById(id);
+  const drop = document.getElementById('directions-drop');
+  const btn = document.getElementById('dir-btn');
+  const chev = document.getElementById('dir-chev');
+  const isOpen = drop.classList.contains('open');
+  if(isOpen){
+    drop.classList.remove('open');
+    btn.classList.remove('is-open');
+    chev.classList.remove('open');
+  } else {
+    document.getElementById('directions-text').textContent = `Enter through ${r.entrance}, then follow the hallway signage to ${r.name}.`;
+    drop.classList.add('open');
+    btn.classList.add('is-open');
+    chev.classList.add('open');
+  }
+}
+document.addEventListener('click', e=>{
+  const el = e.target.closest('.room,.room-sub');
+  if(el && el.dataset.id) selectRoom(parseInt(el.dataset.id));
+});
+selectRoom(1);
+
+/* ---------- MINISTRY DATA ---------- */
+const ministries = {
+  sunam:[
+    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Worship Center (Main Level)',pastor:'Pastor Duane VanderKlok',entrance:'Door K', desc:'Our main English-language service, gathering the whole church family for worship and teaching.', how:'Enter through Door K (Main Entrance) and follow the main concourse to the Worship Center.', mapFile:'map-mainlevel.html', mapRoom:1, mapDoors:['K']},
+    {icon:'people',color:'var(--teal)',bg:'var(--teal-pale)',title:'Iglesia Vida',loc:'ResCenter',pastor:'Pastor Luis Quezada',entrance:'Door G', desc:'Our Spanish-language service, meeting at ResCenter.', how:'Enter through Door G (or Door C) and follow the hallway to ResCenter.', mapFile:'map-level1.html', mapRoom:7, mapDoors:['G','C']},
+    {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Main Lobby',pastor:'', entrance:'Door N', desc:'Free coffee for guests and members before and after service.', how:'Enter through Door N; coffee is set up just off the main lobby.', mapFile:'map-mainlevel.html', mapDoors:['N']},
+    {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.', mapFile:'map-mainlevel.html', mapRoom:2, mapDoors:['K']},
+    {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'High School',loc:'Ground Floor',pastor:'Pastors Ben & Kendra Lepsch — 9 AM only',entrance:'Door C', desc:'High School students gather for teaching, worship, and community.', how:'Enter through Door C or Door J. Take the hallway to the main lobby — High School is on the Ground Floor.', mapFile:'map-level1.html', mapRoom:10, mapDoors:['C','J']},
+    {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · Pastor James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.', mapFile:'map-level1.html', mapRoom:9, mapDoors:['C']},
+    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'3rd – 5th Grade',loc:'The Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.', mapFile:'map-level1.html', mapRoom:11, mapDoors:['C']},
+    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 2nd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
+    {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby.'}
+  ],
+  sunpm:[
+    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'Ground Floor',pastor:'Pastor Daniel VanderKlok',entrance:'Door C or J', desc:'Our evening service, gathering on the Ground Floor.', how:'Enter through Door C or Door J and follow the hallway to the Ground Floor.', mapFile:'map-level1.html', mapRoom:10, mapDoors:['C','J']},
+    {icon:'coffee',color:'var(--orange)',bg:'var(--orange-bg)',title:'Free Coffee',loc:'Ground Floor Lobby',pastor:'', entrance:'Door C', desc:'Free coffee available in the Ground Floor Lobby.', how:'Enter through Door C; coffee is set up in the lobby.', mapFile:'map-level1.html', mapDoors:['C']},
+    {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.', mapFile:'map-mainlevel.html', mapRoom:2, mapDoors:['K']},
+    {icon:'info',color:'var(--muted)',bg:'var(--bg)',title:'Other Classes',loc:'See Guest Service Desk',pastor:'', entrance:'', desc:'Additional classes vary by season — check the Guest Service Desk for current locations.', how:'Ask any team member at the Guest Service Desk for directions.'},
+    {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · Pastor James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.', mapFile:'map-level1.html', mapRoom:9, mapDoors:['C']},
+    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'3rd – 5th Grade',loc:'The Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.', mapFile:'map-level1.html', mapRoom:11, mapDoors:['C']},
+    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 2nd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
+    {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll — Upper level only',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby. Upper level only for this service.'}
+  ],
+  wed:[
+    {icon:'people',color:'var(--green)',bg:'var(--green-bg)',title:'Main Service',loc:'ResCenter',pastor:'Pastor Daniel VanderKlok',entrance:'Door G', desc:'Our midweek service, gathering at ResCenter.', how:'Enter through Door G (or Door C) and follow the hallway to ResCenter.', mapFile:'map-level1.html', mapRoom:7, mapDoors:['G','C']},
+    {icon:'leaf',color:'var(--green)',bg:'var(--green-bg)',title:'Growth Track',loc:'Chapel',pastor:'', entrance:'Door K', desc:'Take your next step in membership, discipleship, and serving.', how:'Enter through Door K and follow signage to the Chapel.', mapFile:'map-mainlevel.html', mapRoom:2, mapDoors:['K']},
+    {icon:'info',color:'var(--muted)',bg:'var(--bg)',title:'Other Classes',loc:'See Guest Service Desk',pastor:'', entrance:'', desc:'Additional classes vary by season — check the Guest Service Desk for current locations.', how:'Ask any team member at the Guest Service Desk for directions.'},
+    {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'High School',loc:'Ground Floor',pastor:'Pastors Ben & Kendra Lepsch',entrance:'Door C', desc:'High School students gather for teaching, worship, and community.', how:'Enter through Door C or Door J. Take the hallway to the main lobby — High School is on the Ground Floor.', mapFile:'map-level1.html', mapRoom:10, mapDoors:['C','J']},
+    {icon:'people',color:'var(--blue)',bg:'var(--blue-bg)',title:'Middle School',loc:'180 · Pastor James Hall',pastor:'', entrance:'Door C', desc:'Middle School students gather for age-specific teaching and worship.', how:'Enter through Door C and follow signage to 180.', mapFile:'map-level1.html', mapRoom:9, mapDoors:['C']},
+    {icon:'star',color:'var(--teal)',bg:'var(--teal-pale)',title:'3rd – 5th Grade',loc:'The Zone',pastor:'Pastor Victoria Hernandez',entrance:'Door C', desc:'Elementary-age kids learn and worship together in The Zone.', how:'Enter through Door C and follow signage to The Zone.', mapFile:'map-level1.html', mapRoom:11, mapDoors:['C']},
+    {icon:'people',color:'var(--pink)',bg:'var(--pink-bg)',title:'Kindergarten – 2nd Grade',loc:'ResKids',pastor:'Pastor Nate VandenHoek',entrance:'Door H', desc:'Younger elementary kids gather in the ResKids area.', how:'Enter through Door H and follow signage to ResKids.'},
+    {icon:'baby',color:'var(--blue)',bg:'var(--blue-bg)',title:'6 Weeks – Pre-K',loc:'Nursery & Preschool',pastor:'Pastor Carson Doll — Upper level only',entrance:'Door N', desc:'Infants through Pre-K are cared for in the Nursery & Preschool area.', how:'Enter through Door N; nursery check-in is just past the lobby. Upper level only for this service.'}
+  ]
+};
+let currentDay='sunam';
+function buildMinistryToggle(){
+  const labels=[{k:'sunam',l:'SUNDAY AM'},{k:'sunpm',l:'SUNDAY PM'},{k:'wed',l:'WEDNESDAY'}];
+  document.getElementById('ministry-toggle').innerHTML = labels.map(o=>
+    `<button class="${o.k===currentDay?'active':''}" onclick="setDay('${o.k}')">${o.l}</button>`).join('');
+}
+function setDay(d){ currentDay=d; buildMinistryToggle(); renderMinistryList(); }
+function renderMinistryList(){
+  const items = ministries[currentDay];
+  document.getElementById('ministry-list').innerHTML = `<div class="list-card">${
+    items.map((m,i)=>`
+    <div class="list-row" onclick="openMinistry('${currentDay}',${i})">
+      <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
+      <div class="row-text"><h4>${m.title}</h4><p>${pinSvgSmall()}${m.loc}${m.pastor?' · '+m.pastor:''}</p></div>
+      <div class="chev">${ic('chevron')}</div>
+    </div>`).join('')
+  }</div>`;
+}
+function pinSvgSmall(){ return `<svg class="i" style="width:11px;height:11px;" viewBox="0 0 24 24">${ '<path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>' }</svg>`; }
+
+function openMinistry(day, idx){
+  const m = ministries[day][idx];
+  document.getElementById('md-title').textContent = m.title;
+  const isNursery = m.icon === 'baby';
+  const isWorshipCenter = m.loc.includes('Worship Center');
+  document.getElementById('md-body').innerHTML = `
+    <div class="detail-hero">
+      <div class="detail-circle" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
+      <h2>${m.title}</h2>
+      <div class="loc">${m.loc}</div>
+      ${m.pastor?`<div class="pastor">${m.pastor}</div>`:''}
+    </div>
+    <div class="detail-body">
+      <div class="detail-block"><h5>What to Expect</h5><p>${m.desc}</p></div>
+      ${m.how?`<div class="detail-block"><h5>How to Get There</h5><p>${m.how}</p></div>`:''}
+      <button class="btn-primary" id="md-dir-btn" onclick="toggleMdDirections('${m.entrance||''}','${m.loc}')">Get Directions <span class="btn-chev" id="md-dir-chev">${ic('chevron-down')}</span></button>
+      <div class="directions-drop" id="md-directions-drop">
+        <div class="directions-drop-inner">${ic('pin')}<p id="md-directions-text"></p></div>
+      </div>
+      ${m.mapFile?(()=>{
+        const fl = m.mapFile.includes('level1') ? 'main' : 'upper';
+        return `<button class="btn-secondary" style="margin-top:10px;" onclick="openMapAt('${fl}',${m.mapRoom||0},'${(m.mapDoors||[])[0]||''}')">View on Map ${ic('pin')}</button>`;
+      })():''}
+      ${isWorshipCenter?`<button class="btn-secondary" style="margin-top:10px;" onclick="window.open('seating.html','_blank')">View Seating Chart ${ic('external')}</button>`:''}
+      ${isNursery?`
+      <button class="btn-secondary" id="md-nursery-btn" onclick="toggleMdNursery()" style="margin-top:10px;">Find Your Child's Room <span class="btn-chev" id="md-nursery-chev">${ic('chevron-down')}</span></button>
+      <div class="directions-drop" id="md-nursery-drop">
+        <div style="padding:12px 4px 4px;">
+          <div class="pill-toggle" id="md-nursery-toggle" style="margin:0 0 6px;"></div>
+          <div class="animal-grid" id="md-nursery-grid" style="padding:6px 0 4px;"></div>
+        </div>
+      </div>`:''}
+    </div>`;
+  go('mdetail');
+}
+let mdNurseryLevel='lower';
+function toggleMdNursery(){
+  const drop = document.getElementById('md-nursery-drop');
+  const btn = document.getElementById('md-nursery-btn');
+  const chev = document.getElementById('md-nursery-chev');
+  const isOpen = drop.classList.contains('open');
+  if(isOpen){
+    drop.classList.remove('open'); btn.classList.remove('is-open'); chev.classList.remove('open');
+  } else {
+    buildMdNurseryToggle();
+    renderMdNursery();
+    drop.classList.add('open'); btn.classList.add('is-open'); chev.classList.add('open');
+  }
+}
+function buildMdNurseryToggle(){
+  document.getElementById('md-nursery-toggle').innerHTML = `
+    <button class="${mdNurseryLevel==='lower'?'active':''}" onclick="setMdNurseryLevel('lower')">LOWER LEVEL</button>
+    <button class="${mdNurseryLevel==='upper'?'active':''}" onclick="setMdNurseryLevel('upper')">UPPER LEVEL</button>`;
+}
+function setMdNurseryLevel(l){ mdNurseryLevel=l; buildMdNurseryToggle(); renderMdNursery(); }
+function renderMdNursery(){
+  const list = mdNurseryLevel==='lower'?nurseryLower:nurseryUpper;
+  document.getElementById('md-nursery-grid').innerHTML = list.map(([name,emoji])=>`
+    <div class="animal-card"><span class="animal-emoji">${emoji}</span><span class="name">${name}</span></div>`).join('');
+}
+function toggleMdDirections(entrance, loc){
+  const drop = document.getElementById('md-directions-drop');
+  const btn = document.getElementById('md-dir-btn');
+  const chev = document.getElementById('md-dir-chev');
+  const isOpen = drop.classList.contains('open');
+  if(isOpen){
+    drop.classList.remove('open'); btn.classList.remove('is-open'); chev.classList.remove('open');
+  } else {
+    document.getElementById('md-directions-text').textContent = `Enter through ${entrance || 'the main lobby'} and follow signage to ${loc}.`;
+    drop.classList.add('open'); btn.classList.add('is-open'); chev.classList.add('open');
+  }
+}
+buildMinistryToggle();
+renderMinistryList();
+
+/* ---------- GUIDE ---------- */
+const guideSections = [
+  {icon:'smile',color:'var(--green)',bg:'var(--green-bg)',title:'Help People Feel Seen, Safe & Welcome',
+    items:['Smile','Make eye contact','Acknowledge people quickly','Be genuine in your greetings & conversations']},
+  {icon:'hand',color:'var(--blue)',bg:'var(--blue-bg)',title:'Take the Initiative With Practical Help',
+    items:['Help people know where to go, what to do, and what to expect','Refrain from pointing — walk with them if you can',"If you're walking with someone, ask about themselves or what brings them to Res"]},
+  {icon:'star',color:'var(--navy)',bg:'#e7ebf0',title:'Be Available',
+    items:['Avoid huddling with volunteers','Avoid looking distracted','Be ready to help']},
+  {icon:'people',color:'var(--purple)',bg:'var(--purple-bg)',title:'First-Time Visitors',
+    items:['Bring first-time guests to the closest welcome desk','Introduce them to a Next Steps coach to begin the guest process']}
+];
+document.getElementById('guide-body').innerHTML = guideSections.map((s,si)=>`
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon(s.icon,s.color,s.bg,34)}<h4>${s.title}</h4></div>
+    ${s.items.map((i,ii)=>`
+      <div class="check-row" id="check-${si}-${ii}" onclick="toggleCheck(${si},${ii})">
+        <div class="check-box"></div>
+        <div class="check-label">${i}</div>
+      </div>`).join('')}
+  </div>`).join('') + `
+  <div style="text-align:center;padding:4px 16px 6px;">
+    <button class="reset-checks-btn" onclick="resetChecks()">Reset checklist</button>
+  </div>
+  <div class="mission-banner" style="margin:16px;">
+    <div class="m-title">MISSION</div>
+    <div class="m-body">See A Need Fill A Need - Phil 2:4</div>
+  </div>`;
+function toggleCheck(si,ii){
+  const row = document.getElementById(`check-${si}-${ii}`);
+  row.classList.toggle('checked');
+  row.querySelector('.check-box').classList.toggle('checked');
+}
+function resetChecks(){
+  document.querySelectorAll('#guide-body .check-row').forEach(r=>{
+    r.classList.remove('checked');
+    r.querySelector('.check-box').classList.remove('checked');
+  });
+}
+
+/* ---------- NURSERY ---------- */
+const nurseryLower = [
+  ['Bunnies','🐰'],['Giraffes','🦒'],['Dolphins','🐬'],['Kangaroos','🦘'],['Doves','🕊️'],['Koalas','🐨'],
+  ['Ducks','🦆'],['Lambs','🐑'],['Elephants','🐘'],['Penguins','🐧'],['Fawns','🦌'],['Seals','🦭'],['Flamingos','🦩'],['Turtles','🐢']
+];
+const nurseryUpper = [
+  ['Bears','🐻'],['Otters','🦦'],['Beavers','🦫'],['Pandas','🐼'],['Cheetahs','🐆'],['Rhinos','🦏'],
+  ['Gators','🐊'],['Zebras','🦓'],['Hippos','🦛'],['Lions','🦁'],['The Big Room','⭐']
+];
+let nurseryLevel='lower';
+function buildNurseryToggle(){
+  document.getElementById('nursery-toggle').innerHTML = `
+    <button class="${nurseryLevel==='lower'?'active':''}" onclick="setNurseryLevel('lower')">LOWER LEVEL</button>
+    <button class="${nurseryLevel==='upper'?'active':''}" onclick="setNurseryLevel('upper')">UPPER LEVEL</button>`;
+}
+function setNurseryLevel(l){ nurseryLevel=l; buildNurseryToggle(); renderNursery(); }
+function renderNursery(){
+  const list = nurseryLevel==='lower'?nurseryLower:nurseryUpper;
+  document.getElementById('nursery-grid').innerHTML = list.map(([name,emoji])=>`
+    <div class="animal-card"><span class="animal-emoji">${emoji}</span><span class="name">${name}</span></div>`).join('');
+}
+buildNurseryToggle();
+renderNursery();
+
+/* ---------- CONTACTS ---------- */
+document.getElementById('contacts-body').innerHTML = `
+  <div class="alert-card">
+    <div class="a-head">${ic('phone')} EMERGENCY SITUATIONS</div>
+    <div class="a-num">Security: 616.261.3775</div>
+    <p style="margin-top:6px;font-size:15px;">Pastor Ricky Luong: (616) 334-5596</p>
+    <p style="margin-top:6px;font-size:15px;">Lisa Feigel: (616) 516-7145</p>
+    <p style="margin-top:6px;font-size:15px;">Pastoral Care: 616.534.4923 OPT. 2 — leave a message, our on-duty pastor will get back to you shortly.</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Pastoral Care Office</h4></div>
+    <p style="font-size:12.5px;margin:0;">Direct: 616.524.9121<br>Church: 616.534.4923 OPT. 2<br>Refer to Pastors Matt Yonker, Nick Mayo, or Pat Binish.</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('people','var(--purple)','var(--purple-bg)',34)}<h4>Deacon On Call</h4></div>
+    <p style="font-size:12.5px;margin:0;">(616) 334-5596</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('phone','var(--red)','var(--red-bg)',34)}<h4>Security</h4></div>
+    <p style="font-size:12.5px;margin:0;">(616) 261-3775<br>Security Head: Mark Garner</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('bag','var(--orange)','var(--orange-bg)',34)}<h4>Lost & Found / Front Office</h4></div>
+    <p style="font-size:12.5px;margin:0;">Monday – Thursday, 8:30am – 4pm<br>Front Office (Door G) · 616.534.4923</p>
+  </div>
+  <div class="info-card">
+    <div class="ic-head">${badgeIcon('heart','var(--green)','var(--green-bg)',34)}<h4>Benevolence + Food Pantry</h4></div>
+    <p style="font-size:12.5px;margin:0;">Meet the deacons in the Olive Tree, 10:15–10:40 am Sundays.</p>
+  </div>`;
+
+/* ---------- MORE ---------- */
+const captainGroups = {
+  ushers: { label:'Ushers', captains:[
+    {name:'Kyle Mol', num:'6164469838'},
+    {name:'Paul Farmwald', num:'6163186150'},
+    {name:'Mike Robinson', num:'3122412455'},
+    {name:'Dave Vanderveen', num:'6169163003'}
+  ]},
+  greeters: { label:'Greeters', captains:[
+    {name:'Sandy Gonzalez', num:'2317402380'},
+    {name:'Janine Dodds', num:'6163280742'},
+    {name:'Edward Bates', num:'6169708788'},
+    {name:'Alicia Bates', num:'6163372005'},
+    {name:'Monica Gonzalez', num:'2317205238'},
+    {name:'Jenny Graham', num:'6164773561'},
+    {name:'Esther Arizola', num:'6164037935'},
+    {name:'Mike King', num:'6169146420'},
+    {name:'Teresa Sovine', num:'6168286449'},
+    {name:'Eric Sovine', num:'6164454950'}
+  ]},
+  shuttle: { label:'Shuttle Drivers', captains:[
+    {name:'Doug Popma', num:'6162916366'},
+    {name:'Jamil Colon', num:'6167067792'},
+    {name:'Gregg Velthuis', num:'6164051724'}
+  ]}
+};
+const CAPTAIN_API = 'https://reslife-captain-list.mgrobinson07.workers.dev/report';
+const captainMsg = "Hi, this is [your name] — I won't be able to serve on [date].";
+function textOneCaptain(num, body){
+  window.open(`sms:${num}?body=${encodeURIComponent(body||captainMsg)}`, '_self');
+}
+function cmEsc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function cmSaved(){try{return JSON.parse(localStorage.getItem('cmVolunteer')||'{}')}catch(e){return {}}}
+function showCaptainForm(key, idx){
+  const g = captainGroups[key], c = g.captains[idx], sv = cmSaved();
+  const first = c.name.split(' ')[0];
+  const inp = 'width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #e3e7ec;border-radius:10px;font-size:16px;margin-top:4px;background:#fff;color:inherit;';
+  const lab = 'display:block;font-size:13px;font-weight:600;margin-top:12px;';
+  document.getElementById('captains-body').innerHTML = `<div class="list-card">
+    <div class="list-row" onclick="showCaptainCategory('${key}')">
+      <div class="row-badge" style="background:var(--teal-pale);color:var(--teal-dark);">${ic('back')}</div>
+      <div class="row-text"><h4>${cmEsc(g.label)}</h4></div>
+    </div>
+    <div style="padding:14px 16px 18px;">
+      <h4 style="margin:0 0 2px;">Let ${cmEsc(first)} know you can't serve</h4>
+      <p style="margin:0;font-size:12.5px;color:#6b7280;">${cmEsc(first)} will reach out to you directly.</p>
+      <label style="${lab}" for="cm-name">Your name</label>
+      <input id="cm-name" style="${inp}" autocomplete="name" value="${cmEsc(sv.name)}">
+      <label style="${lab}" for="cm-phone">Your mobile number</label>
+      <input id="cm-phone" type="tel" style="${inp}" autocomplete="tel" placeholder="(616) 555-0123" value="${cmEsc(sv.phone)}">
+      <label style="${lab}" for="cm-date">Date you can't serve</label>
+      <input id="cm-date" type="date" style="${inp}">
+      <label style="${lab}" for="cm-reason">Reason <span style="font-weight:400;color:#6b7280;">(optional)</span></label>
+      <input id="cm-reason" style="${inp}" maxlength="120" placeholder="e.g. sick, traveling">
+      <div id="cm-err" style="display:none;color:var(--red);font-size:13px;margin-top:10px;"></div>
+      <button id="cm-send" onclick="sendCaptainReport('${key}',${idx})" style="margin-top:16px;width:100%;padding:13px;border:0;border-radius:12px;background:var(--teal-dark);color:#fff;font-size:16px;font-weight:700;">Send to ${cmEsc(first)}</button>
+    </div></div>`;
+}
+async function sendCaptainReport(key, idx){
+  const g = captainGroups[key], c = g.captains[idx], first = c.name.split(' ')[0];
+  const $ = id => document.getElementById(id);
+  const name = $('cm-name').value.trim(), phone = $('cm-phone').value.trim(), dv = $('cm-date').value, reason = $('cm-reason').value.trim();
+  const err = m => { $('cm-err').textContent = m; $('cm-err').style.display = 'block'; };
+  if (!name || phone.replace(/\D/g,'').length < 10 || !dv) return err('Please fill in your name, a 10-digit mobile number, and the date.');
+  const date = new Date(dv + 'T12:00').toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'});
+  try{ localStorage.setItem('cmVolunteer', JSON.stringify({name, phone})); }catch(e){}
+  const fallbackBody = `Hi ${first}, this is ${name}. I won't be able to serve ${date}${reason?` (${reason})`:''}.`;
+  const btn = $('cm-send'); btn.disabled = true; btn.textContent = 'Sending…';
+  let res = null;
+  try{
+    const r = await fetch(CAPTAIN_API, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({team:key, captainPhone:c.num, volunteerName:name, volunteerPhone:phone, date, reason})});
+    res = await r.json().catch(()=>null);
+    if (res && res.error && (r.status===400 || r.status===429)) { btn.disabled=false; btn.textContent=`Send to ${first}`; return err(res.error); }
+  }catch(e){ res = null; }
+  if (res && res.sent) {
+    document.getElementById('captains-body').innerHTML = `<div class="list-card"><div style="padding:22px 16px;text-align:center;">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--teal-pale);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+      <h4 style="margin:0 0 4px;">Sent to ${cmEsc(first)}</h4>
+      <p style="margin:0 0 14px;font-size:13px;color:#6b7280;">${cmEsc(first)} will reach out to you at ${cmEsc(phone)}.</p>
+      <button onclick="renderCaptainCategories()" style="padding:10px 18px;border:1px solid #e3e7ec;border-radius:10px;background:#fff;font-size:14px;font-weight:600;color:inherit;">Done</button>
+    </div></div>`;
+  } else {
+    textOneCaptain(c.num, fallbackBody);
+    showCaptainCategory(key);
+  }
+}
+function renderCaptainCategories(){
+  const rows = Object.entries(captainGroups).map(([key,g])=>({
+    title:g.label,
+    sub: g.captains.length ? '' : 'Coming soon',
+    action:`showCaptainCategory('${key}')`
+  }));
+  document.getElementById('captains-body').innerHTML = `<div class="list-card">${
+    rows.map(m=>`
+    <div class="list-row" onclick="${m.action}">
+      <div class="row-badge" style="background:var(--red-bg);color:var(--red);">${ic('people')}</div>
+      <div class="row-text"><h4>${m.title}</h4>${m.sub?`<p>${m.sub}</p>`:''}</div>
+      <div class="chev">${ic('chevron')}</div>
+    </div>`).join('')
+  }</div>`;
+}
+function showCaptainCategory(key){
+  const g = captainGroups[key];
+  const backRow = `<div class="list-row" onclick="renderCaptainCategories()">
+      <div class="row-badge" style="background:var(--teal-pale);color:var(--teal-dark);">${ic('back')}</div>
+      <div class="row-text"><h4>All Teams</h4></div>
+    </div>`;
+  const body = g.captains.length ? g.captains.map((c,i)=>`
+    <div class="list-row" onclick="showCaptainForm('${key}',${i})">
+      <div class="row-badge" style="background:var(--red-bg);color:var(--red);">${ic('chat')}</div>
+      <div class="row-text"><h4>${c.name}</h4></div>
+      <div class="chev">${ic('chevron')}</div>
+    </div>`).join('') : `<div style="padding:20px 16px;color:#6b7280;font-size:13px;">Captain list for ${g.label} coming soon.</div>`;
+  document.getElementById('captains-body').innerHTML = `<div class="list-card">${backRow}${body}</div>`;
+}
+renderCaptainCategories();
+const moreLinks = [
+  {icon:'heart', color:'var(--orange)', bg:'var(--orange-bg)', title:'Guest Experience Guide', sub:'Best practices & steps', go:'guide'},
+  {icon:'baby', color:'var(--red)', bg:'var(--red-bg)', title:'Nursery Rooms', sub:'Find age & room', go:'nursery'},
+  {icon:'external', color:'var(--teal-dark)', bg:'var(--teal-pale)', title:'Team Captain Site', sub:'', external:'https://drive.google.com/drive/folders/1jf-SD4vZ0hSmhBbXrbgbZK6mlgHxPMwu'}
+];
+document.getElementById('more-body').innerHTML = `<div class="list-card">${
+  moreLinks.map(m=>`
+  <div class="list-row" onclick="${m.action?m.action:(m.external?`window.open('${m.external}','_blank')`:`go('${m.go}')`)}">
+    <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
+    <div class="row-text"><h4>${m.title}</h4>${m.sub?`<p>${m.sub}</p>`:''}</div>
+    <div class="chev">${ic('chevron')}</div>
+  </div>`).join('')
+}</div>`;
+
+/* ---------- SEARCH ---------- */
+const popular = ['Growth Track','3rd Grade','Nursery','High School','Coffee','Restrooms'];
+document.getElementById('popular-chips').innerHTML = popular.map(p=>`<button class="chip" onclick="searchFor('${p}')">${p}</button>`).join('');
+const recent = ['Where is the closest restroom?','3rd – 5th Grade (The Zone)','Nursery pickup','Growth Track location','Lost & Found'];
+document.getElementById('recent-list').innerHTML = recent.map(r=>`<div class="recent-row" onclick="searchFor('${r}')">${ic('clock')}${r}</div>`).join('');
+
+const searchIndex = [];
+rooms.forEach(r=>searchIndex.push({type:'Room',title:r.name,sub:'Suggested entrance: '+r.entrance,action:()=>{go('map'); setTimeout(()=>{ setFloor(r.floor); selectRoom(r.id); },50);}, icon:r.icon||'pin', color:'var(--teal)', bg:'var(--teal-pale)'}));
+const dayLabel={sunam:'Sunday AM',sunpm:'Sunday PM',wed:'Wednesday'};
+Object.entries(ministries).forEach(([day,list])=>list.forEach((m,i)=>searchIndex.push({type:'Ministry',title:m.title,sub:dayLabel[day]+' · '+m.loc,action:()=>openMinistry(day,i), icon:m.icon,color:m.color,bg:m.bg})));
+searchIndex.push({type:'FAQ',title:'Emergency Procedures',sub:'Call 616.534.4923 opt. 2',action:()=>go('contacts'), icon:'warn',color:'var(--red)',bg:'var(--red-bg)'});
+searchIndex.push({type:'FAQ',title:'Lost & Found',sub:'Front Office, Door G',action:()=>go('contacts'), icon:'bag',color:'var(--orange)',bg:'var(--orange-bg)'});
+searchIndex.push({type:'FAQ',title:'Pastoral Care',sub:'616.524.9121',action:()=>go('contacts'), icon:'people',color:'var(--purple)',bg:'var(--purple-bg)'});
+
+function searchFor(q){
+  document.getElementById('search-input').value = q;
+  runSearch();
+}
+function runSearch(){
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const defaultEl = document.getElementById('search-default');
+  const resultsEl = document.getElementById('search-results');
+  if(!q){ defaultEl.style.display=''; resultsEl.style.display='none'; return; }
+  defaultEl.style.display='none'; resultsEl.style.display='';
+  const matches = searchIndex.filter(it=>it.title.toLowerCase().includes(q)||it.sub.toLowerCase().includes(q)).slice(0,12);
+  resultsEl.innerHTML = matches.length ? `<div class="list-card">${
+    matches.map((m,i)=>`
+    <div class="list-row" onclick="searchIndex_click(${searchIndex.indexOf(m)})">
+      <div class="row-badge" style="background:${m.bg};color:${m.color};">${ic(m.icon)}</div>
+      <div class="row-text"><h4>${m.title}</h4><p>${m.sub}</p></div>
+      <div class="chev">${ic('chevron')}</div>
+    </div>`).join('')
+  }</div>` : `<div class="cta-block"><p>No results for "${q}".</p></div>`;
+}
+function searchIndex_click(i){ searchIndex[i].action(); }
+
+/* ---------- CHAT ---------- */
+const chatRules = [
+  {kw:["register","registration","sign up","signup","sign-up","classes","class","events","event","church center"], a:"Classes, events, camps, and retreats that need sign-up are all on Church Center: <a href=\"https://reslife.churchcenter.com/registrations/events\" target=\"_blank\" rel=\"noopener\">Register on Church Center</a>. People register with their phone number, and any fees are paid there."},
+  {kw:["pickup", "pick up", "pick-up", "preschool", "drop off", "drop-off"], a:"Parents pick up preschoolers in the Nursery & Preschool area. If you're on the Lower Level, go to your child's classroom door. If you're on the Upper Level, exit through Door N. Parents should head there right after service, and a guardian receipt is required for every pickup."},
+  {kw:["growth track"], a:"Growth Track meets in the Chapel at every service — enter through Door K. It's also offered as an online class."},
+  {kw:["coffee"], a:"Free coffee is in the Main Lobby (Sunday AM), the Ground Floor Lobby (Sunday PM), or the ResCenter Lobby (Wednesday)."},
+  {kw:["first time", "first-time", "visitor", "new here"], a:"Bring first-time guests to the closest welcome desk and introduce them to a Next Steps coach to begin the guest process."},
+  {kw:["pastoral", "pastoral care", "pastor", "care"], a:"For pastoral care, the main contact is Pastor Matt Yonker. Pastors Nick Mayo and Pat Binish (Senior Care) are also on the team. Direct: 616.524.9121 · Church: 616.534.4923."},
+  {kw:["nurse"], a:"For a nurse, contact Watch Command at (616) 261-3775."},
+  {kw:["security", "watch command", "safety"], a:"For security, contact Watch Command at (616) 261-3775. Security Head: Mark Garner."},
+  {kw:["hispanic", "spanish"], a:"Iglesia Vida, our Spanish-language service, meets at ResCenter on Sundays with Pastor Luis Quezada."},
+  {kw:["lost", "lost and found"], a:"Sunday AM: direct to Door K and let the Safety Team know. Monday–Thursday 8:30am–4pm: Front Office (Door G) or call 616.534.4923."},
+  {kw:["emergency"], a:"If a pastor is needed right away, call 616.534.4923, option 2, and leave a message. Our on-duty pastor will get back to you shortly."},
+  {kw:["restroom", "bathroom"], a:"Restrooms are marked with a green dot on the Campus Map — check the Map tab for the one nearest you."},
+  {kw:["nursery", "infant", "infants", "baby", "babies", "toddler", "toddlers", "newborn"], a:"<b>Nursery</b> — Every Child Loved. Every Family Welcomed.<br>Ages 6 weeks – 5/6 years. Sundays 9 & 11 AM and 5 PM (Main Floor); Wednesdays 6:30 PM (Upstairs). Kids move up by birthday, and move to ResKids on Move-Up Day when they start kindergarten."},
+  {kw:["nursery check in", "nursery check-in", "check in a baby", "check in my baby", "nursery hours"], a:"Nursery check-in opens 15 minutes before service and closes 30 minutes after service begins. Nursery-aged kids can also be checked in at the ResKids check-in."},
+  {kw:["diaper", "diapers", "wipes", "potty", "potty trained", "potty-trained", "changing"], a:"Diapers and wipes are supplied, and the team checks or changes every child at least once. Only females 13+ change diapers or help with bathroom needs. Every Nursery room has a private bathroom for potty-trained kids. Parents can add a label with special instructions (potty training, snack, etc.)."},
+  {kw:["snack", "snacks", "cracker", "crackers", "allergy", "allergies", "gluten", "dairy", "bottle", "bottles", "sippy", "outside food"], a:"<b>Nursery:</b> club crackers and water (dairy-free); a gluten-free option is available. No outside food, but bottles and sippy cups are fine.<br><b>ResKids & The Zone:</b> no snack is served, to avoid allergy issues."},
+  {kw:["crying", "cries", "cry", "upset", "console"], a:"If a child cries in the Nursery, the team will do their best to console them. If crying continues for 5–10 minutes, the parent is notified to come back to the Nursery."},
+  {kw:["parent phone", "phone on", "notify parent", "text the parent", "contact parent"], a:"Parents must keep their phone on them while their child is in the Nursery so the team can reach them. ResKids leaders also text a parent if they think it's best for the parent to be involved."},
+  {kw:["stay on campus", "leave campus", "leave the building", "premises", "run an errand"], a:"Parents must stay on the premises while their child is in Nursery care."},
+  {kw:["tour", "see the nursery", "before leaving", "leaving their baby", "leave their child", "leave my child", "see the room", "see the rooms", "view the rooms", "look at the room", "nervous", "uncomfortable", "not sure about leaving"], a:"A parent can tour the Nursery first — just check the child in to get into the Nursery area. If they're uncomfortable leaving their child, they tell the Nursery staff and the child is checked right back out."},
+  {kw:["full", "stand-by", "standby", "ratio", "ratios", "room is full"], a:"Each Nursery class has ratios limited by the number of volunteers. When a room is full, children are placed on Stand-by until more help is available."},
+  {kw:["nursery safety", "nursery security", "camera", "cameras", "background check", "references", "who can go in", "classroom rules"], a:"Nursery safety: every volunteer has a background check and 2 references. Only approved volunteers — not parents — go into classrooms. Two people are required to open a room (one must be a female 13+). Cameras record in every classroom. A Safety Team member stays outside the Nursery until the last child is picked up. No child is released without a guardian receipt."},
+  {kw:["medication", "medicine", "meds", "injury", "injured", "hurt", "bandaid", "band-aid", "ice pack", "incident"], a:"No medication is given in the Nursery — only bandaids and ice packs. Injuries get an incident report."},
+  {kw:["photo", "photos", "picture", "pictures"], a:"No photos are allowed in the Nursery."},
+  {kw:["nursery curriculum", "nursery lesson", "what do they do in the nursery", "nursery schedule"], a:"ResLife Nursery writes its own curriculum (ages 1–5/6): playtime, worship (1+), offering, lesson, memory verse, coloring sheet/activity, snack, and play. Teachers of 6-week to 1-year-olds speak Bible verses, promises, and prayers over each baby as they hold them."},
+  {kw:["special needs", "sensory", "disability", "disabilities", "autism", "buddy", "buddies", "one-on-one", "one on one"], a:"<b>Special Needs Room</b> (Nursery area): Sunday 11 AM, for any child who does better with less structure — low ratios and sensory toys. Check in at the Nursery check-in.<br><b>ResKids One-On-One Buddies:</b> 2nd service; must be scheduled in advance with the ResKids office."},
+  {kw:["receipt", "guardian receipt", "guardian"], a:"A guardian receipt is required to pick up any child. In ResKids, parents show the receipt to the leader at the Exit door."},
+  {kw:["reskids", "res kids", "kindergarten", "kindergartner", "1st grade", "2nd grade", "first grade", "second grade", "first grader", "second grader", "1st grader", "2nd grader", "1st graders", "2nd graders", "kindergartener", "kindergarteners", "k-2"], a:"<b>ResKids (K–2nd grade)</b> — Word, Worship & Fun. Sundays 9 & 11 AM and 5 PM; Wednesdays 6:30 PM.<br>Kids start in the room with play, go to the gym for games and worship, then come back for the Word, prayer, and play. Two leaders are always in the room, and no one without a guardian receipt is allowed in the area."},
+  {kw:["check in", "check-in", "checkin", "kiosk", "register my kids", "register kids", "sign in"], a:"ResKids check-in is at the kiosks, using the parent's phone number. Families who added household members on the Plan Your Visit form are already set up. To add children or register for the first time, use the computer station instead of the iPad kiosk. Kids are placed in rooms automatically based on past rooms or availability."},
+  {kw:["safe haven", "overstimulated", "overwhelmed"], a:"ResKids has a Safe Haven for kids who get overstimulated. The team is great at resolving fears and issues; if a parent is needed, they'll text."},
+  {kw:["zone", "the zone", "3rd grade", "4th grade", "5th grade", "third grade", "fourth grade", "fifth grade", "3rd", "4th", "5th", "3-5", "3rd grader", "4th grader", "5th grader", "3rd graders", "4th graders", "5th graders"], a:"<b>The Zone (ResKids 3rd–5th grade)</b> with Pastor Victoria Hernandez — enter through Door C. Sundays 9 & 11 AM and 5 PM: small group activity, game, worship, Word, and fun. Each new visitor is paired with a peer \"leader\" who helps them try the small groups; they stay with one group for a month before changing. Wednesdays 6:30 PM: game, worship, Word, fun. No snack. Check in at the main ResKids check-in; a guardian receipt is required for pickup."},
+  {kw:["youth", "student ministry", "students", "teen", "teens", "teenager"], a:"<b>Youth</b> — Every Student Known. Every Student Discipled.<br>Middle School meets Sundays at 9 & 11 AM; High School meets Sundays at 9 AM only (so students can serve 2nd service). Sunday format: worship, message with table discussion, feedback, and a Spiritual Discipline Challenge. No parent check-in required. Youth services are not streamed."},
+  {kw:["middle school", "junior high", "180", "oneighty", "6th", "7th", "8th", "sixth grade", "seventh grade", "eighth grade"], a:"<b>Middle School</b> meets in the 180 with Pastor James Hall — Sundays 9 & 11 AM, plus Community Night every Sunday evening in the 180. Enter through Door C."},
+  {kw:["high school", "9th", "10th", "11th", "12th", "freshman", "sophomore", "junior", "senior in high", "bendra"], a:"<b>High School</b> meets on the Ground Floor with Pastors Ben & Kendra Lepsch — Sundays 9 AM only. Enter through Door C or Door J.<br>Sunday nights (2nd & 4th Sundays) at Ben & Kendra's home (\"Bendra's\"): 6–8 PM hangout and food, 8–9 PM worship and prayer. Reach out to Kendra for details."},
+  {kw:["youth wednesday", "wednesday youth", "squad", "squads", "big party", "youth wednesdays", "wednesday", "wednesdays"], a:"<b>Youth Wednesdays</b><br>1st: Big Party — free food, invite friends, worship, short evangelistic message, response time.<br>2nd & 4th: Squads — small groups by grade and gender (one discussion night and one game night a month).<br>3rd: worship, message, response time, fun.<br>5th: usually a worship night.<br>Mid-week Bible Study: Wednesdays 3:45 PM."},
+  {kw:["first wednesday", "1st wednesday", "first wednesdays", "1st wednesdays"], a:"On 1st Wednesdays: Youth has its Big Party (free food, worship, short message), and Married Life meets (doors 6 PM, 6:30–7:30 PM, September–May)."},
+  {kw:["camp", "camps", "retreat", "retreats", "one heart", "conference", "michigan's adventure", "scholarship"], a:"<b>Youth events:</b> One Heart conference (2nd weekend in March); High School Discipleship trip (June); Middle School Camp (July); Michigan's Adventure (August); HS and MS Retreats (November). A scholarship form is available — there's a cap, so apply early. <a href=\"https://reslife.churchcenter.com/registrations/events\" target=\"_blank\" rel=\"noopener\">Register on Church Center</a>."},
+  {kw:["youth leader", "youth volunteer", "volunteer with youth", "serve in youth"], a:"Youth Leaders aim to know and disciple 2–3 students personally, and help with greeting, check-in, or the crew team."},
+  {kw:["access", "young adult", "young adults", "college", "twenties", "20s", "thursday night"], a:"<b>Access</b> — Every Disciple Equipped. Every Disciple Mobilized.<br>Every Thursday at 7 PM on the Ground Floor (worship, Word, small group, hangout). On Sundays they sit together at 2nd service, front left. Four pillars: Identity, Evangelism, Community, Scriptures. Volunteer teams: Welcome, Guest, Home, and Crew."},
+  {kw:["school of supernatural", "supernatural ministry", "supernatural"], a:"<b>ResLife School of Supernatural Ministry</b> — Training Ordinary People for a Supernatural Lifestyle. Weekly instruction and activation, January–May, overseen by Jared Blauwkamp. No degree."},
+  {kw:["men", "mens", "men's", "reload", "breakfast", "guys"], a:"<b>Men's Ministry</b> — Equipping men to change their world. Led by Pastor Tim Gilleo.<br><b>Reload:</b> breakfast served free at 6:15 AM, worship at 6:30, then teaching and table discussion (sit at any table), wrapped up by 7:30. First-time guests are welcomed from the stage (no hand-raising); 4th-time guests get a journal. Ages 10+ (younger boys have their own table). There's also a closed Facebook group, serve projects, Bible studies, a retreat, and a fishing group."},
+  {kw:["women", "womens", "women's", "ladies", "impact", "karen waldhart"], a:"<b>Impact Women's Ministry</b> with Pastor Karen Waldhart. Current theme: In Christ Under Grace.<br><b>Thursday AM:</b> 30 min worship, 45–60 min message, 15 min table discussion; hard stop at 11:15 AM to pick up kids.<br><b>Monday PM Bible Study:</b> on the Ground Floor; registration required (may include a book cost). <a href=\"https://reslife.churchcenter.com/registrations/events\" target=\"_blank\" rel=\"noopener\">Register on Church Center</a>.<br>Runs September to the week before Thanksgiving, and January to mid-May. Summer Life Groups meet four Thursdays in June."},
+  {kw:["christmas tea", "tea"], a:"The Christmas Tea is churchwide. Half the tables are hosted (the host covers decor, table service, and food) and half are ticketed."},
+  {kw:["getaway", "women's retreat", "womens retreat"], a:"The Women's 24-Hour Getaway is discipleship-focused — a freedom message, activities, Saturday worship, and a guest speaker. Sister churches are invited."},
+  {kw:["quilt", "quilts", "quilting", "quilts of valor"], a:"Quilts of Valor meets 1st & 3rd Thursdays — a quilters' small group. Everyone is welcome; no experience required. Contact: Laurie Edgecomb."},
+  {kw:["homeschool", "home school", "co-op", "coop"], a:"Sandy North is the contact for the Thursday AM Homeschool Co-op."},
+  {kw:["blue nametag", "sister-to-sister", "sister to sister"], a:"First-time guests at Women's Ministry get a blue nametag, a reserved seat at every table, a free coffee card, and a visitor form on the iPad. Sister-to-Sister (led by Laurie Burks) welcomes them."},
+  {kw:["married", "marriage", "married life", "couple", "couples", "spouse", "husband", "wife", "engaged"], a:"<b>Married Life</b> — A community where healthy marriage can happen. Led by Pastor Tim & Rachel Gilleo.<br>1st Wednesdays, September–May: doors open 6 PM (5:30 if dinner is served), 6:30–7:30 PM. Welcome, refreshments, worship, teaching, table discussion or a game. No registration, but check-in is used. Children's ministry is provided. For married or officially engaged couples."},
+  {kw:["family camp", "dunes harbor", "camping"], a:"Family Camp is mid-July at Dunes Harbor. Registration opens in November and fills quickly (<a href=\"https://reslife.churchcenter.com/registrations/events\" target=\"_blank\" rel=\"noopener\">Register on Church Center</a>). Bring your own camper/tent and food; kids are encouraged. Free time during the day, chapel each evening, potluck, movie night, and an ice cream social."},
+  {kw:["small group", "small groups", "life group", "life groups"], a:"Married Life small groups run September–May and require attending 1st Wednesdays. They meet once a month; once a group is full it closes. Women's Ministry also has Summer Life Groups in June."},
+  {kw:["wedding", "weddings", "pre-marriage", "premarital", "pre-marital", "officiate", "get married"], a:"Weddings: a Pre-Marriage Class is required (offered quarterly; <a href=\"https://reslife.churchcenter.com/registrations/events\" target=\"_blank\" rel=\"noopener\">Register on Church Center</a>). Membership isn't required. Ceremonies in a ResLife building require a ResLife pastor; for off-site ceremonies, a ResLife pastor can be requested. Refer to Pastoral Care (Pastor Matt Yonker)."},
+  {kw:["deacon", "deacons", "benevolence", "financial help", "help with bills", "rent", "bills", "assistance", "need money"], a:"Benevolence requests start with the <b>Deacons</b>: Sundays between services, 10:15–11 AM, in the Olive Tree. No appointment needed. There are no same-day answers — deacons complete a worksheet and pray with the person, then decide as a team. If approved, bills are paid on the person's behalf (never cash). Deacon On Call: (616) 334-5596."},
+  {kw:["food pantry", "pantry", "groceries", "hungry", "food"], a:"The Food Pantry works through the Deacons, who give out vouchers (good whenever the person chooses to use them). Pantry processing happens in the Olive Tree. We never want anyone to leave hungry — if someone needs food now, contact the Deacon On Call at (616) 334-5596."},
+  {kw:["financial", "finances", "budget", "budgeting", "money", "debt", "kingdom finances", "financial freedom", "generous life"], a:"<b>Generous Life</b> — the Financial Discipleship Ministry, led by Pastor Greg Gless. Classes follow an order based on financial situation; everyone is encouraged to start with <b>Kingdom Finances</b>. <a href=\"https://reslife.churchcenter.com/registrations/events\" target=\"_blank\" rel=\"noopener\">Register on Church Center</a>. Framework of Financial Freedom is similar to Financial Peace University."},
+  {kw:["mentoring", "real life mentoring", "mentor", "coach"], a:"<b>Real Life Mentoring</b> is a 12-week program with a customized growth plan (financial, relational, practical, emotional, spiritual). Participants must meet with the Deacons first and sign an Accountability Form. There's usually a wait list; two absences in a row removes someone (they can re-enter later)."},
+  {kw:["partnership", "partner", "member", "membership", "join the church"], a:"The <b>Partnership Class</b> is usually held twice a year — a one-time class on beliefs, church structure, and partnership requirements. Partnership isn't required. <a href=\"https://reslife.churchcenter.com/registrations/events\" target=\"_blank\" rel=\"noopener\">Register on Church Center</a>."},
+  {kw:["healing", "healing rooms", "heal", "sick", "ptsd", "physical healing", "emotional healing"], a:"<b>Healing Rooms</b> — Mondays 5:30–7:30 PM in the Community Room, led by Tom & Carrie Townsend. Prayer for physical healing, emotional healing, and PTSD. Guests sign in and fill out an application at the registration desk, then pray with a team of two.<br>To volunteer: pick up an application at a Monday night Healing Room, get pastoral approval, and complete 5 weeks of training."},
+  {kw:["online", "stream", "streaming", "livestream", "live stream", "youtube", "facebook", "watch online", "church online", "cop"], a:"<b>Online Ministry</b> with Pastor Daniel Vander Klok. Watch on Church Online Platform, YouTube (the best place to start — better for long-form viewing), or Facebook. Online classes include Growth Track and Estate Planning, and a YouVersion plan is released each month. (Youth services are not streamed.)"},
+  {kw:["hospital", "hospital visit", "in the hospital"], a:"Hospital visits: the patient must want a visit. Give them Pastor Matt Yonker's Pastoral Care card (leave a voicemail). Info needed: patient's name, hospital, and what's going on (if appropriate). Pastors travel up to an hour for hospital visits."},
+  {kw:["shut-in", "shut in", "homebound", "hospice", "nursing home", "palliative"], a:"Shut-in visits (long-term, palliative, elderly, sometimes hospice) are for prayer and conversation — the person must want the visit. Info needed: name, location, and reason for being shut in. Refer to Pastor Matt Yonker."},
+  {kw:["funeral", "funerals", "memorial", "passed away", "died", "death"], a:"For funerals, hand out Pastor Matt Yonker's Pastoral Care card. Never promise anything."},
+  {kw:["counseling", "counselor", "counsel", "appointment", "ministry appointment"], a:"Ministry appointments must be requested by the person who wants ministry. Pastors offer biblical direction and prayer — they're not licensed counselors — and have a list of approved counselor referrals. Hand out Pastor Matt Yonker's Pastoral Care card."},
+  {kw:["abuse", "abused", "unsafe", "domestic", "not safe", "aren't safe", "isn't safe", "safe at home", "afraid to go home"], a:"If someone reports abuse, ask: \"Are you safe?\" and \"Have you had any interaction with the authorities about this, now or in the past?\" If anyone is in immediate danger, call 911 and contact Watch Command at (616) 261-3775. Then connect them with Pastoral Care."},
+  {kw:["reach", "the reach", "outreach", "prayer walk", "serve project", "donuts for dads", "neighborhood", "wyoming"], a:"<b>The Reach</b> — the Outreach Ministry, led by Pastor Dan Blauwkamp. Monthly Saturday events, usually 10 AM–2 PM, starting and ending at church (Donuts for Dads, prayer walks, raking leaves). No experience or partner needed; registration preferred: <a href=\"https://reslife.churchcenter.com/registrations/events\" target=\"_blank\" rel=\"noopener\">Register on Church Center</a>."},
+  {kw:["equip2reach", "equip 2 reach", "equip to reach"], a:"<b>EQUIP2REACH</b> meets every 3rd Wednesday in the 180 — practical tools for supernatural ministry. Registration preferred: <a href=\"https://reslife.churchcenter.com/registrations/events\" target=\"_blank\" rel=\"noopener\">Register on Church Center</a>."},
+  {kw:["what do i say", "what should i say", "talk to a guest", "talking to guests", "conversation", "start a conversation", "how to greet", "greeting guests", "next steps", "script"], a:"<b>Talking with guests</b><br><b>Do:</b> ask \"What brings you to Res today?\" or \"How can I help you today?\" Share your name and ask theirs. Gently listen for what they need so you can suggest how Res can help, and offer to pray.<br><b>Don't:</b> ask \"Are you looking for a home church?\" (they'll answer that on the card). Keep your own story short and focused on them. Short and sweet beats too long — read the room."}
+];
+/* Scores every rule instead of taking the first keyword hit: whole-word matches only,
+   longer (more specific) keywords win, extra matching keywords break ties. */
+const chatRegex = chatRules.map(r=>r.kw.map(k=>new RegExp('(^|[^a-z0-9])'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'([^a-z0-9]|$)')));
+function botReply(q){
+  const lower = q.toLowerCase().replace(/[’‘]/g,"'");
+  let best=null, bestScore=0;
+  chatRules.forEach((r,i)=>{
+    const hits = r.kw.filter((k,j)=>chatRegex[i][j].test(lower));
+    if(!hits.length) return;
+    const score = Math.max(...hits.map(k=>k.length)) + 0.5*(hits.length-1);
+    if(score>bestScore){ bestScore=score; best=r; }
+  });
+  return best ? best.a : "I don't have an answer for that yet — try the Search tab, or ask a team lead for help.";
+}
+function addBubble(text,who){
+  const log = document.getElementById('chat-log');
+  if(who==='bot'){
+    log.insertAdjacentHTML('beforeend', `<div class="bot-row"><div class="bot-avatar">R</div><div class="bubble bot">${text}</div></div>`);
+  } else {
+    log.insertAdjacentHTML('beforeend', `<div class="bubble user">${text}</div>`);
+  }
+  log.scrollTop = log.scrollHeight;
+}
+addBubble("Hi! I'm the ResLife Assistant. Ask me about any ministry — times, ages, locations, who leads it — how to help a guest, or what to do in an emergency.", 'bot');
+
+const chatSuggestions = ["Where do parents pick up their preschool child?","What ages does the Nursery take?","When is Reload?","Someone needs help with bills","What do I say to a first-time guest?","Who do I call for pastoral care?"];
+document.getElementById('chat-suggest').innerHTML = chatSuggestions.map(s=>`<button class="suggest-chip" onclick="quickAsk('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+function quickAsk(q){
+  document.getElementById('chat-input').value = q;
+  sendChat();
+}
+function sendChat(){
+  const input = document.getElementById('chat-input');
+  const q = input.value.trim();
+  if(!q) return;
+  addBubble(q,'user');
+  input.value='';
+  setTimeout(()=>addBubble(botReply(q),'bot'), 350);
+}
+
+document.querySelectorAll('.cta-ic').forEach(e=>e.innerHTML=ic('chat'));
+render();
+
+/* Deep link: #map-mainlevel or #map-level1 opens the map on that specific floor. */
+(function(){
+  if(initialHash==='map-mainlevel'){ setFloor('upper'); }
+  else if(initialHash==='map-level1'){ setFloor('main'); }
+})();
+</script>
+</body>
+</html>
