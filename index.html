@@ -399,7 +399,7 @@
     background:var(--teal-pale);
     border-radius:12px;
   }
-  .directions-drop.open{max-height:160px; opacity:1;}
+  .directions-drop.open{max-height:160px; opacity:1;} /* fallback; fitDrop() sizes to content */
   .directions-drop-inner{
     padding:12px 14px;
     display:flex;
@@ -974,15 +974,18 @@ Object.entries(staticIcons).forEach(([id,name])=>{
 });
 
 /* ---------- CAPTAIN SIGN-UP BANNER ----------
-   Shown only to people who opened the Hub with ?captain=1 (remembered on the
+   Shown to everyone while SHOW_TO_ALL is true, otherwise only to people who opened the Hub with ?captain=1 (remembered on the
    device so it survives opening from the home-screen icon). Hidden for good
    once the sign-up page records a successful text-alert opt-in. */
 (function(){
   const b = document.getElementById('cap-banner');
   if(!b) return;
   try{
+    // Beta: every user is a team captain, so show to all. Set to false before
+    // volunteers get the app; then only ?captain=1 links show it.
+    const SHOW_TO_ALL = true;
     if(new URLSearchParams(location.search).get('captain')==='1') localStorage.setItem('capInvite','1');
-    if(localStorage.getItem('capInvite')==='1' && localStorage.getItem('capSignedUp')!=='1'){
+    if((SHOW_TO_ALL || localStorage.getItem('capInvite')==='1') && localStorage.getItem('capSignedUp')!=='1'){
       document.getElementById('icon-cap-banner').innerHTML = badgeIcon('chat','#0f7a6e','#e2f6f2',38);
       document.getElementById('icon-cap-chev').innerHTML = ic('chevron');
       b.hidden = false;
@@ -1263,6 +1266,7 @@ function showDirections(id){
     btn.classList.add('is-open');
     chev.classList.add('open');
   }
+  fitDrop(drop);
 }
 document.addEventListener('click', e=>{
   const el = e.target.closest('.room,.room-sub');
@@ -1359,6 +1363,13 @@ function openMinistry(day, idx){
     </div>`;
   go('mdetail');
 }
+/* Size an open drop-down to its real content height so nothing is clipped
+   (the room list is ~470px; the old fixed 160px cap cut it off). */
+function fitDrop(el){
+  if(!el) return;
+  if(el.classList.contains('open')) el.style.maxHeight = el.scrollHeight + 'px';
+  else el.style.maxHeight = '';
+}
 let mdNurseryLevel='lower';
 function toggleMdNursery(){
   const drop = document.getElementById('md-nursery-drop');
@@ -1372,13 +1383,14 @@ function toggleMdNursery(){
     renderMdNursery();
     drop.classList.add('open'); btn.classList.add('is-open'); chev.classList.add('open');
   }
+  fitDrop(drop);
 }
 function buildMdNurseryToggle(){
   document.getElementById('md-nursery-toggle').innerHTML = `
     <button class="${mdNurseryLevel==='lower'?'active':''}" onclick="setMdNurseryLevel('lower')">LOWER LEVEL</button>
     <button class="${mdNurseryLevel==='upper'?'active':''}" onclick="setMdNurseryLevel('upper')">UPPER LEVEL</button>`;
 }
-function setMdNurseryLevel(l){ mdNurseryLevel=l; buildMdNurseryToggle(); renderMdNursery(); }
+function setMdNurseryLevel(l){ mdNurseryLevel=l; buildMdNurseryToggle(); renderMdNursery(); fitDrop(document.getElementById('md-nursery-drop')); }
 function renderMdNursery(){
   const list = mdNurseryLevel==='lower'?nurseryLower:nurseryUpper;
   document.getElementById('md-nursery-grid').innerHTML = list.map(([name,emoji])=>`
@@ -1395,6 +1407,7 @@ function toggleMdDirections(entrance, loc){
     document.getElementById('md-directions-text').textContent = `Enter through ${entrance || 'the main lobby'} and follow signage to ${loc}.`;
     drop.classList.add('open'); btn.classList.add('is-open'); chev.classList.add('open');
   }
+  fitDrop(drop);
 }
 buildMinistryToggle();
 renderMinistryList();

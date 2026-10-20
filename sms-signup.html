@@ -70,9 +70,9 @@ async function send(e){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,team:t,phone:p,sms})});
   const d=await r.json();
   if(d.ok){
-   if(sms){ try{ localStorage.setItem('capSignedUp','1'); }catch(e){} }
+   try{ localStorage.setItem('capSignedUp','1'); }catch(e){}
    done(sms ? '<b>You\'re signed up.</b> You\'ll get a confirmation text from (435) 317-5904 shortly. Reply STOP anytime to opt out.<br><br><a href="index.html">Back to the Guest Experience Hub</a>'
-            : '<b>Thanks, you\'re on the captain list.</b> You chose not to receive text alerts. You can come back to this page anytime to turn them on.');
+            : '<b>Thanks, you\'re on the captain list.</b> You chose not to receive text alerts. You can come back to this page anytime to turn them on.<br><br><a href="index.html">Back to the Guest Experience Hub</a>');
   } else { $('err').textContent=d.error||'Something went wrong. Please try again.'; $('err').style.display='block'; go.disabled=false; go.textContent='Submit'; }
  }catch(err){
   mailFallback(n,t,p,sms);
